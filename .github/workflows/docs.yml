@@ -51,9 +51,9 @@ jobs:
       - if: steps.pages.outputs.enabled == 'true'
         uses: actions/checkout@v7
       - if: steps.pages.outputs.enabled == 'true'
-        uses: ./.github/actions/setup-pnpm
+        uses: ./actions/setup-pnpm
       - if: steps.pages.outputs.enabled == 'true'
-        uses: ./.github/actions/turbo-cache
+        uses: ./actions/turbo-cache
       - if: steps.pages.outputs.enabled == 'true'
         run: pnpm install --frozen-lockfile
 

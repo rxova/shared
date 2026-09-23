@@ -1,15 +1,15 @@
 ---
-title: template-oss
-description: Documentation for template-oss.
+title: rxova shared
+description: Shared tooling, GitHub Actions and runtime helpers for rxova projects.
 template: splash
 hero:
-  tagline: Replace this page with what the project does, in one sentence.
+  tagline: One place for the scripts, presets, CI actions and small helpers every rxova repository uses.
   actions:
     - text: Get started
       link: start/getting-started/
       icon: right-arrow
     - text: View on GitHub
-      link: https://github.com/rxova/template-oss
+      link: https://github.com/rxova/shared
       icon: external
       variant: minimal
 ---
@@ -17,10 +17,13 @@ hero:
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
-  <Card title="Install" icon="add-document">
-    `pnpm add @rxova/example`
+  <Card title="@rxova/toolbox" icon="puzzle">
+    Dependency-free runtime helpers, inlined by each package's build.
   </Card>
-  <Card title="Use" icon="rocket">
-    `greet('Ada')` returns `'Hello, Ada.'`
+  <Card title="@rxova/tooling" icon="setting">
+    The `rxova-tooling` scripts and the tsdown, vitest, eslint, commitlint and prettier presets.
+  </Card>
+  <Card title="GitHub Actions" icon="github">
+    `setup-pnpm`, `turbo-cache`, `turbo-remote-cache` and `setup-playwright`.
   </Card>
 </CardGrid>

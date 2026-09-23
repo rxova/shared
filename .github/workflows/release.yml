@@ -46,7 +46,7 @@ jobs:
           # its base branch when it opens the version pull request.
           ref: main
           fetch-depth: 0
-      - uses: ./.github/actions/setup-pnpm
+      - uses: ./actions/setup-pnpm
         with:
           registry-url: 'https://registry.npmjs.org'
       - name: Upgrade npm for trusted publishing

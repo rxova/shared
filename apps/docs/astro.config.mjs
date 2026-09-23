@@ -17,11 +17,11 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: 'template-oss',
-      description: 'Documentation for template-oss.',
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/rxova/template-oss' }],
+      title: 'rxova shared',
+      description: 'Shared tooling, GitHub Actions and runtime helpers for rxova projects.',
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/rxova/shared' }],
       editLink: {
-        baseUrl: 'https://github.com/rxova/template-oss/edit/main/apps/docs/',
+        baseUrl: 'https://github.com/rxova/shared/edit/main/apps/docs/',
       },
       sidebar: [
         { label: 'Start here', items: [{ autogenerate: { directory: 'start' } }] },

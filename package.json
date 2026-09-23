@@ -1,11 +1,11 @@
 {
-  "name": "template-oss",
+  "name": "shared",
   "private": true,
-  "description": "Template for rxova open-source TypeScript projects.",
+  "description": "Shared tooling, GitHub Actions and runtime helpers for rxova projects.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rxova/template-oss.git"
+    "url": "git+https://github.com/rxova/shared.git"
   },
   "type": "module",
   "packageManager": "pnpm@12.5.1",
@@ -25,13 +25,13 @@
     "audit:check": "pnpm audit --audit-level=high --ignore-registry-errors",
     "dedupe:check": "pnpm dedupe --check",
     "sherif:check": "sherif --fail-on-warnings",
-    "knip:check": "knip",
+    "knip:check": "turbo run build --filter=@rxova/tooling --output-logs=errors-only && knip",
     "check:exports": "turbo run check:exports",
     "pack:smoke": "turbo run pack:smoke --concurrency=1",
     "docs": "pnpm --filter docs dev",
     "changeset": "changeset",
     "release": "turbo run build --filter=./packages/* && changeset publish",
-    "verify": "node --import tsx ./packages/tooling/verify.ts",
+    "verify": "node --import tsx ./packages/tooling/src/verify/verify.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -47,6 +47,7 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
+    "@rxova/tooling": "workspace:*",
     "@types/node": "^26.6.2",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",

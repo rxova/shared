@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         For a security issue, please use private vulnerability reporting instead:
-        https://github.com/rxova/template-oss/security/advisories/new
+        https://github.com/rxova/shared/security/advisories/new
 
   - type: input
     id: version

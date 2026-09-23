@@ -1,21 +1,49 @@
 ---
 title: Getting started
-description: Install the package and make the first call.
+description: Add the shared packages and actions to a repository.
 ---
 
-## Install
+## Runtime helpers
 
 ```sh
-pnpm add @rxova/example
+pnpm add -D @rxova/toolbox
 ```
-
-## Use
 
 ```ts
-import { greet } from '@rxova/example';
-
-greet('Ada'); // 'Hello, Ada.'
-greet('Ada', { excited: true }); // 'Hello, Ada!'
+import { errorMessage, isRecord } from '@rxova/toolbox';
 ```
 
-Every option is listed in the [API reference](../../reference/api/).
+Add it as a dev dependency of a published package so its build inlines the helpers. The package
+stays dependency-free.
+
+## Repository tooling
+
+```sh
+pnpm add -D @rxova/tooling
+```
+
+```json
+{
+  "scripts": {
+    "verify": "rxova-tooling verify"
+  }
+}
+```
+
+```js
+// eslint.config.js
+import { baseEslintConfig } from '@rxova/tooling/eslint';
+export default baseEslintConfig({ tsconfigRootDir: import.meta.dirname });
+```
+
+## GitHub Actions
+
+```yaml
+steps:
+  - uses: actions/checkout@v7
+  - uses: rxova/shared/actions/setup-pnpm@main
+  - uses: rxova/shared/actions/turbo-cache@main
+  - run: pnpm install --frozen-lockfile
+```
+
+Every export, command and action input is listed in the [reference](../../reference/api/).
