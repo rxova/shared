@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup-pnpm
+      - uses: ./actions/setup-pnpm
       - run: pnpm install --frozen-lockfile
 
       - name: Decide whether this commit touched the tree
@@ -52,7 +52,7 @@ jobs:
           HEAD_SHA: >-
             ${{ github.event_name == 'pull_request'
             && github.event.pull_request.head.sha || github.sha }}
-        run: node --import tsx ./packages/tooling/check-scope.ts
+        run: node --import tsx ./packages/tooling/src/check-scope/check-scope.ts
 
       - name: Lint the branch commits
         if: github.event_name == 'pull_request'
@@ -73,8 +73,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/setup-pnpm
+      - uses: ./actions/turbo-cache
       - run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
@@ -86,6 +86,23 @@ jobs:
         run: pnpm exec turbo run build --filter='!docs'
       - name: Typecheck
         run: pnpm exec turbo run typecheck
+      # Turbo only runs suites it knows about. A package with a vitest config
+      # but no `test` script would be skipped without a word, so look for the
+      # config rather than trusting the task graph.
+      - name: Every package with tests is in the task graph
+        run: |
+          set -eu
+          missing=''
+          for config in packages/*/vitest.config.* apps/*/vitest.config.*; do
+            [ -e "$config" ] || continue
+            pkg=$(dirname "$config")
+            node -e "process.exit(require('./$pkg/package.json').scripts?.test ? 0 : 1)" \
+              || missing="$missing $pkg"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::these packages have a vitest config but no test script:$missing"
+            exit 1
+          fi
 
   test:
     name: unit (node ${{ matrix.node-version }}, ${{ matrix.os }})
@@ -103,13 +120,13 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
+      - uses: ./actions/setup-pnpm
         with:
           node-version: ${{ matrix.node-version }}
       # Turbo hashes files and env, not the Node binary, and the cache action
       # keys on the job name — one string for every leg. Naming the partition
       # after the leg keeps one Node from replaying a result from another.
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/turbo-cache
         with:
           key: unit-${{ matrix.os }}-node${{ matrix.node-version }}
       - run: pnpm install --frozen-lockfile
@@ -133,8 +150,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/setup-pnpm
+      - uses: ./actions/turbo-cache
       - run: pnpm install --frozen-lockfile
       # Not a Turbo task: its verdict changes with the advisory database, not
       # with any file here, so a cached pass could replay over a fresh CVE.
@@ -149,7 +166,9 @@ jobs:
       - name: Check dependency versions across the workspace
         run: pnpm run sherif:check
       # Unused files, exports and dependencies. The only check here that
-      # notices an export nothing imports.
+      # notices an export nothing imports. It loads every vitest and tsdown
+      # config, which import the built presets, so the script builds
+      # @rxova/tooling first.
       - name: Check for unused files, exports and dependencies
         run: pnpm run knip:check
       # Last, and it has to stay last: `pnpm dedupe --check` removes the
@@ -166,8 +185,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/setup-pnpm
+      - uses: ./actions/turbo-cache
       - run: pnpm install --frozen-lockfile
       - name: Publint and Are The Types Wrong
         run: pnpm run check:exports
@@ -192,14 +211,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/setup-pnpm
+      - uses: ./actions/turbo-cache
         with:
           key: compat
       - run: pnpm install --frozen-lockfile
       - name: Read the Node floor from engines
         id: floor
-        run: node --import tsx ./packages/tooling/node-floor.ts
+        run: node --import tsx ./packages/tooling/src/node-floor/node-floor.ts
       - name: Build
         if: steps.floor.outputs.version != ''
         run: pnpm exec turbo run build --filter='./packages/*'
@@ -215,7 +234,7 @@ jobs:
         run: |
           node --version
           for dir in $PACKAGES; do
-            (cd "$dir" && node --import tsx ../tooling/pack-smoke.ts)
+            (cd "$dir" && node --import tsx ../tooling/src/pack-smoke/pack-smoke.ts)
           done
 
   docs:
@@ -226,8 +245,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-pnpm
-      - uses: ./.github/actions/turbo-cache
+      - uses: ./actions/setup-pnpm
+      - uses: ./actions/turbo-cache
       - run: pnpm install --frozen-lockfile
       # At the base path Pages serves it from, so an absolute link that only
       # works at a domain root fails here. The build also runs
@@ -248,7 +267,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup-pnpm
+      - uses: ./actions/setup-pnpm
       - run: pnpm install --frozen-lockfile
       - name: Require a changeset when a published package changed
         env:
@@ -257,7 +276,7 @@ jobs:
           # Still runs and reports rather than being skipped by an `if:`, so that
           # honouring the label is visible in a log somebody can read.
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: node --import tsx ./packages/tooling/check-changeset.ts
+        run: node --import tsx ./packages/tooling/src/check-changeset/check-changeset.ts
 
   # The single context branch protection should require, and the only job here
   # that never skips. Matrix jobs skipped before expansion report under their

@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
-  "changelog": ["./changelog-no-thanks.cjs", { "repo": "rxova/template-oss" }],
+  "changelog": ["./changelog-no-thanks.cjs", { "repo": "rxova/shared" }],
   "commit": false,
   "fixed": [],
   "linked": [],

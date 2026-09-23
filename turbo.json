@@ -7,7 +7,9 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      // Tests and prose cannot change dist, so editing them should not cost a rebuild.
+      // Tests and prose cannot change dist, so editing them should not cost a
+      // rebuild. The shared presets reach every package through `^build` on
+      // @rxova/tooling, which each package lists as a dev dependency.
       "inputs": [
         "$TURBO_DEFAULT$",
         "!**/*.test.ts",
@@ -22,6 +24,8 @@
       "outputs": [],
       "outputLogs": "new-only"
     },
+    // A raised threshold in the shared preset re-runs every suite rather than
+    // replaying yesterday's pass: it changes @rxova/tooling, which `^build` hashes.
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
@@ -38,7 +42,7 @@
     "pack:smoke": {
       "dependsOn": ["build"],
       "outputs": [],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/tooling/pack-smoke.ts"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/tooling/src/pack-smoke/pack-smoke.ts"],
       "outputLogs": "new-only"
     },
     // Root tasks (`//#`): each reads the whole tree in one pass, so there is
