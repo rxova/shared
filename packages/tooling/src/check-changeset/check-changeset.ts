@@ -75,11 +75,15 @@ export const hasChangeset = (changed: string[]): boolean => changesetFiles(chang
  * them, after which a double-quote-only pattern counts zero.
  */
 export const packagesNamed = (markdown: string): number => {
-  const frontmatter = /^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/.exec(markdown)?.[1];
-  if (frontmatter === undefined) return 0;
-  return frontmatter
-    .split('\n')
-    .map((line) => line.trim())
+  // Scanned line by line rather than matched with one regex: a pattern that
+  // spans the fences backtracks polynomially on a file of blank lines, and
+  // this reads files a pull request can put anything in.
+  const lines = markdown.split('\n').map((line) => line.trim());
+  if (lines[0] !== '---') return 0;
+  const end = lines.indexOf('---', 1);
+  if (end === -1) return 0;
+  return lines
+    .slice(1, end)
     .filter((line) => /^("[^"]+"|'[^']+')\s*:\s*(patch|minor|major)(?:\s+#.*)?$/.test(line)).length;
 };
 
