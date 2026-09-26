@@ -51,13 +51,14 @@ not a silent default.
 
 ## Presets
 
-| Import                      | Use                                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------------------- |
-| `@rxova/tooling/tsdown`     | `baseBuildConfig(overrides)`: ESM, Node 22, `.js`/`.d.ts`, types, clean.                           |
-| `@rxova/tooling/vitest`     | `baseVitestConfig({ environment, include, exclude, reporter })`: 95% per-file coverage thresholds. |
-| `@rxova/tooling/eslint`     | `baseEslintConfig({ tsconfigRootDir, consoleAllowed, ignores }, ...extra)`: `strictTypeChecked`.   |
-| `@rxova/tooling/commitlint` | Conventional Commits with no length limits, plus `rename`.                                         |
-| `@rxova/tooling/prettier`   | `singleQuote`, `printWidth: 100`.                                                                  |
+| Import                              | Use                                                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `@rxova/tooling/tsdown`             | `baseBuildConfig(overrides)`: ESM, Node 22, `.js`/`.d.ts`, types, clean.                           |
+| `@rxova/tooling/vitest`             | `baseVitestConfig({ environment, include, exclude, reporter })`: 95% per-file coverage thresholds. |
+| `@rxova/tooling/eslint`             | `baseEslintConfig({ tsconfigRootDir, consoleAllowed, ignores }, ...extra)`: `strictTypeChecked`.   |
+| `@rxova/tooling/commitlint`         | Conventional Commits with no length limits, plus `rename`.                                         |
+| `@rxova/tooling/prettier`           | `singleQuote`, `printWidth: 100`.                                                                  |
+| `@rxova/tooling/tsconfig.base.json` | Strict TypeScript for ESM libraries: `bundler` resolution, `verbatimModuleSyntax`, `noEmit`.       |
 
 ```js
 // eslint.config.js
@@ -71,6 +72,11 @@ export { default } from '@rxova/tooling/commitlint';
 ```json
 // .prettierrc
 "@rxova/tooling/prettier"
+```
+
+```json
+// tsconfig.json
+{ "extends": "@rxova/tooling/tsconfig.base.json", "include": ["src"] }
 ```
 
 The eslint and commitlint presets ship as plain JavaScript. Hooks load them before anything is

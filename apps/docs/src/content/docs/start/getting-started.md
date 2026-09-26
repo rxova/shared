@@ -36,6 +36,11 @@ import { baseEslintConfig } from '@rxova/tooling/eslint';
 export default baseEslintConfig({ tsconfigRootDir: import.meta.dirname });
 ```
 
+```json
+// tsconfig.json
+{ "extends": "@rxova/tooling/tsconfig.base.json", "include": ["src"] }
+```
+
 ## GitHub Actions
 
 ```yaml

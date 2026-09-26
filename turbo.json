@@ -1,7 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": ["tsconfig.base.json", ".nvmrc"],
+  "globalDependencies": [
+    "tsconfig.base.json",
+    "packages/tooling/presets/tsconfig.base.json",
+    ".nvmrc"
+  ],
   "globalPassThroughEnv": ["CI"],
   "tasks": {
     "build": {
