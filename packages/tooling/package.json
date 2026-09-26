@@ -43,6 +43,7 @@
       "default": "./presets/commitlint.js"
     },
     "./prettier": "./presets/prettier.json",
+    "./tsconfig.base.json": "./presets/tsconfig.base.json",
     "./package.json": "./package.json"
   },
   "files": [

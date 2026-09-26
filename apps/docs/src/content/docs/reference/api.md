@@ -29,7 +29,8 @@ description: Every export, command and action this repository publishes.
 | `rxova-tooling check-llms [root]`                         | Holds each `llms.txt` to the package exports                     |
 | `rxova-tooling write-page-bundle <dist> <project> <base>` | Marks a docs dist for the rxova.org aggregator                   |
 
-Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`.
+Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
+`/tsconfig.base.json`.
 
 ## GitHub Actions
 
