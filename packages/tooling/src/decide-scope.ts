@@ -1,4 +1,4 @@
-import { git, versionBumpOnly } from '@rxova/helpers';
+import { gitReader, versionBumpOnly } from '@rxova/helpers';
 import type { Git, Scope } from './scope.types.js';
 import { isReleaseMetadata } from './is-release-metadata.js';
 
@@ -19,7 +19,7 @@ import { isReleaseMetadata } from './is-release-metadata.js';
 export const decideScope = (
   base: string | undefined,
   head: string | undefined,
-  run: Git = git,
+  run: Git = gitReader,
 ): Scope => {
   // An initial push reports an all-zero `before`, and a force-push can report a
   // commit that is no longer reachable. Neither is a licence to skip.
@@ -29,7 +29,7 @@ export const decideScope = (
 
   let changed: string[];
   try {
-    changed = run('diff', '--name-only', `${base}...${head}`).split('\n').filter(Boolean);
+    changed = run.names(base, head);
   } catch {
     return { codeChanged: true, reason: 'could not diff the range' };
   }

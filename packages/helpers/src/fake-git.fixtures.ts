@@ -1,12 +1,10 @@
 import type { Git } from '../../tooling/src/scope.types.ts';
 
-/** A fake repository: `--name-only` lists files, `--unified=0` returns a diff per file. */
-export const fakeGit =
-  (files: string[], patches: Record<string, string> = {}): Git =>
-  (...args) => {
-    if (args.includes('--name-only')) return files.join('\n');
-    return patches[args[args.length - 1] ?? ''] ?? '';
-  };
+/** A fake repository: `names` lists files, `patch` returns a diff per file. */
+export const fakeGit = (files: string[], patches: Record<string, string> = {}): Git => ({
+  names: () => files,
+  patch: (_base, _head, file) => patches[file] ?? '',
+});
 
 /** A patch that moves only the version line of a manifest. */
 export const BUMP = [

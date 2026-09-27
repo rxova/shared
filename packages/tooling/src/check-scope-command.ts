@@ -1,4 +1,4 @@
-import { git } from '@rxova/helpers';
+import { gitReader } from '@rxova/helpers';
 import type { Git } from './scope.types.js';
 import { appendFileSync } from 'node:fs';
 import { decideScope } from './decide-scope.js';
@@ -10,7 +10,7 @@ import { decideScope } from './decide-scope.js';
  */
 export const checkScopeCommand = (
   env: NodeJS.ProcessEnv = process.env,
-  { run = git }: { run?: Git } = {},
+  { run = gitReader }: { run?: Git } = {},
 ): number => {
   const verdict = decideScope(env.BASE_SHA, env.HEAD_SHA, run);
 
