@@ -1,4 +1,4 @@
-import { fakeGit } from '@rxova-helpers/scope/fake-git.fixtures';
+import { fakeGit } from '@/internal/scope/fake-git.fixtures';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

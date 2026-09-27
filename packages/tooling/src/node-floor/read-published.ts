@@ -1,4 +1,4 @@
-import { workspaceFiles } from '@rxova-helpers/node-floor/workspace-files';
+import { workspaceFiles } from '@/internal/node-floor/workspace-files';
 import type { PackageManifest } from '@/manifest/manifest.types';
 import type { Published, WorkspaceFiles } from '@/node-floor/node-floor.types';
 import { join } from 'node:path';

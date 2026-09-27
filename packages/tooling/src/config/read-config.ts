@@ -1,4 +1,4 @@
-import { readFile } from '@rxova-helpers/config/read-file';
+import { readFile } from '@/internal/config/read-file';
 import type { Reader, ToolingConfig } from '@/config/config.types';
 import { join } from 'node:path';
 import { parseConfig } from '@/config/parse-config';

@@ -1,7 +1,7 @@
-import { captureCommand } from '@rxova-helpers/pack-smoke/capture-command';
-import { probeSource } from '@rxova-helpers/pack-smoke/probe-source';
-import { resolveWorkspaceDeps } from '@rxova-helpers/pack-smoke/resolve-workspace-deps';
-import { scratchFiles } from '@rxova-helpers/pack-smoke/scratch-files';
+import { captureCommand } from '@/internal/pack-smoke/capture-command';
+import { probeSource } from '@/internal/pack-smoke/probe-source';
+import { resolveWorkspaceDeps } from '@/internal/pack-smoke/resolve-workspace-deps';
+import { scratchFiles } from '@/internal/pack-smoke/scratch-files';
 import type { PackageManifest } from '@/manifest/manifest.types';
 import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
 import { join } from 'node:path';

@@ -1,4 +1,4 @@
-import { PAGE_BUNDLE_FILENAME } from '@rxova-helpers/page-bundle/page-bundle-filename';
+import { PAGE_BUNDLE_FILENAME } from '@/internal/page-bundle/page-bundle-filename';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pageBundleManifest } from '@/page-bundle/page-bundle-manifest';

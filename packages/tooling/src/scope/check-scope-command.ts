@@ -1,4 +1,4 @@
-import { gitReader } from '@rxova-helpers/scope/git-reader';
+import { gitReader } from '@/internal/scope/git-reader';
 import type { Git } from '@/scope/scope.types';
 import { appendFileSync } from 'node:fs';
 import { decideScope } from '@/scope/decide-scope';

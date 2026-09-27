@@ -1,9 +1,4 @@
-import {
-  cleanupLlmsRepos,
-  INDEX,
-  llmsRepo,
-  wellFormed,
-} from '@rxova-helpers/llms/llms-repo.fixtures';
+import { cleanupLlmsRepos, INDEX, llmsRepo, wellFormed } from '@/internal/llms/llms-repo.fixtures';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { checkLlmsCommand } from '@/llms/check-llms-command';
 

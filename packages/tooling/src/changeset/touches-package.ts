@@ -1,4 +1,4 @@
-import { isTestFile } from '@rxova-helpers/changeset/is-test-file';
+import { isTestFile } from '@/internal/changeset/is-test-file';
 
 /**
  * Whether the diff touches something a published package ships. Markdown and

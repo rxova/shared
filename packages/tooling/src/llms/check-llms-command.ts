@@ -1,5 +1,5 @@
-import { collectLlmsFailures } from '@rxova-helpers/llms/collect-llms-failures';
-import { formatLlmsFailures } from '@rxova-helpers/llms/format-llms-failures';
+import { collectLlmsFailures } from '@/internal/llms/collect-llms-failures';
+import { formatLlmsFailures } from '@/internal/llms/format-llms-failures';
 import { resolve } from 'node:path';
 
 /**

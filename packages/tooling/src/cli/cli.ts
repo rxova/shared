@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { consoleIo } from '@rxova-helpers/cli/console-io';
-import { ownVersion } from '@rxova-helpers/cli/own-version';
-import { usage } from '@rxova-helpers/cli/usage';
+import { consoleIo } from '@/internal/cli/console-io';
+import { ownVersion } from '@/internal/cli/own-version';
+import { usage } from '@/internal/cli/usage';
 import type { CommandEntry, Io } from '@/cli/cli.types';
 import { commands } from '@/cli/commands';
 import { isEntry } from '@/entry/is-entry';

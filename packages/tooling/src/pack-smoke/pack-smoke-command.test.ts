@@ -1,4 +1,4 @@
-import { fakeNpm, memoryScratch } from '@rxova-helpers/pack-smoke/memory-scratch.fixtures';
+import { fakeNpm, memoryScratch } from '@/internal/pack-smoke/memory-scratch.fixtures';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

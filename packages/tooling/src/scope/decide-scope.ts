@@ -1,5 +1,5 @@
-import { gitReader } from '@rxova-helpers/scope/git-reader';
-import { versionBumpOnly } from '@rxova-helpers/scope/version-bump-only';
+import { gitReader } from '@/internal/scope/git-reader';
+import { versionBumpOnly } from '@/internal/scope/version-bump-only';
 import type { Git, Scope } from '@/scope/scope.types';
 import { isReleaseMetadata } from '@/scope/is-release-metadata';
 

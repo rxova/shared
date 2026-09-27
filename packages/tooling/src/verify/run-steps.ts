@@ -1,4 +1,4 @@
-import { runCommand } from '@rxova-helpers/verify/run-command';
+import { runCommand } from '@/internal/verify/run-command';
 import type { Runner } from '@/verify/verify.types';
 import type { Step } from '@/config/config.types';
 

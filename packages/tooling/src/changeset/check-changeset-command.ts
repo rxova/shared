@@ -1,8 +1,8 @@
-import { changesetFiles } from '@rxova-helpers/changeset/changeset-files';
-import { gitDiff } from '@rxova-helpers/changeset/git-diff';
-import { labelsOf } from '@rxova-helpers/changeset/labels-of';
-import { readFile } from '@rxova-helpers/config/read-file';
-import { singlePackageProblems } from '@rxova-helpers/changeset/single-package-problems';
+import { changesetFiles } from '@/internal/changeset/changeset-files';
+import { gitDiff } from '@/internal/changeset/git-diff';
+import { labelsOf } from '@/internal/changeset/labels-of';
+import { readFile } from '@/internal/config/read-file';
+import { singlePackageProblems } from '@/internal/changeset/single-package-problems';
 import type { Differ } from '@/changeset/changeset.types';
 import type { Reader } from '@/config/config.types';
 import { join } from 'node:path';

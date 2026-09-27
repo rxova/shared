@@ -1,4 +1,4 @@
-import { workspaceFiles } from '@rxova-helpers/node-floor/workspace-files';
+import { workspaceFiles } from '@/internal/node-floor/workspace-files';
 import type { WorkspaceFiles } from '@/node-floor/node-floor.types';
 import { appendFileSync } from 'node:fs';
 import { decideFloor } from '@/node-floor/decide-floor';
