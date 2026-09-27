@@ -1,6 +1,6 @@
-import { hasChangeset } from '@rxova-helpers/changeset/has-changeset';
-import { SKIP_LABEL } from '@rxova-helpers/changeset/skip-label';
-import { skipReason } from '@rxova-helpers/changeset/skip-reason';
+import { hasChangeset } from '@/internal/changeset/has-changeset';
+import { SKIP_LABEL } from '@/internal/changeset/skip-label';
+import { skipReason } from '@/internal/changeset/skip-reason';
 import type { Request, Verdict } from '@/changeset/changeset.types';
 import { touchesPackage } from '@/changeset/touches-package';
 

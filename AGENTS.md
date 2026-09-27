@@ -11,10 +11,6 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   vitest preset only. This repository runs the scripts from source with `tsx`.
 - `packages/toolbox` — `@rxova/toolbox`: small dependency-free runtime helpers, plus a `/react`
   entry. Neutral platform, es2020, no side effects: consumers inline it at build time.
-- `packages/helpers` — `@rxova/helpers`, private: everything the published packages use but do
-  not export — io adapters, parsers, constants, types and the test fixtures several suites share
-  (`@rxova/helpers/fixtures`). Consumed from source, never built or published: tsdown bundles it
-  into each package's dist.
 - `packages/tooling/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
   them before anything is built.
 - `actions/*` — composite GitHub Actions other repositories use as
@@ -40,17 +36,14 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   under `src/`; only `index.ts` (and toolbox's `react.ts`) live at the root, and they re-export
   only. Barrels, types and fixtures are excluded from coverage, so logic there is logic nobody
   measures.
-- No relative imports in source. A package names its own files as `@/<topic>/<file>`, and a
-  sibling workspace's files as `@rxova-<workspace>/<topic>/<file>` (`@rxova-helpers/cli/usage`,
-  `@rxova-tooling/scope/scope.types`). Each package's `tsconfig.json` declares the aliases it uses
-  in `paths`; the vitest preset maps them for tests, tsdown reads them for the build, and the root
-  `tsconfig.json` carries them for `tsx` runs from the repository root. The eslint preset rejects
-  `./` and `../` imports. Inside `packages/helpers` the package's own files are also
-  `@rxova-helpers/…`, never `@/…`: helpers is compiled as part of tooling's program, where `@/`
-  means tooling.
+- No relative imports in source. A package names its own files as `@/<topic>/<file>`; each
+  package's `tsconfig.json` declares `@/*` in `paths`, the vitest preset maps it for tests, tsdown
+  reads it for the build, and the root `tsconfig.json` carries tooling's for `tsx` runs from the
+  repository root. The eslint preset rejects `./` and `../` imports.
 - `@rxova/tooling` and `@rxova/toolbox` hold only their public functions: what `index.ts`, a
   subpath export or the `rxova-tooling` bin reaches. Anything else — a private helper, an io
-  adapter, a constant — goes in `packages/helpers`. A published package never has a module-level
+  adapter, a constant, a shared test fixture — goes in the package's `src/internal/<topic>/`,
+  which `index.ts` never re-exports. A published package never has a module-level
   binding it does not export.
 - Coverage is 95% per file; raise thresholds, never lower them.
 - Never skip, delete or weaken a test to make a change pass.

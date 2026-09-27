@@ -4,9 +4,7 @@
     "types": ["node"],
     "allowImportingTsExtensions": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@rxova-helpers/*": ["../helpers/src/*"],
-      "@rxova-tooling/*": ["./src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src", "presets", "tsdown.config.ts", "vitest.config.ts"]

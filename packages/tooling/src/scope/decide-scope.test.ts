@@ -1,5 +1,5 @@
 import type { Git } from '@/scope/scope.types';
-import { BUMP, fakeGit } from '@rxova-helpers/scope/fake-git.fixtures';
+import { BUMP, fakeGit } from '@/internal/scope/fake-git.fixtures';
 import { describe, expect, it } from 'vitest';
 import { decideScope } from '@/scope/decide-scope';
 

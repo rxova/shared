@@ -1,4 +1,4 @@
-import { usage } from '@rxova-helpers/cli/usage';
+import { usage } from '@/internal/cli/usage';
 import type { CommandEntry } from '@/cli/cli.types';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';

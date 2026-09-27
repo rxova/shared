@@ -42,21 +42,18 @@ describe('baseVitestConfig', () => {
     expect(test?.coverage).toMatchObject({ reporter: ['json-summary'] });
   });
 
-  it('maps @/ to the package src and @rxova-<name>/ to a sibling workspace, from root', () => {
+  it('maps @/ to the package src, from root', () => {
     const alias = baseVitestConfig({ root: '/repo/packages/lib' }).resolve?.alias as {
       find: RegExp;
       replacement: string;
     }[];
-    expect(alias).toHaveLength(2);
+    expect(alias).toHaveLength(1);
     const resolve = (specifier: string) =>
       alias.reduce((id, { find, replacement }) => id.replace(find, replacement), specifier);
     expect(resolve('@/scope/decide-scope')).toBe(
       `${join('/repo/packages/lib', 'src')}/scope/decide-scope`,
     );
-    expect(resolve('@rxova-helpers/cli/usage')).toBe(
-      `${join('/repo/packages')}/helpers/src/cli/usage`,
-    );
     expect(resolve('vitest/config')).toBe('vitest/config');
-    expect(baseVitestConfig().resolve?.alias).toHaveLength(2);
+    expect(baseVitestConfig().resolve?.alias).toHaveLength(1);
   });
 });

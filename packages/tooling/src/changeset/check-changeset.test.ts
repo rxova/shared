@@ -1,4 +1,4 @@
-import { SKIP_LABEL } from '@rxova-helpers/changeset/skip-label';
+import { SKIP_LABEL } from '@/internal/changeset/skip-label';
 import { describe, expect, it } from 'vitest';
 import { checkChangeset } from '@/changeset/check-changeset';
 

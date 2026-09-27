@@ -7,9 +7,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./packages/tooling/src/*"],
-      "@rxova-helpers/*": ["./packages/helpers/src/*"],
-      "@rxova-tooling/*": ["./packages/tooling/src/*"]
+      "@/*": ["./packages/tooling/src/*"]
     }
   },
   "files": []

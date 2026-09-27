@@ -4,7 +4,7 @@ import {
   memoryScratch,
   PARENT,
   SCRATCH,
-} from '@rxova-helpers/pack-smoke/memory-scratch.fixtures';
+} from '@/internal/pack-smoke/memory-scratch.fixtures';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { packSmoke } from '@/pack-smoke/pack-smoke';

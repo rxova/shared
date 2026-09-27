@@ -1,4 +1,4 @@
-import { realpathOrSelf } from '@rxova-helpers/entry/realpath-or-self';
+import { realpathOrSelf } from '@/internal/entry/realpath-or-self';
 import { pathToFileURL } from 'node:url';
 
 /**

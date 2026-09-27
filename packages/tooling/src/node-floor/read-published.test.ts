@@ -1,7 +1,7 @@
 import {
   fakeWorkspaceFiles,
   manifestWithFloor as pkg,
-} from '@rxova-helpers/node-floor/fake-workspace-files.fixtures';
+} from '@/internal/node-floor/fake-workspace-files.fixtures';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readPublished } from '@/node-floor/read-published';

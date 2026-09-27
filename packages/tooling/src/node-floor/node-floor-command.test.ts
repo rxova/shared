@@ -1,7 +1,7 @@
 import {
   fakeWorkspaceFiles,
   manifestWithFloor as pkg,
-} from '@rxova-helpers/node-floor/fake-workspace-files.fixtures';
+} from '@/internal/node-floor/fake-workspace-files.fixtures';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

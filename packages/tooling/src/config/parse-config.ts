@@ -1,7 +1,7 @@
-import { assertOnlyKeys } from '@rxova-helpers/config/assert-only-keys';
-import { failConfig } from '@rxova-helpers/config/fail-config';
-import { isRecord } from '@rxova-helpers/config/is-record';
-import { parseSteps } from '@rxova-helpers/config/parse-steps';
+import { assertOnlyKeys } from '@/internal/config/assert-only-keys';
+import { failConfig } from '@/internal/config/fail-config';
+import { isRecord } from '@/internal/config/is-record';
+import { parseSteps } from '@/internal/config/parse-steps';
 import type { ToolingConfig } from '@/config/config.types';
 
 /**

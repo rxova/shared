@@ -1,5 +1,5 @@
-import { PAGE_BUNDLE_FILENAME } from '@rxova-helpers/page-bundle/page-bundle-filename';
-import { writeFile } from '@rxova-helpers/page-bundle/write-file';
+import { PAGE_BUNDLE_FILENAME } from '@/internal/page-bundle/page-bundle-filename';
+import { writeFile } from '@/internal/page-bundle/write-file';
 import type { Writer } from '@/page-bundle/page-bundle.types';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

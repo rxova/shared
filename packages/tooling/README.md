@@ -51,14 +51,14 @@ not a silent default.
 
 ## Presets
 
-| Import                              | Use                                                                                                                                                                          |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@rxova/tooling/tsdown`             | `baseBuildConfig(overrides)`: ESM, Node 22, `.js`/`.d.ts`, types, clean.                                                                                                     |
-| `@rxova/tooling/vitest`             | `baseVitestConfig({ root, environment, include, exclude, reporter })`: 95% per-file coverage thresholds; `@/` is `<root>/src`, `@rxova-<name>/` a sibling workspace's `src`. |
-| `@rxova/tooling/eslint`             | `baseEslintConfig({ tsconfigRootDir, consoleAllowed, ignores }, ...extra)`: `strictTypeChecked`, no relative imports.                                                        |
-| `@rxova/tooling/commitlint`         | Conventional Commits with no length limits, plus `rename`.                                                                                                                   |
-| `@rxova/tooling/prettier`           | `singleQuote`, `printWidth: 100`.                                                                                                                                            |
-| `@rxova/tooling/tsconfig.base.json` | Strict TypeScript for ESM libraries: `bundler` resolution, `verbatimModuleSyntax`, `noEmit`.                                                                                 |
+| Import                              | Use                                                                                                                            |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `@rxova/tooling/tsdown`             | `baseBuildConfig(overrides)`: ESM, Node 22, `.js`/`.d.ts`, types, clean.                                                       |
+| `@rxova/tooling/vitest`             | `baseVitestConfig({ root, environment, include, exclude, reporter })`: 95% per-file coverage thresholds; `@/` is `<root>/src`. |
+| `@rxova/tooling/eslint`             | `baseEslintConfig({ tsconfigRootDir, consoleAllowed, ignores }, ...extra)`: `strictTypeChecked`, no relative imports.          |
+| `@rxova/tooling/commitlint`         | Conventional Commits with no length limits, plus `rename`.                                                                     |
+| `@rxova/tooling/prettier`           | `singleQuote`, `printWidth: 100`.                                                                                              |
+| `@rxova/tooling/tsconfig.base.json` | Strict TypeScript for ESM libraries: `bundler` resolution, `verbatimModuleSyntax`, `noEmit`.                                   |
 
 ```js
 // eslint.config.js
