@@ -1,3 +1,3 @@
-import { baseVitestConfig } from './src/base-vitest-config.ts';
+import { baseVitestConfig } from './src/vitest/base-vitest-config.ts';
 
-export default baseVitestConfig();
+export default baseVitestConfig({ root: import.meta.dirname });

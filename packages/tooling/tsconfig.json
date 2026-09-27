@@ -2,7 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@rxova-helpers/*": ["../helpers/src/*"],
+      "@rxova-tooling/*": ["./src/*"]
+    }
   },
   "include": ["src", "presets", "tsdown.config.ts", "vitest.config.ts"]
 }

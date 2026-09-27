@@ -48,6 +48,21 @@ export const baseEslintConfig = (
         ],
         // Libraries ship no console noise. Repo tooling opts out below.
         'no-console': 'error',
+        // A module names its own package's files as `@/…` and a sibling
+        // workspace's as `@rxova-<name>/…`, so a file can move without its
+        // importers changing and a path never says `../../` about a package.
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                group: ['./*', '../*'],
+                message:
+                  'Import through the alias (@/… or @rxova-<workspace>/…), not a relative path.',
+              },
+            ],
+          },
+        ],
       },
     },
     {

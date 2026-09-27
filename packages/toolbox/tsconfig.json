@@ -5,7 +5,8 @@
     // tests, which run in Node. The build targets `neutral`, and nothing in the
     // source may reach for either platform without a guard.
     "lib": ["ES2023", "DOM"],
-    "types": ["node"]
+    "types": ["node"],
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
 }

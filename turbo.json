@@ -48,8 +48,8 @@
       "outputs": [],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/packages/tooling/src/pack-smoke.ts",
-        "$TURBO_ROOT$/packages/helpers/src/*.ts"
+        "$TURBO_ROOT$/packages/tooling/src/pack-smoke/**",
+        "$TURBO_ROOT$/packages/helpers/src/pack-smoke/**"
       ],
       "outputLogs": "new-only"
     },
