@@ -59,7 +59,7 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
-    "pack:smoke": "node --import tsx src/cli.ts pack-smoke"
+    "pack:smoke": "node --import tsx src/cli/cli.ts pack-smoke"
   },
   "peerDependencies": {
     "@commitlint/config-conventional": ">=19",
@@ -100,7 +100,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
-    "@rxova/helpers": "workspace:*",
     "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",

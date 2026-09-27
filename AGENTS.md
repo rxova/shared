@@ -33,11 +33,21 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 
 ## Rules
 
-- One function per file, and the file is named after it: `src/<function-name>.ts` exports exactly
-  `functionName` (kebab-case file, camelCase export), `<function-name>.test.ts` beside it holds its
-  tests, `<name>.types.ts` holds types only, `<name>.fixtures.ts` the fakes several suites share.
-  `src/index.ts` re-exports only. Barrels, types and fixtures are excluded from coverage, so logic
-  there is logic nobody measures.
+- One function per file, and the file is named after it: `src/<topic>/<function-name>.ts` exports
+  exactly `functionName` (kebab-case file, camelCase export), `<function-name>.test.ts` beside it
+  holds its tests, `<name>.types.ts` holds types only, `<name>.fixtures.ts` the fakes several
+  suites share. Files sit in topic folders (`scope/`, `changeset/`, `pack-smoke/`, …), never loose
+  under `src/`; only `index.ts` (and toolbox's `react.ts`) live at the root, and they re-export
+  only. Barrels, types and fixtures are excluded from coverage, so logic there is logic nobody
+  measures.
+- No relative imports in source. A package names its own files as `@/<topic>/<file>`, and a
+  sibling workspace's files as `@rxova-<workspace>/<topic>/<file>` (`@rxova-helpers/cli/usage`,
+  `@rxova-tooling/scope/scope.types`). Each package's `tsconfig.json` declares the aliases it uses
+  in `paths`; the vitest preset maps them for tests, tsdown reads them for the build, and the root
+  `tsconfig.json` carries them for `tsx` runs from the repository root. The eslint preset rejects
+  `./` and `../` imports. Inside `packages/helpers` the package's own files are also
+  `@rxova-helpers/…`, never `@/…`: helpers is compiled as part of tooling's program, where `@/`
+  means tooling.
 - `@rxova/tooling` and `@rxova/toolbox` hold only their public functions: what `index.ts`, a
   subpath export or the `rxova-tooling` bin reaches. Anything else — a private helper, an io
   adapter, a constant — goes in `packages/helpers`. A published package never has a module-level

@@ -1,21 +1,25 @@
-export { isObjectLike } from './is-object-like.js';
-export { isRecord } from './is-record.js';
-export { isPlainObject } from './is-plain-object.js';
-export { tryRead } from './try-read.js';
-export type { ReadResult } from './try-read.types.js';
-export { readProperty } from './read-property.js';
-export { readString } from './read-string.js';
-export { hasProperty } from './has-property.js';
-export { safeKeys } from './safe-keys.js';
-export { isInstanceOf } from './is-instance-of.js';
-export { objectTag } from './object-tag.js';
-export { arrayItems } from './array-items.js';
-export { isError } from './is-error.js';
-export { errorMessage } from './error-message.js';
-export { shallowEqual } from './shallow-equal.js';
-export { isDevelopment } from './is-development.js';
-export { createDevWarner } from './create-dev-warner.js';
-export type { DevWarner, DevWarnerOptions, WarnOptions } from './create-dev-warner.types.js';
-export { canUseDOM } from './can-use-dom.js';
-export { deepFreeze } from './deep-freeze.js';
-export { clamp } from './clamp.js';
+export { isObjectLike } from '@/predicates/is-object-like';
+export { isRecord } from '@/predicates/is-record';
+export { isPlainObject } from '@/predicates/is-plain-object';
+export { tryRead } from '@/safe/try-read';
+export type { ReadResult } from '@/safe/try-read.types';
+export { readProperty } from '@/safe/read-property';
+export { readString } from '@/safe/read-string';
+export { hasProperty } from '@/safe/has-property';
+export { safeKeys } from '@/safe/safe-keys';
+export { isInstanceOf } from '@/safe/is-instance-of';
+export { objectTag } from '@/safe/object-tag';
+export { arrayItems } from '@/safe/array-items';
+export { isError } from '@/errors/is-error';
+export { errorMessage } from '@/errors/error-message';
+export { shallowEqual } from '@/equality/shallow-equal';
+export { isDevelopment } from '@/env/is-development';
+export { createDevWarner } from '@/dev-warner/create-dev-warner';
+export type {
+  DevWarner,
+  DevWarnerOptions,
+  WarnOptions,
+} from '@/dev-warner/create-dev-warner.types';
+export { canUseDOM } from '@/dom/can-use-dom';
+export { deepFreeze } from '@/freeze/deep-freeze';
+export { clamp } from '@/number/clamp';

@@ -2,14 +2,10 @@
   "name": "@rxova/helpers",
   "version": "0.0.0",
   "private": true,
-  "description": "Code the published packages use but do not export: io adapters, parsers, constants, types and test fixtures. Consumed from source and bundled into each package's dist.",
+  "description": "Code the published packages use but do not export: io adapters, parsers, constants, types and test fixtures. Reached as `@rxova-helpers/<topic>/<file>` from the packages' source, and bundled into their dist.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": "./src/index.ts",
-    "./fixtures": "./src/index.fixtures.ts"
-  },
   "scripts": {
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit"

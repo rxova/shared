@@ -52,7 +52,7 @@ jobs:
           HEAD_SHA: >-
             ${{ github.event_name == 'pull_request'
             && github.event.pull_request.head.sha || github.sha }}
-        run: node --import tsx ./packages/tooling/src/cli.ts check-scope
+        run: node --import tsx ./packages/tooling/src/cli/cli.ts check-scope
 
       - name: Lint the branch commits
         if: github.event_name == 'pull_request'
@@ -218,7 +218,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Read the Node floor from engines
         id: floor
-        run: node --import tsx ./packages/tooling/src/cli.ts node-floor
+        run: node --import tsx ./packages/tooling/src/cli/cli.ts node-floor
       - name: Build
         if: steps.floor.outputs.version != ''
         run: pnpm exec turbo run build --filter='./packages/*'
@@ -234,7 +234,7 @@ jobs:
         run: |
           node --version
           for dir in $PACKAGES; do
-            (cd "$dir" && node --import tsx ../tooling/src/cli.ts pack-smoke)
+            (cd "$dir" && node ../tooling/dist/cli.js pack-smoke)
           done
 
   docs:
@@ -276,7 +276,7 @@ jobs:
           # Still runs and reports rather than being skipped by an `if:`, so that
           # honouring the label is visible in a log somebody can read.
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: node --import tsx ./packages/tooling/src/cli.ts check-changeset
+        run: node --import tsx ./packages/tooling/src/cli/cli.ts check-changeset
 
   # The single context branch protection should require, and the only job here
   # that never skips. Matrix jobs skipped before expansion report under their
