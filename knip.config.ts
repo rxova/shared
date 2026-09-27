@@ -7,18 +7,10 @@ import type { KnipConfig } from 'knip';
  * kept working, still shows up in completions, and still reads as part of the
  * contract. Nothing else in this repository notices one.
  *
- * Entry points are inferred from each package's manifest, so what follows is
- * only the things inference cannot know — every one of them a place where a
- * file is reached by something other than a TypeScript import.
+ * Entry points are inferred from each package's manifest: the exports, and the
+ * bin every command is reached from. Nothing needs listing by hand.
  */
 export default {
   // Advice nobody has to act on is advice that stops being read.
   treatConfigHintsAsErrors: true,
-  workspaces: {
-    'packages/tooling': {
-      // Repo scripts (not their tests or types). This repository runs them
-      // from source by path, in package.json and CI, as well as through the bin.
-      entry: ['src/*/*.ts', '!src/**/*.{test,types}.ts'],
-    },
-  },
 } satisfies KnipConfig;

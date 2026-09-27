@@ -1,1 +1,1 @@
-export { useIsomorphicLayoutEffect } from './layout-effect/layout-effect.js';
+export { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect.js';
