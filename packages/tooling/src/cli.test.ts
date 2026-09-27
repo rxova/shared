@@ -54,6 +54,10 @@ describe('cli', () => {
   });
 });
 
+// Each case spawns a Node that loads tsx and the CLI graph; on a cold Windows
+// runner that alone can take longer than vitest's default five seconds.
+const SPAWN_TIMEOUT = 60_000;
+
 describe('the bin', () => {
   const script = fileURLToPath(new URL('./cli.ts', import.meta.url));
   const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -65,23 +69,35 @@ describe('the bin', () => {
       env: { ...process.env, ...env },
     });
 
-  it('prints a verdict when run as a script', () => {
-    const out = exec(['check-scope'], { BASE_SHA: '', HEAD_SHA: '', GITHUB_OUTPUT: '' });
-    expect(out).toContain('code-changed=true');
-  });
+  it(
+    'prints a verdict when run as a script',
+    () => {
+      const out = exec(['check-scope'], { BASE_SHA: '', HEAD_SHA: '', GITHUB_OUTPUT: '' });
+      expect(out).toContain('code-changed=true');
+    },
+    SPAWN_TIMEOUT,
+  );
 
-  it('reads this repository and prints its floor', () => {
-    expect(exec(['node-floor'], { GITHUB_OUTPUT: '' })).toMatch(/^node-floor: /);
-  });
+  it(
+    'reads this repository and prints its floor',
+    () => {
+      expect(exec(['node-floor'], { GITHUB_OUTPUT: '' })).toMatch(/^node-floor: /);
+    },
+    SPAWN_TIMEOUT,
+  );
 
-  it('sets the process exit code from the command', () => {
-    let status = 0;
-    try {
-      // No range in the environment: the one failure that needs no repository.
-      exec(['check-changeset'], { BASE_SHA: '', HEAD_SHA: '' });
-    } catch (failure) {
-      status = (failure as { status: number }).status;
-    }
-    expect(status).toBe(1);
-  });
+  it(
+    'sets the process exit code from the command',
+    () => {
+      let status = 0;
+      try {
+        // No range in the environment: the one failure that needs no repository.
+        exec(['check-changeset'], { BASE_SHA: '', HEAD_SHA: '' });
+      } catch (failure) {
+        status = (failure as { status: number }).status;
+      }
+      expect(status).toBe(1);
+    },
+    SPAWN_TIMEOUT,
+  );
 });
