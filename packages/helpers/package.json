@@ -1,0 +1,23 @@
+{
+  "name": "@rxova/helpers",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Code the published packages use but do not export: io adapters, parsers, constants, types and test fixtures. Consumed from source and bundled into each package's dist.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./fixtures": "./src/index.fixtures.ts"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@vitest/coverage-v8": "^5.0.1",
+    "typescript": "6.0.3",
+    "vitest": "^5.0.1"
+  }
+}

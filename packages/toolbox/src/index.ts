@@ -1,20 +1,21 @@
-export { isObjectLike, isPlainObject, isRecord } from './predicates/predicates.js';
-export {
-  arrayItems,
-  hasProperty,
-  isInstanceOf,
-  objectTag,
-  readProperty,
-  readString,
-  safeKeys,
-  tryRead,
-} from './safe/safe.js';
-export type { ReadResult } from './safe/safe.types.js';
-export { errorMessage, isError } from './errors/errors.js';
-export { shallowEqual } from './equality/equality.js';
-export { isDevelopment } from './env/env.js';
-export { createDevWarner } from './dev-warner/dev-warner.js';
-export type { DevWarner, DevWarnerOptions, WarnOptions } from './dev-warner/dev-warner.types.js';
-export { canUseDOM } from './dom/dom.js';
-export { deepFreeze } from './freeze/freeze.js';
-export { clamp } from './number/number.js';
+export { isObjectLike } from './is-object-like.js';
+export { isRecord } from './is-record.js';
+export { isPlainObject } from './is-plain-object.js';
+export { tryRead } from './try-read.js';
+export type { ReadResult } from './try-read.types.js';
+export { readProperty } from './read-property.js';
+export { readString } from './read-string.js';
+export { hasProperty } from './has-property.js';
+export { safeKeys } from './safe-keys.js';
+export { isInstanceOf } from './is-instance-of.js';
+export { objectTag } from './object-tag.js';
+export { arrayItems } from './array-items.js';
+export { isError } from './is-error.js';
+export { errorMessage } from './error-message.js';
+export { shallowEqual } from './shallow-equal.js';
+export { isDevelopment } from './is-development.js';
+export { createDevWarner } from './create-dev-warner.js';
+export type { DevWarner, DevWarnerOptions, WarnOptions } from './create-dev-warner.types.js';
+export { canUseDOM } from './can-use-dom.js';
+export { deepFreeze } from './deep-freeze.js';
+export { clamp } from './clamp.js';

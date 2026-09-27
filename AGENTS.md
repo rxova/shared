@@ -11,6 +11,10 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   vitest preset only. This repository runs the scripts from source with `tsx`.
 - `packages/toolbox` — `@rxova/toolbox`: small dependency-free runtime helpers, plus a `/react`
   entry. Neutral platform, es2020, no side effects: consumers inline it at build time.
+- `packages/helpers` — `@rxova/helpers`, private: everything the published packages use but do
+  not export — io adapters, parsers, constants, types and the test fixtures several suites share
+  (`@rxova/helpers/fixtures`). Consumed from source, never built or published: tsdown bundles it
+  into each package's dist.
 - `packages/tooling/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
   them before anything is built.
 - `actions/*` — composite GitHub Actions other repositories use as
@@ -22,16 +26,22 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 ## Commands
 
 - `pnpm run verify` — the full gate, same order as CI. Run it before saying work is done.
+- `node --import tsx ./packages/tooling/src/cli.ts <command>` — the bin from source.
 - `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm format` — the pieces.
 - `pnpm --filter <package> test` — one package.
 - `pnpm changeset` — record a change to a published package.
 
 ## Rules
 
-- One folder per feature: `src/<feature>/<feature>.ts` holds the code and no types,
-  `<feature>.test.ts` its tests, `<feature>.types.ts` its types, `<feature>.fixtures.ts` the fakes
-  its suites share. `src/index.ts` re-exports only and `.types.ts` files hold types only — both are
-  excluded from coverage, so logic there is logic nobody measures.
+- One function per file, and the file is named after it: `src/<function-name>.ts` exports exactly
+  `functionName` (kebab-case file, camelCase export), `<function-name>.test.ts` beside it holds its
+  tests, `<name>.types.ts` holds types only, `<name>.fixtures.ts` the fakes several suites share.
+  `src/index.ts` re-exports only. Barrels, types and fixtures are excluded from coverage, so logic
+  there is logic nobody measures.
+- `@rxova/tooling` and `@rxova/toolbox` hold only their public functions: what `index.ts`, a
+  subpath export or the `rxova-tooling` bin reaches. Anything else — a private helper, an io
+  adapter, a constant — goes in `packages/helpers`. A published package never has a module-level
+  binding it does not export.
 - Coverage is 95% per file; raise thresholds, never lower them.
 - Never skip, delete or weaken a test to make a change pass.
 - ESLint runs `strictTypeChecked`. Fix the finding rather than disabling the rule; if a disable is

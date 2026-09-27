@@ -41,7 +41,7 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
-    "pack:smoke": "node --import tsx ../tooling/src/pack-smoke/pack-smoke.ts"
+    "pack:smoke": "node --import tsx ../tooling/src/cli.ts pack-smoke"
   },
   "peerDependencies": {
     "react": ">=18"

@@ -35,8 +35,8 @@
       "default": "./dist/vitest.js"
     },
     "./eslint": {
-      "types": "./presets/eslint.d.ts",
-      "default": "./presets/eslint.js"
+      "types": "./presets/base-eslint-config.d.ts",
+      "default": "./presets/base-eslint-config.js"
     },
     "./commitlint": {
       "types": "./presets/commitlint.d.ts",
@@ -59,7 +59,7 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
-    "pack:smoke": "node --import tsx src/pack-smoke/pack-smoke.ts"
+    "pack:smoke": "node --import tsx src/cli.ts pack-smoke"
   },
   "peerDependencies": {
     "@commitlint/config-conventional": ">=19",
@@ -100,6 +100,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
+    "@rxova/helpers": "workspace:*",
     "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",

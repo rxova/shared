@@ -46,7 +46,11 @@
     "pack:smoke": {
       "dependsOn": ["build"],
       "outputs": [],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/tooling/src/pack-smoke/pack-smoke.ts"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/tooling/src/pack-smoke.ts",
+        "$TURBO_ROOT$/packages/helpers/src/*.ts"
+      ],
       "outputLogs": "new-only"
     },
     // Root tasks (`//#`): each reads the whole tree in one pass, so there is
