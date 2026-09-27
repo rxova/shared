@@ -61,11 +61,6 @@ describe('commands', () => {
     expect(await call('check-llms', [empty])).toBe(1);
   });
 
-  it('write-page-bundle needs its three arguments', async () => {
-    quiet();
-    expect(await call('write-page-bundle', [])).toBe(1);
-  });
-
   it.each(Object.keys(commands()))('%s has a summary', (name) => {
     expect(commands()[name]?.summary).toBeTruthy();
   });

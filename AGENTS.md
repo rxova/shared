@@ -6,7 +6,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 
 - `packages/*` — published npm packages (each one needs a changeset when it changes).
 - `packages/tooling` — `@rxova/tooling`: the repo scripts behind the `rxova-tooling` bin (verify,
-  changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check, page bundle) and the
+  changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check) and the
   shared tsdown, vitest, eslint, commitlint and prettier presets. Coverage thresholds live in its
   vitest preset only. This repository runs the scripts from source with `tsx`.
 - `packages/toolbox` — `@rxova/toolbox`: small dependency-free runtime helpers, plus a `/react`
