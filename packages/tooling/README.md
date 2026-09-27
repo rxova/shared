@@ -15,15 +15,14 @@ pnpm add -D @rxova/tooling
 
 Run each command from the repository root, except `pack-smoke`, which runs from a package directory.
 
-| Command                                             | What it does                                                                                                                                                                                       |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rxova-tooling verify [--only a,b]`                 | Runs the pre-push gate in order and stops at the first failure. The steps come from `package.json#tooling.verify.steps`, or a default pnpm and Turborepo list.                                     |
-| `rxova-tooling check-changeset`                     | Fails when a published package changed and no changeset was added. Reads `BASE_SHA` and `HEAD_SHA`. `PR_LABELS` or `PR_TITLE` can carry `skip-changeset`.                                          |
-| `rxova-tooling check-scope`                         | Writes `code-changed=false` to `GITHUB_OUTPUT` for a release commit, which contains only version and changelog edits.                                                                              |
-| `rxova-tooling node-floor`                          | Writes to `GITHUB_OUTPUT` the single `engines.node` floor that all published packages share.                                                                                                       |
-| `rxova-tooling pack-smoke [dir]`                    | Packs the package, installs it in a scratch project, then imports and requires it. It also runs every bin with `--version` and checks the shipped files. `workspace:` dependencies are packed too. |
-| `rxova-tooling check-llms [root]`                   | Checks each published `llms.txt`: its title, summary and sections, that it appears in `files`, and that its `## API` table matches `src/index.ts` in both directions. Needs `typescript`.          |
-| `rxova-tooling write-page-bundle <dist> <p> <base>` | Writes `rxova-page-bundle.json` into a docs dist, for the rxova.org aggregator.                                                                                                                    |
+| Command                             | What it does                                                                                                                                                                                       |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rxova-tooling verify [--only a,b]` | Runs the pre-push gate in order and stops at the first failure. The steps come from `package.json#tooling.verify.steps`, or a default pnpm and Turborepo list.                                     |
+| `rxova-tooling check-changeset`     | Fails when a published package changed and no changeset was added. Reads `BASE_SHA` and `HEAD_SHA`. `PR_LABELS` or `PR_TITLE` can carry `skip-changeset`.                                          |
+| `rxova-tooling check-scope`         | Writes `code-changed=false` to `GITHUB_OUTPUT` for a release commit, which contains only version and changelog edits.                                                                              |
+| `rxova-tooling node-floor`          | Writes to `GITHUB_OUTPUT` the single `engines.node` floor that all published packages share.                                                                                                       |
+| `rxova-tooling pack-smoke [dir]`    | Packs the package, installs it in a scratch project, then imports and requires it. It also runs every bin with `--version` and checks the shipped files. `workspace:` dependencies are packed too. |
+| `rxova-tooling check-llms [root]`   | Checks each published `llms.txt`: its title, summary and sections, that it appears in `files`, and that its `## API` table matches `src/index.ts` in both directions. Needs `typescript`.          |
 
 Published packages are the directories under `packages/` whose manifest is not `private`. Nothing
 needs to be listed by hand.

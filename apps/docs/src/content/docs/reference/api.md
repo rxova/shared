@@ -19,15 +19,14 @@ description: Every export, command and action this repository publishes.
 
 ## `@rxova/tooling`
 
-| Command                                                   | What it does                                                     |
-| --------------------------------------------------------- | ---------------------------------------------------------------- |
-| `rxova-tooling verify [--only a,b]`                       | Runs the pre-push gate, from `package.json#tooling.verify.steps` |
-| `rxova-tooling check-changeset`                           | Requires a changeset when a published package changed            |
-| `rxova-tooling check-scope`                               | Reports `code-changed=false` for a release commit                |
-| `rxova-tooling node-floor`                                | Reads the one `engines.node` floor the packages share            |
-| `rxova-tooling pack-smoke [dir]`                          | Packs, installs, imports and requires a package from its tarball |
-| `rxova-tooling check-llms [root]`                         | Holds each `llms.txt` to the package exports                     |
-| `rxova-tooling write-page-bundle <dist> <project> <base>` | Marks a docs dist for the rxova.org aggregator                   |
+| Command                             | What it does                                                     |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| `rxova-tooling verify [--only a,b]` | Runs the pre-push gate, from `package.json#tooling.verify.steps` |
+| `rxova-tooling check-changeset`     | Requires a changeset when a published package changed            |
+| `rxova-tooling check-scope`         | Reports `code-changed=false` for a release commit                |
+| `rxova-tooling node-floor`          | Reads the one `engines.node` floor the packages share            |
+| `rxova-tooling pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball |
+| `rxova-tooling check-llms [root]`   | Holds each `llms.txt` to the package exports                     |
 
 Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
 `/tsconfig.base.json`.

@@ -8,12 +8,12 @@ The code every rxova repository shares, in one place:
 
 Each repository depends on these instead of keeping its own copy.
 
-| Piece              | What it is                                                                                                                                                                                                                                  |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/toolbox` | [`@rxova/toolbox`](packages/toolbox/README.md): small dependency-free runtime helpers (predicates, safe reflection, errors, equality, dev warnings, DOM, freeze, clamp) and a `/react` entry                                                |
-| `packages/tooling` | [`@rxova/tooling`](packages/tooling/README.md): the `rxova-tooling` bin (verify, changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check, page bundle) and the tsdown, vitest, eslint, commitlint and prettier presets |
-| `actions/`         | [Composite GitHub Actions](actions/README.md): `setup-pnpm`, `turbo-cache`, `turbo-remote-cache`, `setup-playwright`                                                                                                                        |
-| `apps/docs`        | Astro Starlight documentation, deployed to GitHub Pages                                                                                                                                                                                     |
+| Piece              | What it is                                                                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/toolbox` | [`@rxova/toolbox`](packages/toolbox/README.md): small dependency-free runtime helpers (predicates, safe reflection, errors, equality, dev warnings, DOM, freeze, clamp) and a `/react` entry                                   |
+| `packages/tooling` | [`@rxova/tooling`](packages/tooling/README.md): the `rxova-tooling` bin (verify, changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check) and the tsdown, vitest, eslint, commitlint and prettier presets |
+| `actions/`         | [Composite GitHub Actions](actions/README.md): `setup-pnpm`, `turbo-cache`, `turbo-remote-cache`, `setup-playwright`                                                                                                           |
+| `apps/docs`        | Astro Starlight documentation, deployed to GitHub Pages                                                                                                                                                                        |
 
 ## Using it
 

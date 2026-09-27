@@ -1,5 +1,4 @@
 export type { Step, ToolingConfig } from '@/config/config.types';
-export type { PageBundleManifest } from '@/page-bundle/page-bundle.types';
 export { isEntry } from '@/entry/is-entry';
 export { parseConfig } from '@/config/parse-config';
 export { readConfig } from '@/config/read-config';
@@ -17,4 +16,3 @@ export { decideFloor } from '@/node-floor/decide-floor';
 export { binsOf } from '@/pack-smoke/bins-of';
 export { shippedFiles } from '@/pack-smoke/shipped-files';
 export { packSmoke } from '@/pack-smoke/pack-smoke';
-export { pageBundleManifest } from '@/page-bundle/page-bundle-manifest';

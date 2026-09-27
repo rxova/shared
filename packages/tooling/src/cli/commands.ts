@@ -47,11 +47,4 @@ export const commands = (): Record<string, CommandEntry> => ({
       return (argv) => checkLlmsCommand(argv[0]);
     },
   },
-  'write-page-bundle': {
-    summary: 'mark a docs dist for the rxova.org aggregator <dist> <project> <base>',
-    load: async () => {
-      const { writePageBundleCommand } = await import('@/page-bundle/write-page-bundle-command');
-      return (argv) => writePageBundleCommand(argv);
-    },
-  },
 });
