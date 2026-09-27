@@ -16,8 +16,11 @@ describe('decideScope', () => {
   });
 
   it('runs everything when the range cannot be diffed', () => {
-    const run: Git = () => {
-      throw new Error('bad object');
+    const run: Git = {
+      names: () => {
+        throw new Error('bad object');
+      },
+      patch: () => '',
     };
     expect(decideScope('aaa', 'bbb', run).reason).toBe('could not diff the range');
   });
