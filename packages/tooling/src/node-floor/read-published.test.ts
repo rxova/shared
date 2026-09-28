@@ -38,6 +38,6 @@ describe('readPublished', () => {
       readPublished(root)
         .map(({ name }) => name)
         .sort(),
-    ).toEqual(['@rxova/toolbox', '@rxova/tooling']);
+    ).toEqual(['@rxova/ai', '@rxova/toolbox', '@rxova/tooling']);
   });
 });
