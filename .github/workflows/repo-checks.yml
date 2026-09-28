@@ -1,7 +1,7 @@
 name: Repo checks
 
-# Reusable: lint, formatting, build and typecheck in one job, plus a check that
-# every package with a vitest config is in the task graph.
+# Reusable: lint, formatting, workflow lint, build and typecheck in one job, plus
+# a check that every package with a vitest config is in the task graph.
 #
 #   jobs:
 #     checks:
@@ -24,8 +24,15 @@ on:
         type: string
         required: false
         default: pnpm exec turbo run build --filter='!docs'
+      actionlint:
+        description: >-
+          Lint the workflows with actionlint (shellcheck included), from its official image
+          pinned by version.
+        type: boolean
+        required: false
+        default: true
       extra-command:
-        description: Runs after the format check, before the build (a workflow linter, say).
+        description: Runs after the format check, before the build.
         type: string
         required: false
         default: ""
@@ -54,6 +61,13 @@ jobs:
         run: pnpm lint
       - name: Check formatting
         run: pnpm format:check
+      # A typo in a workflow expression otherwise surfaces only when that
+      # workflow runs, which for a reusable one is in someone else's CI.
+      - name: Lint the workflows
+        if: inputs.actionlint
+        uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color
       - name: Extra checks
         if: inputs.extra-command != ''
         run: ${{ inputs.extra-command }}
