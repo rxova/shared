@@ -1,7 +1,7 @@
 ---
 name: rx-observability
 description: Investigates production behaviour of backend services with Datadog (traces, logs, metrics, monitors, deploy events) and returns a findings report with evidence links and a confidence level. Read-only by default. Use when an alert fires, a deploy looks suspicious, or someone asks why a service is slow or failing.
-model: sonnet
+model: opus
 ---
 
 <!-- No tools line on purpose: this agent inherits the session's tools, including the Datadog MCP server. -->

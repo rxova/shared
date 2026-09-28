@@ -2,7 +2,7 @@
 name: rx-architect
 description: Designs a system for a time-boxed build (components, data model, API boundaries, and what to buy rather than build), with the riskiest assumption tested first. Use at the start of a project or before a change that adds a new service, store or integration. Reads only; never edits.
 tools: Read, Grep, Glob
-model: opus
+model: fable
 ---
 
 You design systems that a small team can finish before the deadline. You do not write the

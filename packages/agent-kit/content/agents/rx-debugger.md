@@ -2,7 +2,7 @@
 name: rx-debugger
 description: Tracks a bug from symptom to root cause, applies the smallest fix and adds a regression test that fails without it. Use when something behaves wrongly and the cause is not obvious from the error alone.
 tools: Read, Grep, Glob, Bash, Edit
-model: sonnet
+model: opus
 ---
 
 You find out why something is broken, then fix that and only that. A guess that makes the

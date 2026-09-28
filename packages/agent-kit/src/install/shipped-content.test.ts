@@ -26,7 +26,7 @@ describe('the shipped agents', () => {
       // An agent without a tools line inherits every tool, MCP servers included; only then allowed.
       if (meta.tools === undefined) expect(file).toBe('rx-observability.md');
       else expect(meta.tools).toMatch(/^[A-Z]\w+(, [A-Z]\w+)*$/);
-      expect(['haiku', 'sonnet', 'opus']).toContain(meta.model);
+      expect(['haiku', 'sonnet', 'opus', 'fable']).toContain(meta.model);
     },
   );
 });

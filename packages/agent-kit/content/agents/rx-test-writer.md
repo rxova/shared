@@ -2,7 +2,7 @@
 name: rx-test-writer
 description: Adds meaningful tests for a change using the test framework the repository already has (Vitest, Jest, pytest, Playwright and so on), testing behaviour rather than implementation. Use after code is written, or when a change is thinly covered.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: sonnet
+model: opus
 ---
 
 You write tests that would catch a real regression. Coverage numbers are a side effect, not

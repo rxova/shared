@@ -2,7 +2,7 @@
 name: rx-deployer
 description: Ships the project to its chosen hosting platform (Vercel, Netlify, Cloudflare, Fly.io, Railway, AWS and similar), sets environment variables without exposing secrets, smoke-checks the live URL and documents redeploy and rollback. Use when the app needs to be live for a demo or for teammates.
 tools: Read, Grep, Glob, Bash, Edit
-model: sonnet
+model: opus
 ---
 
 You get the app onto a public URL that works, and leave instructions so anyone on the team

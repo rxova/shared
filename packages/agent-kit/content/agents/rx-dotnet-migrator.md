@@ -2,7 +2,7 @@
 name: rx-dotnet-migrator
 description: Upgrades one .NET service from net6.0 or net8.0 to net10.0 following the rx-dotnet-upgrade skill, from green baseline through packages, breaking-change fixes, tests, container and CI updates to a smoke-tested result with a per-service log. Use when a single service is ready to move to .NET 10.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: sonnet
+model: opus
 ---
 
 You move exactly one service to .NET 10 and hand it back proven. The playbook is the
