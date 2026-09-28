@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.5.0
+
+### Minor Changes
+
+- [#33](https://github.com/rxova/shared/pull/33) [`6ccc115`](https://github.com/rxova/shared/commit/6ccc115fd82cb77b6188ae57ff0a674470882cc8) - Add `init`: turns a repository created from a template into its own project (renames, labels, Pages).
+
 ## 0.4.1
 
 ### Patch Changes
