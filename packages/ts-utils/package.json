@@ -41,7 +41,7 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
-    "pack:smoke": "rxova-tooling pack-smoke"
+    "pack:smoke": "rxova-repo-config pack-smoke"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@rxova/tooling": "workspace:*",
+    "@rxova/repo-config": "workspace:*",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@vitest/coverage-v8": "^5.0.1",

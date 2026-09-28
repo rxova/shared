@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsdown';
-import { baseBuildConfig } from '@rxova/tooling/tsdown';
+import { baseBuildConfig } from '@rxova/repo-config/tsdown';
 
 // The hook runner is built on its own: the installer copies that one file out of the
 // package, so it must not import a chunk it shares with the CLI.

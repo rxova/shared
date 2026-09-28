@@ -17,18 +17,18 @@ description: Every export, command and action this repository publishes.
 | `canUseDOM` / `deepFreeze` / `clamp`                  | DOM presence; recursive freeze; a bounded number                             |
 | `useIsomorphicLayoutEffect` (`@rxova/ts-utils/react`) | `useLayoutEffect` in the browser, `useEffect` on the server                  |
 
-## `@rxova/tooling`
+## `@rxova/repo-config`
 
-| Command                             | What it does                                                     |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `rxova-tooling verify [--only a,b]` | Runs the pre-push gate, from `package.json#tooling.verify.steps` |
-| `rxova-tooling check-changeset`     | Requires a changeset when a published package changed            |
-| `rxova-tooling check-scope`         | Reports `code-changed=false` for a release commit                |
-| `rxova-tooling node-floor`          | Reads the one `engines.node` floor the packages share            |
-| `rxova-tooling pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball |
-| `rxova-tooling check-llms [root]`   | Holds each `llms.txt` to the package exports                     |
+| Command                                 | What it does                                                     |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate, from `package.json#tooling.verify.steps` |
+| `rxova-repo-config check-changeset`     | Requires a changeset when a published package changed            |
+| `rxova-repo-config check-scope`         | Reports `code-changed=false` for a release commit                |
+| `rxova-repo-config node-floor`          | Reads the one `engines.node` floor the packages share            |
+| `rxova-repo-config pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball |
+| `rxova-repo-config check-llms [root]`   | Holds each `llms.txt` to the package exports                     |
 
-Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
+Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
 `/tsconfig.base.json`.
 
 ## `@rxova/ai`

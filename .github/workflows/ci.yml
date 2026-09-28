@@ -52,7 +52,7 @@ jobs:
           HEAD_SHA: >-
             ${{ github.event_name == 'pull_request'
             && github.event.pull_request.head.sha || github.sha }}
-        run: node --import tsx ./packages/tooling/src/cli/cli.ts check-scope
+        run: node --import tsx ./packages/repo-config/src/cli/cli.ts check-scope
 
       - name: Lint the branch commits
         if: github.event_name == 'pull_request'
@@ -168,7 +168,7 @@ jobs:
       # Unused files, exports and dependencies. The only check here that
       # notices an export nothing imports. It loads every vitest and tsdown
       # config, which import the built presets, so the script builds
-      # @rxova/tooling first.
+      # @rxova/repo-config first.
       - name: Check for unused files, exports and dependencies
         run: pnpm run knip:check
       # Last, and it has to stay last: `pnpm dedupe --check` removes the
@@ -218,7 +218,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Read the Node floor from engines
         id: floor
-        run: node --import tsx ./packages/tooling/src/cli/cli.ts node-floor
+        run: node --import tsx ./packages/repo-config/src/cli/cli.ts node-floor
       - name: Build
         if: steps.floor.outputs.version != ''
         run: pnpm exec turbo run build --filter='./packages/*'
@@ -234,7 +234,7 @@ jobs:
         run: |
           node --version
           for dir in $PACKAGES; do
-            (cd "$dir" && node ../tooling/dist/cli.js pack-smoke)
+            (cd "$dir" && node ../repo-config/dist/cli.js pack-smoke)
           done
 
   docs:
@@ -276,7 +276,7 @@ jobs:
           # Still runs and reports rather than being skipped by an `if:`, so that
           # honouring the label is visible in a log somebody can read.
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: node --import tsx ./packages/tooling/src/cli/cli.ts check-changeset
+        run: node --import tsx ./packages/repo-config/src/cli/cli.ts check-changeset
 
   # The single context branch protection should require, and the only job here
   # that never skips. Matrix jobs skipped before expansion report under their

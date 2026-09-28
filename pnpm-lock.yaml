@@ -181,9 +181,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))
-      '@rxova/tooling':
+      '@rxova/repo-config':
         specifier: workspace:*
-        version: link:packages/tooling
+        version: link:packages/repo-config
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -248,9 +248,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
         version: 0.18.5
-      '@rxova/tooling':
+      '@rxova/repo-config':
         specifier: workspace:*
-        version: link:../tooling
+        version: link:../repo-config
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -273,7 +273,7 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@26.6.2)(@vitest/coverage-v8@5.0.1)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/tooling:
+  packages/repo-config:
     dependencies:
       '@commitlint/config-conventional':
         specifier: '>=19'
@@ -321,9 +321,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
         version: 0.18.5
-      '@rxova/tooling':
+      '@rxova/repo-config':
         specifier: workspace:*
-        version: link:../tooling
+        version: link:../repo-config
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2

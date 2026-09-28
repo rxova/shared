@@ -5,7 +5,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 ## Layout
 
 - `packages/*` — published npm packages (each one needs a changeset when it changes).
-- `packages/tooling` — `@rxova/tooling`: the repo scripts behind the `rxova-tooling` bin (verify,
+- `packages/repo-config` — `@rxova/repo-config`: the repo scripts behind the `rxova-repo-config` bin (verify,
   changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check) and the
   shared tsdown, vitest, eslint, commitlint and prettier presets. Coverage thresholds live in its
   vitest preset only. This repository runs the scripts from source with `tsx`.
@@ -17,7 +17,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   `src/install/profiles.ts`. `content/` ships as-is; `src/hooks/hooks-entry.ts` is built as a
   standalone `dist/hooks.js` (its own tsdown config, no shared chunks) because the installer copies
   that one file out of the package.
-- `packages/tooling/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
+- `packages/repo-config/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
   them before anything is built.
 - `actions/*` — composite GitHub Actions other repositories use as
   `rxova/shared/actions/<name>@<ref>`. This repository's workflows use them through
@@ -28,7 +28,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 ## Commands
 
 - `pnpm run verify` — the full gate, same order as CI. Run it before saying work is done.
-- `node --import tsx ./packages/tooling/src/cli.ts <command>` — the bin from source.
+- `node --import tsx ./packages/repo-config/src/cli.ts <command>` — the bin from source.
 - `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm format` — the pieces.
 - `pnpm --filter <package> test` — one package.
 - `pnpm changeset` — record a change to a published package.
@@ -44,10 +44,10 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   measures.
 - No relative imports in source. A package names its own files as `@/<topic>/<file>`; each
   package's `tsconfig.json` declares `@/*` in `paths`, the vitest preset maps it for tests, tsdown
-  reads it for the build, and the root `tsconfig.json` carries tooling's for `tsx` runs from the
+  reads it for the build, and the root `tsconfig.json` carries repo-config's for `tsx` runs from the
   repository root. The eslint preset rejects `./` and `../` imports.
-- `@rxova/tooling` and `@rxova/ts-utils` hold only their public functions: what `index.ts`, a
-  subpath export or the `rxova-tooling` bin reaches. Anything else — a private helper, an io
+- `@rxova/repo-config` and `@rxova/ts-utils` hold only their public functions: what `index.ts`, a
+  subpath export or the `rxova-repo-config` bin reaches. Anything else — a private helper, an io
   adapter, a constant, a shared test fixture — goes in the package's `src/internal/<topic>/`,
   which `index.ts` never re-exports. A published package never has a module-level
   binding it does not export.
@@ -57,4 +57,4 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   truly needed, scope it to one line and say why.
 - Conventional Commits; subject line only. Never `--no-verify`.
 - No new runtime dependency in a published package without saying why. `@rxova/ts-utils` takes none
-  at all, and `@rxova/tooling` keeps its tools as optional peer dependencies.
+  at all, and `@rxova/repo-config` keeps its tools as optional peer dependencies.
