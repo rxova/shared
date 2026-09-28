@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
-import { act, createElement } from 'react';
+import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@/react/render-hook.fixtures';
+import { act, renderHook } from '@/react/render-hook.fixtures';
 import { useMediaQuery } from '@/react/use-media-query';
 
 /** A controllable `matchMedia`: one list per query, flipped by `set`. */

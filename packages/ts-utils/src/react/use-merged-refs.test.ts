@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
-import { act, createElement, createRef, type Ref } from 'react';
+import { createElement, createRef, type Ref } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@/react/render-hook.fixtures';
+import { act, renderHook } from '@/react/render-hook.fixtures';
 import { useMergedRefs } from '@/react/use-merged-refs';
 
 const mountSpan = (refs: Ref<HTMLSpanElement>[]) => {
