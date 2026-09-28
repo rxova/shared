@@ -1,4 +1,4 @@
-import { withBase } from '@/links/with-base';
+import { withBase } from "@/links/with-base";
 
 /**
  * Site-root URLs as absolute ones: markdown links and images, raw `href`/`src`

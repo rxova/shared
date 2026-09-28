@@ -1,5 +1,5 @@
-import { isObjectLike } from '@/predicates/is-object-like';
-import { readProperty } from '@/safe/read-property';
+import { isObjectLike } from "@/predicates/is-object-like";
+import { readProperty } from "@/safe/read-property";
 
 /**
  * Anything shaped like an error: an object whose `message` is a string. Looser
@@ -12,4 +12,4 @@ import { readProperty } from '@/safe/read-property';
  * optionally `name`, `stack`, `cause`); only `message` is guaranteed.
  */
 export const isErrorLike = (value: unknown): value is Error =>
-  isObjectLike(value) && typeof readProperty(value, 'message') === 'string';
+  isObjectLike(value) && typeof readProperty(value, "message") === "string";

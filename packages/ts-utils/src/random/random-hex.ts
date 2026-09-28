@@ -1,6 +1,6 @@
-import { notifiedFallbacks } from '@/internal/random/notified-fallbacks';
-import { toHex } from '@/internal/random/to-hex';
-import type { RandomHexOptions } from '@/random/random-hex.types';
+import { notifiedFallbacks } from "@/internal/random/notified-fallbacks";
+import { toHex } from "@/internal/random/to-hex";
+import type { RandomHexOptions } from "@/random/random-hex.types";
 
 /**
  * `bytes` random bytes as lowercase hex, so the string is `2 * bytes` long.
@@ -21,13 +21,13 @@ export const randomHex = (bytes: number, { onFallback }: RandomHexOptions = {}):
   }
 
   const crypto = (globalThis as { crypto?: Partial<Crypto> }).crypto;
-  if (typeof crypto?.getRandomValues === 'function') {
-    return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), toHex).join('');
+  if (typeof crypto?.getRandomValues === "function") {
+    return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), toHex).join("");
   }
 
   if (onFallback !== undefined && !notifiedFallbacks.has(onFallback)) {
     notifiedFallbacks.add(onFallback);
     onFallback();
   }
-  return Array.from({ length: bytes }, () => toHex(Math.floor(Math.random() * 256))).join('');
+  return Array.from({ length: bytes }, () => toHex(Math.floor(Math.random() * 256))).join("");
 };

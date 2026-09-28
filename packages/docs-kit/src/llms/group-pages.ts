@@ -1,5 +1,5 @@
-import type { DocsPage } from '@/pages/docs-pages.types';
-import type { GroupOptions, Grouped, PageGroup } from '@/llms/llms.types';
+import type { DocsPage } from "@/pages/docs-pages.types";
+import type { GroupOptions, Grouped, PageGroup } from "@/llms/llms.types";
 
 /**
  * Pages grouped by section in the order a reader should meet them: the listed

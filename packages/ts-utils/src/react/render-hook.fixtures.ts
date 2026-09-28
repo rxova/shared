@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
-import * as TestUtils from 'react-dom/test-utils';
+import * as React from "react";
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
+import * as TestUtils from "react-dom/test-utils";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -27,7 +27,7 @@ export const renderHook = <Props, Result>(hook: (props: Props) => Result, initia
     result.renders += 1;
     return null;
   };
-  const root = createRoot(document.createElement('div'));
+  const root = createRoot(document.createElement("div"));
   const render = (props: Props) => {
     act(() => {
       root.render(createElement(Probe, { props }));

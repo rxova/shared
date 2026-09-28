@@ -1,4 +1,4 @@
-import type { ComponentRules } from '@/markdown/markdown.types';
+import type { ComponentRules } from "@/markdown/markdown.types";
 
 /**
  * The default component rules merged with a repository's additions.
@@ -16,7 +16,7 @@ export const componentRules = ({ unwrap = [], headings = {} }: ComponentRules = 
   return {
     unwrap: [
       ...new Set([
-        ...['Tabs', 'TabItem', 'CardGrid', 'Card', 'Steps', 'Aside', 'LinkCard'],
+        ...["Tabs", "TabItem", "CardGrid", "Card", "Steps", "Aside", "LinkCard"],
         ...unwrap,
         ...Object.keys(allHeadings),
       ]),

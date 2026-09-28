@@ -1,5 +1,5 @@
-import type { NonProductionOptions } from '@/env/is-non-production.types';
-import { isObjectLike } from '@/predicates/is-object-like';
+import type { NonProductionOptions } from "@/env/is-non-production.types";
+import { isObjectLike } from "@/predicates/is-object-like";
 
 // Typed here so the package needs no Node types: it runs in browsers too.
 declare const process: { env: { NODE_ENV?: string } };
@@ -34,6 +34,6 @@ export const isNonProduction = (options: NonProductionOptions = {}): boolean => 
     if (bundlerEnv.PROD === true) return false;
     if (bundlerEnv.DEV === true) return true;
   }
-  const nodeEnv = 'nodeEnv' in options ? options.nodeEnv : ambientNodeEnv();
-  return typeof nodeEnv === 'string' && nodeEnv !== 'production';
+  const nodeEnv = "nodeEnv" in options ? options.nodeEnv : ambientNodeEnv();
+  return typeof nodeEnv === "string" && nodeEnv !== "production";
 };

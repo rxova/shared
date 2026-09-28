@@ -1,4 +1,4 @@
-import type { DocsPage } from '@/pages/docs-pages.types';
+import type { DocsPage } from "@/pages/docs-pages.types";
 
 /** A section key (the top directory, or `root`) and the heading it gets, in reading order. */
 export type Section = readonly [key: string, heading: string];

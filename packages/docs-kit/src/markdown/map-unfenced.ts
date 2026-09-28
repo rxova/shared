@@ -1,4 +1,4 @@
-import { FENCE } from '@/internal/markdown/fence';
+import { FENCE } from "@/internal/markdown/fence";
 
 /**
  * Applies `fn` to the runs of a document outside code fences, leaving every
@@ -23,11 +23,11 @@ export const mapUnfenced = (
   let marker: string | undefined;
 
   const flush = () => {
-    if (buffer.length > 0) out.push(fn(buffer.join('\n')));
+    if (buffer.length > 0) out.push(fn(buffer.join("\n")));
     buffer = [];
   };
 
-  for (const line of text.split('\n')) {
+  for (const line of text.split("\n")) {
     const match = FENCE.exec(line);
     const fence = match?.[2];
     if (marker === undefined) {
@@ -45,12 +45,12 @@ export const mapUnfenced = (
       fence !== undefined &&
       fence.startsWith(marker.charAt(0)) &&
       fence.length >= marker.length &&
-      match?.[3]?.trim() === ''
+      match?.[3]?.trim() === ""
     ) {
       marker = undefined;
     }
   }
 
   flush();
-  return out.join('\n');
+  return out.join("\n");
 };

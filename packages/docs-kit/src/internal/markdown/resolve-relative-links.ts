@@ -1,5 +1,5 @@
-import { normalizePath } from '@/internal/markdown/normalize-path';
-import { withBase } from '@/links/with-base';
+import { normalizePath } from "@/internal/markdown/normalize-path";
+import { withBase } from "@/links/with-base";
 
 /**
  * Doc-relative `.md` links as absolute twin URLs. `../rules/x.md` written in
@@ -13,10 +13,10 @@ export const resolveRelativeLinks = (
   text: string,
   { origin, base, fromRoute }: { origin: string; base: string; fromRoute: string },
 ): string => {
-  const dir = fromRoute.slice(0, fromRoute.lastIndexOf('/') + 1);
+  const dir = fromRoute.slice(0, fromRoute.lastIndexOf("/") + 1);
   return text.replace(
     /(\]\()(\.{1,2}\/[^)\s#]*\.md)(#[^)\s]*)?(\))/g,
     (_, open: string, path: string, hash: string | undefined, close: string) =>
-      `${open}${origin}${withBase(normalizePath(dir + path).toLowerCase(), base)}${hash ?? ''}${close}`,
+      `${open}${origin}${withBase(normalizePath(dir + path).toLowerCase(), base)}${hash ?? ""}${close}`,
   );
 };
