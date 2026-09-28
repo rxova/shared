@@ -42,7 +42,14 @@
       "types": "./presets/commitlint.d.ts",
       "default": "./presets/commitlint.js"
     },
-    "./prettier": "./presets/prettier.json",
+    "./prettier": {
+      "types": "./presets/prettier.d.ts",
+      "default": "./presets/prettier.js"
+    },
+    "./lint-staged": {
+      "types": "./presets/lint-staged.d.ts",
+      "default": "./presets/lint-staged.js"
+    },
     "./tsconfig.base.json": "./presets/tsconfig.base.json",
     "./package.json": "./package.json"
   },
@@ -61,11 +68,15 @@
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
     "pack:smoke": "node --import tsx src/cli/cli.ts pack-smoke"
   },
+  "dependencies": {
+    "prettier-plugin-astro": "^1.1.0"
+  },
   "peerDependencies": {
     "@commitlint/config-conventional": ">=19",
     "@eslint/js": ">=9",
     "eslint": ">=9",
     "globals": ">=15",
+    "prettier": ">=3.5",
     "tsdown": ">=0.15",
     "typescript": ">=5.5",
     "typescript-eslint": ">=8",
@@ -82,6 +93,9 @@
       "optional": true
     },
     "globals": {
+      "optional": true
+    },
+    "prettier": {
       "optional": true
     },
     "tsdown": {
@@ -104,6 +118,7 @@
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
+    "prettier": "^3.9.8",
     "publint": "^0.3.24",
     "tsdown": "^0.23.0",
     "tsx": "^4.23.15",
