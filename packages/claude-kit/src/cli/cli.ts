@@ -7,7 +7,7 @@ import { commands } from '@/cli/commands';
 import { isEntry } from '@/internal/entry/is-entry';
 
 /**
- * `rxova-ai <command>`: installs, inspects and removes the kit. Picks the command by name and
+ * `rxova-claude-kit <command>`: installs, inspects and removes the kit. Picks the command by name and
  * hands it the rest of the arguments; returns the exit code rather than setting it, so tests
  * can call it.
  */
@@ -30,7 +30,7 @@ export const cli = async (
   }
   const command = Object.hasOwn(table, name) ? table[name] : undefined;
   if (command === undefined) {
-    io.err(`rxova-ai: unknown command "${name}"\n\n${usage(table)}`);
+    io.err(`rxova-claude-kit: unknown command "${name}"\n\n${usage(table)}`);
     return 1;
   }
   return (await command.load())(rest);

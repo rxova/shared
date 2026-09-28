@@ -12,7 +12,7 @@ import { targetDir } from '@/internal/install/target-dir';
 import { writeJson } from '@/internal/install/write-json';
 
 /**
- * `rxova-ai uninstall [--project] [--dry-run]`: removes the files the manifest lists and the
+ * `rxova-claude-kit uninstall [--project] [--dry-run]`: removes the files the manifest lists and the
  * rx-ai hook entries, leaving every other file and setting as it was.
  */
 export const uninstallCommand = (
@@ -46,7 +46,7 @@ export const uninstallCommand = (
     io.out(`Removed rx-ai from ${target}.`);
     return 0;
   } catch (failure) {
-    io.err(`rxova-ai uninstall: ${(failure as Error).message}`);
+    io.err(`rxova-claude-kit uninstall: ${(failure as Error).message}`);
     return 1;
   }
 };

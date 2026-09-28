@@ -20,7 +20,9 @@ export const selectItems = ({
 }): { profile: string; items: string[] } => {
   const unknown = [...add, ...skip].filter((name) => !names.includes(name));
   if (unknown.length > 0)
-    throw new Error(`unknown item ${unknown.join(', ')}; run \`rxova-ai list\` to see every item`);
+    throw new Error(
+      `unknown item ${unknown.join(', ')}; run \`rxova-claude-kit list\` to see every item`,
+    );
 
   let base: { profile: string; items: readonly string[] };
   if (profile === undefined && previous !== undefined) {

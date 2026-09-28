@@ -18,7 +18,7 @@ import { targetDir } from '@/internal/install/target-dir';
 import { writeJson } from '@/internal/install/write-json';
 
 /**
- * `rxova-ai install [--profile core|hackathon|full] [--add a,b] [--skip c] [--project]
+ * `rxova-claude-kit install [--profile core|hackathon|full] [--add a,b] [--skip c] [--project]
  * [--dry-run] [--force]`: copies the chosen agents and skills and the hook runner into `.claude`,
  * registers the chosen hooks in its `settings.json`, and records what it wrote. Running it again
  * updates in place, keeping the last selection unless told otherwise.
@@ -47,7 +47,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
     });
     if (plan.conflicts.length > 0 && options.force !== true)
       throw new Error(
-        `these already exist and were not written by rxova-ai:\n${plan.conflicts.map((file) => `  ${file}`).join('\n')}\n` +
+        `these already exist and were not written by rxova-claude-kit:\n${plan.conflicts.map((file) => `  ${file}`).join('\n')}\n` +
           'Move them, or pass --force to overwrite.',
       );
     const written = plan.copies.map(({ to }) => to);
@@ -91,7 +91,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
     io.out(`Installed rx-ai (${selection.profile}: ${counts}) into ${target}.`);
     return 0;
   } catch (failure) {
-    io.err(`rxova-ai install: ${(failure as Error).message}`);
+    io.err(`rxova-claude-kit install: ${(failure as Error).message}`);
     return 1;
   }
 };

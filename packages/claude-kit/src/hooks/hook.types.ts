@@ -64,7 +64,7 @@ export interface HookSpec {
   on: readonly HookTrigger[];
   /** Seconds Claude Code waits before giving up on it. */
   timeout: number;
-  /** One line for `rxova-ai list`. */
+  /** One line for `rxova-claude-kit list`. */
   summary: string;
   run: (input: HookInput, context: HookContext) => HookOutcome;
 }

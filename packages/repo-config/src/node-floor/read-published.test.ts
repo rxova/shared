@@ -38,6 +38,6 @@ describe('readPublished', () => {
       readPublished(root)
         .map(({ name }) => name)
         .sort(),
-    ).toEqual(['@rxova/ai', '@rxova/repo-config', '@rxova/ts-utils']);
+    ).toEqual(['@rxova/claude-kit', '@rxova/repo-config', '@rxova/ts-utils']);
   });
 });
