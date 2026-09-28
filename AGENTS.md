@@ -12,7 +12,9 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 - `packages/toolbox` — `@rxova/toolbox`: small dependency-free runtime helpers, plus a `/react`
   entry. Neutral platform, es2020, no side effects: consumers inline it at build time.
 - `packages/ai` — `@rxova/ai`: the `rxova-ai` bin that installs Claude Code agents, skills and
-  guard hooks into `.claude`. `content/` ships as-is; `src/hooks/hooks-entry.ts` is built as a
+  hooks into `.claude`, in profiles. Agents and skills are Markdown under `content/`; every
+  hook is a `HookSpec` in `src/hooks/hooks-table.ts`, and profiles live in
+  `src/install/profiles.ts`. `content/` ships as-is; `src/hooks/hooks-entry.ts` is built as a
   standalone `dist/hooks.js` (its own tsdown config, no shared chunks) because the installer copies
   that one file out of the package.
 - `packages/tooling/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
