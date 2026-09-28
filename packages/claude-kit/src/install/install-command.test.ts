@@ -97,7 +97,9 @@ describe('installCommand', () => {
     const { env, target } = scratch();
     writeTree(target, { 'agents/rx-planner.md': 'someone else' });
     expect(installCommand([], env)).toBe(1);
-    expect(env.io.err).toHaveBeenCalledWith(expect.stringContaining('agents/rx-planner.md'));
+    expect(env.io.err).toHaveBeenCalledWith(
+      expect.stringContaining(join('agents', 'rx-planner.md')),
+    );
     expect(readFileSync(join(target, 'agents/rx-planner.md'), 'utf8')).toBe('someone else');
     expect(installCommand(['--force'], env)).toBe(0);
     expect(readFileSync(join(target, 'agents/rx-planner.md'), 'utf8')).toContain('plans');

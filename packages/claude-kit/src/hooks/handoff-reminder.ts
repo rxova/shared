@@ -1,4 +1,4 @@
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import type { HookSpec } from '@/hooks/hook.types';
 import { latestNote } from '@/internal/hooks/latest-note';
 
@@ -20,7 +20,7 @@ export const handoffReminder: HookSpec = {
     return {
       code: 0,
       stdout:
-        `rx-ai: the latest handoff note for this project is ${relative(cwd, note.path)} (${note.date}). ` +
+        `rx-ai: the latest handoff note for this project is ${relative(cwd, note.path).split(sep).join('/')} (${note.date}). ` +
         'If this session continues that work, read it before doing anything else.',
     };
   },
