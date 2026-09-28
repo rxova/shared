@@ -20,7 +20,7 @@ describe('statusCommand', () => {
     const { env } = scratch();
     installCommand([], env);
     expect(statusCommand([], env)).toBe(0);
-    expect(env.io.out).toHaveBeenCalledWith(expect.stringContaining('3 guard hooks registered'));
+    expect(env.io.out).toHaveBeenCalledWith(expect.stringContaining('6 hooks registered'));
   });
 
   it('fails when nothing is installed', () => {
@@ -31,11 +31,11 @@ describe('statusCommand', () => {
   it('lists missing and changed files, and fails', () => {
     const { env, target } = scratch();
     installCommand([], env);
-    rmSync(join(target, 'agents/rx-one.md'));
-    writeFileSync(join(target, 'agents/rx-two.md'), 'edited');
+    rmSync(join(target, 'agents/rx-planner.md'));
+    writeFileSync(join(target, 'skills/rx-verify/SKILL.md'), 'edited');
     expect(statusCommand([], env)).toBe(1);
-    expect(env.io.out).toHaveBeenCalledWith('  missing  agents/rx-one.md');
-    expect(env.io.out).toHaveBeenCalledWith('  changed  agents/rx-two.md');
+    expect(env.io.out).toHaveBeenCalledWith('  missing  agents/rx-planner.md');
+    expect(env.io.out).toHaveBeenCalledWith('  changed  skills/rx-verify/SKILL.md');
   });
 
   it('fails on another version, or when the hooks are gone', () => {
@@ -51,7 +51,7 @@ describe('statusCommand', () => {
   it('does not flag a file this version no longer ships as changed', () => {
     const { env } = scratch();
     installCommand([], env);
-    rmSync(join(env.packageDir, 'content/agents/rx-one.md'));
+    rmSync(join(env.packageDir, 'content/agents/rx-planner.md'));
     expect(statusCommand([], env)).toBe(0);
   });
 

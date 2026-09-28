@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bash, filesWith } from '@/internal/hooks/guard.fixtures';
+import { bash, contextWith } from '@/internal/hooks/context.fixtures';
 import { noAttribution } from '@/hooks/no-attribution';
 
 // Built from parts so the fixtures do not trip an attribution guard on this very file.
@@ -7,10 +7,12 @@ const TRAILER = ['Co', 'Authored', 'By'].join('-');
 const SESSION = ['Claude', 'Session'].join('-');
 const BADGE = String.fromCodePoint(0x1f916);
 
-const files = filesWith({
-  '/repo/msg.txt': `feat: x\n\n${TRAILER}: Claude <noreply@anthropic.com>\n`,
-  '/repo/clean.txt': 'feat: x\n',
-  '/repo/body.md': `## Summary\n\n${BADGE} Generated with Claude Code\n`,
+const files = contextWith({
+  files: {
+    '/repo/msg.txt': `feat: x\n\n${TRAILER}: Claude <noreply@anthropic.com>\n`,
+    '/repo/clean.txt': 'feat: x\n',
+    '/repo/body.md': `## Summary\n\n${BADGE} Generated with Claude Code\n`,
+  },
 });
 const blocked = (command: string) => noAttribution(bash(command), files).block;
 

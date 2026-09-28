@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { bash, filesWith } from '@/internal/hooks/guard.fixtures';
+import { bash, contextWith } from '@/internal/hooks/context.fixtures';
 import { noBypass } from '@/hooks/no-bypass';
 
-const blocked = (command: string) => noBypass(bash(command), filesWith()).block;
+const blocked = (command: string) => noBypass(bash(command), contextWith()).block;
 
 describe('noBypass', () => {
   it.each([
@@ -41,11 +41,11 @@ describe('noBypass', () => {
   });
 
   it('says what it stopped and what to do instead', () => {
-    expect(noBypass(bash('HUSKY=0 git push'), filesWith())).toEqual({
+    expect(noBypass(bash('HUSKY=0 git push'), contextWith())).toEqual({
       block: true,
       reason: expect.stringContaining('HUSKY=0') as string,
     });
-    expect(noBypass(bash('git config core.hooksPath x'), filesWith())).toEqual({
+    expect(noBypass(bash('git config core.hooksPath x'), contextWith())).toEqual({
       block: true,
       reason: expect.stringContaining('core.hooksPath') as string,
     });
@@ -53,9 +53,10 @@ describe('noBypass', () => {
 
   it('ignores every tool but Bash, and a Bash call without a command', () => {
     expect(
-      noBypass({ tool_name: 'Write', tool_input: { command: 'git commit -n' } }, filesWith()).block,
+      noBypass({ tool_name: 'Write', tool_input: { command: 'git commit -n' } }, contextWith())
+        .block,
     ).toBe(false);
-    expect(noBypass({ tool_name: 'Bash', tool_input: {} }, filesWith()).block).toBe(false);
-    expect(noBypass({ tool_name: 'Bash' }, filesWith()).block).toBe(false);
+    expect(noBypass({ tool_name: 'Bash', tool_input: {} }, contextWith()).block).toBe(false);
+    expect(noBypass({ tool_name: 'Bash' }, contextWith()).block).toBe(false);
   });
 });

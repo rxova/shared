@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { filesWith } from '@/internal/hooks/guard.fixtures';
-import type { HookInput } from '@/hooks/guard.types';
+import { contextWith } from '@/internal/hooks/context.fixtures';
+import type { HookInput } from '@/hooks/hook.types';
 import { configLock } from '@/hooks/config-lock';
 
 const edit = (file_path: unknown, tool_name = 'Edit', cwd?: string): HookInput => ({
@@ -8,12 +8,14 @@ const edit = (file_path: unknown, tool_name = 'Edit', cwd?: string): HookInput =
   tool_input: { file_path },
   ...(cwd === undefined ? {} : { cwd }),
 });
-const existing = filesWith({
-  '/repo/eslint.config.js': '',
-  '/repo/packages/a/tsconfig.build.json': '',
-  '/repo/.prettierrc': '',
-  '/repo/vitest.config.ts': '',
-  '/repo/src/app.ts': '',
+const existing = contextWith({
+  files: {
+    '/repo/eslint.config.js': '',
+    '/repo/packages/a/tsconfig.build.json': '',
+    '/repo/.prettierrc': '',
+    '/repo/vitest.config.ts': '',
+    '/repo/src/app.ts': '',
+  },
 });
 
 describe('configLock', () => {

@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import type { Guard } from '@/hooks/guard.types';
+import type { Guard } from '@/hooks/hook.types';
 import { allow } from '@/internal/hooks/allow';
 import { bashCommand } from '@/internal/hooks/bash-command';
 import { carriesAttribution } from '@/internal/hooks/carries-attribution';
@@ -11,7 +11,7 @@ import { shellSegments } from '@/internal/shell/shell-segments';
  * `Co-Authored-By` naming Claude, a session trailer, a "Generated with Claude" footer or 🤖.
  * Reads the command itself, heredocs included, and any message or body file it names.
  */
-export const noAttribution: Guard = (input, files) => {
+export const noAttribution: Guard = (input, context) => {
   const command = bashCommand(input);
   if (command === undefined) return allow;
   const named = shellSegments(command).map(messageFiles);
@@ -22,7 +22,7 @@ export const noAttribution: Guard = (input, files) => {
     ...named
       .flatMap((entry) => entry ?? [])
       .filter((file) => file !== '' && file !== '-')
-      .map((file) => files.read(resolve(input.cwd ?? '.', file)) ?? ''),
+      .map((file) => context.read(resolve(input.cwd ?? '.', file)) ?? ''),
   ];
   if (!texts.some(carriesAttribution)) return allow;
   return {

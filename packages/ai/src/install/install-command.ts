@@ -1,58 +1,73 @@
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { InstallEnv } from '@/install/install.types';
+import { catalog } from '@/install/catalog';
 import { hookGroups } from '@/install/hook-groups';
 import { planInstall } from '@/install/plan-install';
+import { selectItems } from '@/install/select-items';
 import { withOwnHooks } from '@/install/with-own-hooks';
 import { defaultEnv } from '@/internal/install/default-env';
 import { fromTarget } from '@/internal/install/from-target';
+import { MANIFEST, RUNNER } from '@/internal/install/install-paths';
 import { packageVersionAt } from '@/internal/install/package-version-at';
-import { parseFlags } from '@/internal/install/parse-flags';
+import { parseOptions } from '@/internal/install/parse-options';
 import { readManifest } from '@/internal/install/read-manifest';
 import { readSettings } from '@/internal/install/read-settings';
 import { removeFiles } from '@/internal/install/remove-files';
-import { MANIFEST, RUNNER } from '@/internal/install/install-paths';
 import { targetDir } from '@/internal/install/target-dir';
 import { writeJson } from '@/internal/install/write-json';
 
 /**
- * `rxova-ai install [--project] [--dry-run] [--force]`: copies the agents, skills and hook
- * runner into `.claude`, registers the guards in its `settings.json`, and records what it wrote.
- * Running it again updates in place; files an earlier version wrote and this one does not are
- * removed.
+ * `rxova-ai install [--profile core|hackathon|full] [--add a,b] [--skip c] [--project]
+ * [--dry-run] [--force]`: copies the chosen agents and skills and the hook runner into `.claude`,
+ * registers the chosen hooks in its `settings.json`, and records what it wrote. Running it again
+ * updates in place, keeping the last selection unless told otherwise.
  */
 export const installCommand = (argv: readonly string[], env: InstallEnv = defaultEnv()): number => {
   const { io } = env;
-  const { flags, unknown } = parseFlags(argv, ['--project', '--dry-run', '--force']);
-  if (unknown.length > 0) {
-    io.err(`rxova-ai install: unknown option ${unknown.join(' ')}`);
-    return 1;
-  }
-  if (!existsSync(join(env.packageDir, 'dist', 'hooks.js'))) {
-    io.err('rxova-ai install: dist/hooks.js is missing; build the package first');
-    return 1;
-  }
   try {
-    const target = targetDir(flags.has('--project'), env);
+    const options = parseOptions(argv, ['project', 'dry-run', 'force', 'profile', 'add', 'skip']);
+    if (!existsSync(join(env.packageDir, 'dist', 'hooks.js')))
+      throw new Error('dist/hooks.js is missing; build the package first');
+    const target = targetDir(options.project === true, env);
     const previous = readManifest(target);
+    const items = catalog(env.packageDir);
+    const selection = selectItems({
+      names: items.map(({ name }) => name),
+      profile: options.profile,
+      add: options.add ?? [],
+      skip: options.skip ?? [],
+      previous,
+    });
     const plan = planInstall({
       packageDir: env.packageDir,
+      items: selection.items,
       previous,
       exists: (file) => existsSync(fromTarget(target, file)),
     });
-    if (plan.conflicts.length > 0 && !flags.has('--force')) {
-      io.err(
-        `rxova-ai install: these already exist and were not written by rxova-ai:\n` +
-          `${plan.conflicts.map((file) => `  ${file}`).join('\n')}\nMove them, or pass --force to overwrite.`,
+    if (plan.conflicts.length > 0 && options.force !== true)
+      throw new Error(
+        `these already exist and were not written by rxova-ai:\n${plan.conflicts.map((file) => `  ${file}`).join('\n')}\n` +
+          'Move them, or pass --force to overwrite.',
       );
-      return 1;
-    }
     const written = plan.copies.map(({ to }) => to);
     const stale = (previous?.files ?? []).filter((file) => !written.includes(file));
-    const settings = withOwnHooks(readSettings(target), hookGroups(fromTarget(target, RUNNER)));
+    const hookNames = selection.items.filter((name) =>
+      items.some((item) => item.name === name && item.kind === 'hook'),
+    );
+    const settings = withOwnHooks(
+      readSettings(target),
+      hookGroups(fromTarget(target, RUNNER), hookNames),
+    );
+    const counts = (['agent', 'skill', 'hook'] as const)
+      .map(
+        (kind) =>
+          `${String(items.filter((item) => item.kind === kind && selection.items.includes(item.name)).length)} ${kind}s`,
+      )
+      .join(', ');
 
-    if (flags.has('--dry-run')) {
-      io.out(`Would install into ${target}:`);
+    if (options['dry-run'] === true) {
+      io.out(`Would install the ${selection.profile} selection (${counts}) into ${target}:`);
       for (const file of written) io.out(`  write   ${file}`);
       for (const file of stale) io.out(`  remove  ${file}`);
       io.out('  update  settings.json (the rx-ai hooks)');
@@ -63,13 +78,17 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       mkdirSync(dirname(path), { recursive: true });
       copyFileSync(from, path);
     }
+    const createdSettings = previous?.createdSettings ?? !existsSync(join(target, 'settings.json'));
     removeFiles(target, stale);
     writeJson(join(target, 'settings.json'), settings);
     writeJson(fromTarget(target, MANIFEST), {
       version: packageVersionAt(env.packageDir),
+      profile: selection.profile,
+      items: selection.items,
       files: written,
+      createdSettings,
     });
-    io.out(`Installed rx-ai into ${target}: ${String(written.length)} files, 3 guards.`);
+    io.out(`Installed rx-ai (${selection.profile}: ${counts}) into ${target}.`);
     return 0;
   } catch (failure) {
     io.err(`rxova-ai install: ${(failure as Error).message}`);

@@ -52,6 +52,10 @@ describe('cli', () => {
 });
 
 describe('commands', () => {
+  it('has list, install, uninstall and status', () => {
+    expect(Object.keys(commands())).toEqual(['list', 'install', 'uninstall', 'status']);
+  });
+
   it('loads each command, which reports an unknown option', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     for (const [name, entry] of Object.entries(commands())) {

@@ -1,4 +1,4 @@
-import type { Guard } from '@/hooks/guard.types';
+import type { Guard } from '@/hooks/hook.types';
 import { allow } from '@/internal/hooks/allow';
 import { BYPASS_FIX } from '@/internal/hooks/bypass-fix';
 import { bashCommand } from '@/internal/hooks/bash-command';
