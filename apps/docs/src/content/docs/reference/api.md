@@ -41,12 +41,12 @@ single axes with `thresholds` (`{ branches: 88 }`), and change what is measured 
 
 ## `@rxova/agent-kit`
 
-| Command                                                                                                       | What it does                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `rxova-agent-kit list [--profile p]`                                                                          | Lists every agent, skill and hook, and the profiles that include it                                                              |
-| `rxova-agent-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `dotnet`, `full`) for Claude Code, OpenCode or both (`--target claude\|opencode\|both`) |
-| `rxova-agent-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes exactly what each install wrote                                                                                          |
-| `rxova-agent-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and any missing or changed file                                                            |
+| Command                                                                                                       | What it does                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rxova-agent-kit list [--profile p]`                                                                          | Lists every agent, skill and hook, and the profiles that include it                                                                                          |
+| `rxova-agent-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `dotnet`, `react`, `qa`, `marketing`, `full`) for Claude Code, OpenCode or both (`--target claude\|opencode\|both`) |
+| `rxova-agent-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes exactly what each install wrote                                                                                                                      |
+| `rxova-agent-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and any missing or changed file                                                                                        |
 
 Hooks run on their own; Claude (or OpenCode) loads skills and hands work to agents when a
 request matches their description, or when you name one (`/rx-kickoff`, "use rx-architect"). In
@@ -112,6 +112,38 @@ Platforms:
 | `rx-deploy-container`  | Deploy containers to Fly.io, Railway or anywhere Docker runs.                            |
 | `rx-aws`               | Take the fast paths on AWS, with a budget alarm first and a teardown list last.          |
 
+React:
+
+| Skill                  | Use it to                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `rx-fe-redux-toolkit`  | Use Redux Toolkit 2: store, slices, typed hooks, RTK Query tags and optimistic updates, migration.   |
+| `rx-fe-code-splitting` | Split by route and feature, preload on intent, recover from stale chunks, hold a bundle budget.      |
+| `rx-fe-hooks`          | Write custom hooks, drop effects you don't need, get deps and cleanup right, use React 19 hooks.     |
+| `rx-fe-performance`    | Profile first, cut re-renders, lean on the React Compiler, virtualise lists, fix LCP, INP and CLS.   |
+| `rx-fe-state`          | Decide where state lives: local, URL, server cache, store, context or form. Derive, don't duplicate. |
+| `rx-fe-testing`        | Test components with Testing Library role queries, user-event and MSW; split component from e2e.     |
+
+QA:
+
+| Skill               | Use it to                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `rx-qa-test-plan`   | Plan a feature or release by risk: ranked risks, a test matrix, automated vs manual, exit criteria.  |
+| `rx-qa-exploratory` | Run time-boxed exploratory sessions with charters, heuristics and tours; turn findings into tests.   |
+| `rx-qa-bug-report`  | Write bugs anyone can reproduce: minimal steps, evidence, severity vs priority, then a failing test. |
+| `rx-qa-regression`  | Scope smoke and regression runs from the diff and the risks, with a release checklist and sign-off.  |
+| `rx-qa-flaky`       | Reproduce a flaky test with repeats and shuffles, fix the root cause, quarantine with an owner.      |
+| `rx-qa-a11y`        | Test accessibility: axe, keyboard, screen reader, 400% reflow, forms, mapped to WCAG 2.2 AA.         |
+
+Marketing:
+
+| Skill                | Use it to                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------ |
+| `rx-mkt-positioning` | Pin down who it's for, the alternative, what's unique, the category and the one-liner.                 |
+| `rx-mkt-landing`     | Write landing page and store listing copy, meta and OG text, in the site's own file, and measure it.   |
+| `rx-mkt-launch`      | Plan a launch: channels and their rules, assets, a day-of timeline, funnel events, a retro.            |
+| `rx-mkt-ceo`         | Think like the CEO: north-star and input metrics, weekly priorities, decision memos, pricing, updates. |
+| `rx-mkt-voice`       | Set the app's voice and tone, fix microcopy and errors, keep a glossary and i18n-safe strings.         |
+
 .NET:
 
 | Skill               | Use it to                                                                                                        |
@@ -134,24 +166,31 @@ Datadog:
 
 | Agent                | Model  | Can edit | Use it to                                                                                                                                                   |
 | -------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rx-planner`         | opus   | no       | Turn a request into a sliced plan grounded in the code.                                                                                                     |
-| `rx-architect`       | opus   | no       | Design the system for a time-boxed build: parts, data, boundaries.                                                                                          |
-| `rx-security`        | opus   | no       | Find what would embarrass the demo: secrets, auth gaps, RLS, injection.                                                                                     |
-| `rx-reviewer`        | sonnet | no       | Review a diff and report only defects it can back.                                                                                                          |
-| `rx-researcher`      | sonnet | no       | Answer "how do I do X with Y" from official docs, with sources.                                                                                             |
-| `rx-builder`         | sonnet | yes      | Build one slice end to end, with tests.                                                                                                                     |
-| `rx-debugger`        | sonnet | yes      | Find a bug's root cause and fix it with a regression test.                                                                                                  |
-| `rx-test-writer`     | sonnet | yes      | Add tests that check behaviour.                                                                                                                             |
-| `rx-build-fixer`     | sonnet | yes      | Turn a red build green with the smallest honest diff.                                                                                                       |
-| `rx-ui`              | sonnet | yes      | Build and polish UI: responsive, accessible, every state.                                                                                                   |
-| `rx-db`              | sonnet | yes      | Design schemas, migrations, policies and demo seed data.                                                                                                    |
-| `rx-deployer`        | sonnet | yes      | Ship to the chosen platform and prove the live URL works.                                                                                                   |
-| `rx-pitch`           | sonnet | yes      | Write the demo script and the pitch.                                                                                                                        |
-| `rx-scout`           | haiku  | no       | Find where things live without flooding the context.                                                                                                        |
-| `rx-doc-writer`      | haiku  | yes      | Write a README a judge can follow in five minutes.                                                                                                          |
-| `rx-dotnet-migrator` | sonnet | yes      | Upgrade one .NET service to .NET 10: baseline, change, build, fix, test, smoke, with a log.                                                                 |
-| `rx-dotnet-reviewer` | sonnet | no       | Review a .NET diff: async, DI lifetimes, EF Core safety, behaviour the upgrade changed.                                                                     |
-| `rx-observability`   | sonnet | no       | Investigate production behaviour in Datadog and report with evidence; changes nothing unless asked. Has no tool list, so it can use the Datadog MCP server. |
+| `rx-planner`         | fable  | no       | Turn a request into a sliced plan grounded in the code.                                                                                                     |
+| `rx-architect`       | fable  | no       | Design the system for a time-boxed build: parts, data, boundaries.                                                                                          |
+| `rx-security`        | fable  | no       | Find what would embarrass the demo: secrets, auth gaps, RLS, injection.                                                                                     |
+| `rx-reviewer`        | opus   | no       | Review a diff and report only defects it can back.                                                                                                          |
+| `rx-researcher`      | opus   | no       | Answer "how do I do X with Y" from official docs, with sources.                                                                                             |
+| `rx-builder`         | opus   | yes      | Build one slice end to end, with tests.                                                                                                                     |
+| `rx-debugger`        | opus   | yes      | Find a bug's root cause and fix it with a regression test.                                                                                                  |
+| `rx-test-writer`     | opus   | yes      | Add tests that check behaviour.                                                                                                                             |
+| `rx-build-fixer`     | opus   | yes      | Turn a red build green with the smallest honest diff.                                                                                                       |
+| `rx-ui`              | opus   | yes      | Build and polish UI: responsive, accessible, every state.                                                                                                   |
+| `rx-db`              | opus   | yes      | Design schemas, migrations, policies and demo seed data.                                                                                                    |
+| `rx-deployer`        | opus   | yes      | Ship to the chosen platform and prove the live URL works.                                                                                                   |
+| `rx-pitch`           | opus   | yes      | Write the demo script and the pitch.                                                                                                                        |
+| `rx-scout`           | sonnet | no       | Find where things live without flooding the context.                                                                                                        |
+| `rx-doc-writer`      | sonnet | yes      | Write a README a judge can follow in five minutes.                                                                                                          |
+| `rx-dotnet-migrator` | opus   | yes      | Upgrade one .NET service to .NET 10: baseline, change, build, fix, test, smoke, with a log.                                                                 |
+| `rx-dotnet-reviewer` | opus   | no       | Review a .NET diff: async, DI lifetimes, EF Core safety, behaviour the upgrade changed.                                                                     |
+| `rx-observability`   | opus   | no       | Investigate production behaviour in Datadog and report with evidence; changes nothing unless asked. Has no tool list, so it can use the Datadog MCP server. |
+| `rx-fe-builder`      | opus   | yes      | Build React features in the repo's own conventions, and verify them.                                                                                        |
+| `rx-fe-reviewer`     | opus   | no       | Review React: hooks, effects, re-renders, state, a11y, bundle size.                                                                                         |
+| `rx-qa-tester`       | opus   | yes      | Explore the running app against a charter; report bugs with evidence.                                                                                       |
+| `rx-qa-flake-hunter` | opus   | yes      | Fix a flaky test at its root and prove it with repeat runs.                                                                                                 |
+| `rx-mkt-advisor`     | fable  | yes      | A CEO's second opinion: test plans against the goal, cut, write memos.                                                                                      |
+| `rx-mkt-marketer`    | opus   | yes      | Write positioning, landing and launch copy from what the code does.                                                                                         |
+| `rx-mkt-copywriter`  | opus   | yes      | Rewrite in-app copy to the voice guide; strings only, never logic.                                                                                          |
 
 ## GitHub Actions
 
