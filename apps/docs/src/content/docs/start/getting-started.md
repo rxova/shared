@@ -63,4 +63,31 @@ steps:
   - run: pnpm install --frozen-lockfile
 ```
 
+Whole jobs come from the reusable workflows, and the gate from `require-jobs`:
+
+```yaml
+jobs:
+  commitlint:
+    uses: rxova/shared/.github/workflows/commit-messages.yml@main
+  changeset:
+    needs: [commitlint]
+    uses: rxova/shared/.github/workflows/changeset-gate.yml@main
+  gate:
+    name: all checks
+    if: always()
+    needs: [commitlint, changeset]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rxova/shared/actions/require-jobs@main
+        with:
+          needs: ${{ toJSON(needs) }}
+```
+
+Renovate takes the org preset:
+
+```json5
+// .github/renovate.json5
+{ extends: ['github>rxova/shared//renovate/default.json5'] }
+```
+
 Every export, command and action input is listed in the [reference](../../reference/api/).
