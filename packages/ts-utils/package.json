@@ -1,6 +1,6 @@
 {
   "name": "@rxova/ts-utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Small, dependency-free runtime helpers shared across the rxova packages.",
   "license": "MIT",
   "author": "Jonatan Kruszewski",

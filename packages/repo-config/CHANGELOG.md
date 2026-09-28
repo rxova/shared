@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.4.1
+
+### Patch Changes
+
+- [#27](https://github.com/rxova/shared/pull/27) [`13167fc`](https://github.com/rxova/shared/commit/13167fc22a3692718a5d4964848ed84b9e92f8e3) - `check-snippets` no longer reads a ` ```json ` fence as ` ```js `, so JSON fences stop being reported as unparseable. `@vitest/coverage-v8`, which the vitest preset's coverage uses, is now declared as an optional peer dependency (`>=3`, matching `vitest`).
+
 ## 0.4.0
 
 ### Minor Changes
