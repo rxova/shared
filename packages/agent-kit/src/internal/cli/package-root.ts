@@ -11,7 +11,7 @@ export const packageRoot = (from: string): string => {
   for (;;) {
     if (existsSync(join(dir, 'package.json'))) return dir;
     const parent = dirname(dir);
-    if (parent === dir) throw new Error('rxova-claude-kit: no package.json above this module');
+    if (parent === dir) throw new Error('rxova-agent-kit: no package.json above this module');
     dir = parent;
   }
 };

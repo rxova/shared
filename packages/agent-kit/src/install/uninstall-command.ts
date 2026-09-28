@@ -12,7 +12,7 @@ import { removeFiles } from '@/internal/install/remove-files';
 import { writeJson } from '@/internal/install/write-json';
 
 /**
- * `rxova-claude-kit uninstall [--target claude|opencode|both] [--project] [--dry-run]`: removes
+ * `rxova-agent-kit uninstall [--target claude|opencode|both] [--project] [--dry-run]`: removes
  * the files each target's manifest lists and, for Claude Code, the rx-ai hook entries, leaving
  * every other file and setting as it was. With no `--target`, every installed target.
  */
@@ -48,7 +48,7 @@ export const uninstallCommand = (
     if (!removedAny) io.out('rx-ai is not installed here.');
     return 0;
   } catch (failure) {
-    io.err(`rxova-claude-kit uninstall: ${(failure as Error).message}`);
+    io.err(`rxova-agent-kit uninstall: ${(failure as Error).message}`);
     return 1;
   }
 };

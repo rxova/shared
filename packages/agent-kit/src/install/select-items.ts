@@ -21,7 +21,7 @@ export const selectItems = ({
   const unknown = [...add, ...skip].filter((name) => !names.includes(name));
   if (unknown.length > 0)
     throw new Error(
-      `unknown item ${unknown.join(', ')}; run \`rxova-claude-kit list\` to see every item`,
+      `unknown item ${unknown.join(', ')}; run \`rxova-agent-kit list\` to see every item`,
     );
 
   let base: { profile: string; items: readonly string[] };

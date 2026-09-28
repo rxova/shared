@@ -1,15 +1,15 @@
 {
-  "name": "@rxova/claude-kit",
+  "name": "@rxova/agent-kit",
   "version": "0.0.0",
-  "description": "A small Claude Code kit: guard hooks that enforce commit and config rules, workflow skills, and three least-privilege agents, installed by one bin.",
+  "description": "A kit for coding agents (Claude Code and OpenCode): guard and helper hooks, 34 skills and 18 agents, installed in profiles by one bin.",
   "license": "MIT",
   "author": "Jonatan Kruszewski",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rxova/shared.git",
-    "directory": "packages/claude-kit"
+    "directory": "packages/agent-kit"
   },
-  "homepage": "https://github.com/rxova/shared/tree/main/packages/claude-kit#readme",
+  "homepage": "https://github.com/rxova/shared/tree/main/packages/agent-kit#readme",
   "bugs": "https://github.com/rxova/shared/issues",
   "publishConfig": {
     "access": "public"
@@ -19,7 +19,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "rxova-claude-kit": "./dist/cli.js"
+    "rxova-agent-kit": "./dist/cli.js"
   },
   "exports": {
     ".": {

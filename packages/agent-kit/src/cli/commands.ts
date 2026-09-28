@@ -1,6 +1,6 @@
 import type { CommandEntry } from '@/cli/cli.types';
 
-/** Every `rxova-claude-kit` command, by name, each loaded when it runs. */
+/** Every `rxova-agent-kit` command, by name, each loaded when it runs. */
 export const commands = (): Record<string, CommandEntry> => ({
   list: {
     summary: 'show every agent, skill and hook, and which profiles include it [--profile p]',

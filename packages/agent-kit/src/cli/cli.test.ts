@@ -61,7 +61,7 @@ describe('commands', () => {
     for (const [name, entry] of Object.entries(commands())) {
       const command = await entry.load();
       expect(await command(['--not-an-option'])).toBe(1);
-      expect(error).toHaveBeenLastCalledWith(expect.stringContaining(`rxova-claude-kit ${name}`));
+      expect(error).toHaveBeenLastCalledWith(expect.stringContaining(`rxova-agent-kit ${name}`));
     }
     error.mockRestore();
   });
@@ -78,7 +78,7 @@ describe('the bin', () => {
       const out = execFileSync(process.execPath, ['--import', 'tsx', script, '--help'], {
         encoding: 'utf8',
       });
-      expect(out).toContain('usage: rxova-claude-kit');
+      expect(out).toContain('usage: rxova-agent-kit');
     },
     SPAWN_TIMEOUT,
   );
