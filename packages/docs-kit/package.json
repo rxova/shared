@@ -1,0 +1,56 @@
+{
+  "name": "@rxova/docs-kit",
+  "version": "0.0.0",
+  "description": "The agent-facing surfaces of a Starlight docs site: raw-markdown twins of every page, llms.txt and llms-full.txt, doc-relative link rewriting, and a build check that holds them to it.",
+  "license": "MIT",
+  "author": "Jonatan Kruszewski",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rxova/shared.git",
+    "directory": "packages/docs-kit"
+  },
+  "homepage": "https://github.com/rxova/shared/tree/main/packages/docs-kit#readme",
+  "bugs": "https://github.com/rxova/shared/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "rxova-docs-kit": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "check:exports": "publint --strict && attw --pack . --profile esm-only",
+    "pack:smoke": "rxova-repo-config pack-smoke"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@rxova/repo-config": "workspace:*",
+    "@types/node": "^26.6.2",
+    "@vitest/coverage-v8": "^5.0.1",
+    "publint": "^0.3.24",
+    "tsdown": "^0.23.0",
+    "tsx": "^4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^5.0.1"
+  }
+}

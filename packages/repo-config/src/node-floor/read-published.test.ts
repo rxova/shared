@@ -38,6 +38,6 @@ describe("readPublished", () => {
       readPublished(root)
         .map(({ name }) => name)
         .sort(),
-    ).toEqual(["@rxova/agent-kit", "@rxova/repo-config", "@rxova/ts-utils"]);
+    ).toEqual(["@rxova/agent-kit", "@rxova/docs-kit", "@rxova/repo-config", "@rxova/ts-utils"]);
   });
 });

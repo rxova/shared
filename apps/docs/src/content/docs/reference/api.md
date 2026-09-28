@@ -23,6 +23,24 @@ description: Every export, command and action this repository publishes.
 | `assignRef` / `useMergedRefs` (`/react`)              | Feed a value to any ref; one callback ref for several                        |
 | `useDevWarner` (`/react`)                             | `createDevWarner` per component instance, with an `onWarn` sink              |
 
+## `@rxova/docs-kit`
+
+The agent-facing surfaces of a Starlight site: `.md` twins, `llms.txt`, `llms-full.txt`, and the
+check that holds them to it. Nothing imports Astro; a site passes in `getCollection('docs')`.
+
+| Export                                                  | What it does                                                          |
+| ------------------------------------------------------- | --------------------------------------------------------------------- |
+| `docsPages`                                             | Every page as normalized Markdown with absolute links, sorted by id   |
+| `renderMarkdown`                                        | The document served at a page's `.md` route                           |
+| `llmsIndex` / `llmsFull` / `groupPages`                 | `llms.txt`, `llms-full.txt`, and the section grouping both use        |
+| `mdxToMarkdown` / `mapUnfenced` / `splitFenced`         | A page body as plain Markdown; rewrites that never touch a code fence |
+| `rehypeMdLinks` / `withBase`                            | Doc-relative `.md` links to HTML routes; a root URL under the mount   |
+| `mdRoute` / `htmlRoute` / `sectionOf` / `firstSentence` | Routes, sections and fallback descriptions                            |
+| `checkMdRoutes` / `twinFor`                             | Missing twins, leftover markup, dangling twin links, llms budgets     |
+
+The bin: `rxova-docs-kit check-md-routes [dist] [--untwinned a,b/] [--max-full 800k] [--max-index 24k] [--components A,B]`,
+run after `astro build`.
+
 ## `@rxova/repo-config`
 
 | Command                                 | What it does                                                                                        |
