@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsdown';
-import { baseBuildConfig } from '@rxova/tooling/tsdown';
+import { baseBuildConfig } from '@rxova/repo-config/tsdown';
 
 // Browser and Node alike, and inlined into packages with their own budgets, so
 // the syntax floor is es2020 and nothing assumes a platform.

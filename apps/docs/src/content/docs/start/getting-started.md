@@ -19,26 +19,26 @@ stays dependency-free.
 ## Repository tooling
 
 ```sh
-pnpm add -D @rxova/tooling
+pnpm add -D @rxova/repo-config
 ```
 
 ```json
 {
   "scripts": {
-    "verify": "rxova-tooling verify"
+    "verify": "rxova-repo-config verify"
   }
 }
 ```
 
 ```js
 // eslint.config.js
-import { baseEslintConfig } from '@rxova/tooling/eslint';
+import { baseEslintConfig } from '@rxova/repo-config/eslint';
 export default baseEslintConfig({ tsconfigRootDir: import.meta.dirname });
 ```
 
 ```json
 // tsconfig.json
-{ "extends": "@rxova/tooling/tsconfig.base.json", "include": ["src"] }
+{ "extends": "@rxova/repo-config/tsconfig.base.json", "include": ["src"] }
 ```
 
 ## GitHub Actions

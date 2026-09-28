@@ -3,7 +3,7 @@
   "ui": "tui",
   "globalDependencies": [
     "tsconfig.base.json",
-    "packages/tooling/presets/tsconfig.base.json",
+    "packages/repo-config/presets/tsconfig.base.json",
     ".nvmrc"
   ],
   "globalPassThroughEnv": ["CI"],
@@ -13,7 +13,7 @@
       "outputs": ["dist/**"],
       // Tests and prose cannot change dist, so editing them should not cost a
       // rebuild. The shared presets reach every package through `^build` on
-      // @rxova/tooling, which each package lists as a dev dependency.
+      // @rxova/repo-config, which each package lists as a dev dependency.
       "inputs": [
         "$TURBO_DEFAULT$",
         "!**/*.test.ts",
@@ -29,7 +29,7 @@
       "outputLogs": "new-only"
     },
     // A raised threshold in the shared preset re-runs every suite rather than
-    // replaying yesterday's pass: it changes @rxova/tooling, which `^build` hashes.
+    // replaying yesterday's pass: it changes @rxova/repo-config, which `^build` hashes.
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
@@ -48,8 +48,8 @@
       "outputs": [],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/packages/tooling/src/pack-smoke/**",
-        "$TURBO_ROOT$/packages/tooling/src/internal/pack-smoke/**"
+        "$TURBO_ROOT$/packages/repo-config/src/pack-smoke/**",
+        "$TURBO_ROOT$/packages/repo-config/src/internal/pack-smoke/**"
       ],
       "outputLogs": "new-only"
     },

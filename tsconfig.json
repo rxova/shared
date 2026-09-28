@@ -1,13 +1,13 @@
 {
-  // For tsx, which runs the tooling bin from source at the repository root and
+  // For tsx, which runs the repo-config bin from source at the repository root and
   // reads the aliases from the tsconfig in the working directory. The packages
   // declare the same aliases in their own tsconfigs; this one exists for the
-  // root's `node --import tsx ./packages/tooling/src/cli/cli.ts …` and nothing
-  // else, so `@/` here means tooling's src.
+  // root's `node --import tsx ./packages/repo-config/src/cli/cli.ts …` and nothing
+  // else, so `@/` here means repo-config's src.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./packages/tooling/src/*"]
+      "@/*": ["./packages/repo-config/src/*"]
     }
   },
   "files": []
