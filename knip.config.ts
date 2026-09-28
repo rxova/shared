@@ -15,4 +15,8 @@ export default {
   treatConfigHintsAsErrors: true,
   // `rxova-repo-config check-exports` runs `attw` from a shell command, where knip cannot see it.
   ignoreDependencies: ["@arethetypeswrong/cli"],
+  // Scripts the composite actions run with `node`: an action.yml is their only caller.
+  workspaces: {
+    ".": { entry: ["actions/*/*.{js,cjs,mjs}"] },
+  },
 } satisfies KnipConfig;

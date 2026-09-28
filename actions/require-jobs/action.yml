@@ -1,0 +1,34 @@
+name: Require jobs
+description: Fail unless every job in `needs` passed or was skipped — the single check branch protection requires.
+
+# Use it in a job with `if: always()` and every other job in `needs`:
+#
+#   gate:
+#     name: all checks
+#     if: always()
+#     needs: [commitlint, checks, test]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: rxova/shared/actions/require-jobs@main
+#         with:
+#           needs: ${{ toJSON(needs) }}
+#
+# Matrix jobs skipped before expansion report under their unexpanded name, and
+# a `skipped` report never satisfies a required context, so requiring the jobs
+# one by one does not work. `skipped` is an answer a workflow gives on purpose
+# (a release commit, a push with no pull request), so it passes; `failure` and
+# `cancelled` do not.
+
+inputs:
+  needs:
+    description: The JSON of the calling job's needs context (toJSON(needs) in an expression).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Require every job to have passed or skipped
+      shell: bash
+      env:
+        RESULTS: ${{ inputs.needs }}
+      run: bash "$GITHUB_ACTION_PATH/require-jobs.sh"

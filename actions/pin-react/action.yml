@@ -1,0 +1,43 @@
+name: Pin React
+description: Install one React version at the workspace root and in the given packages, and prove only that one resolves.
+
+# For a job that tests a package against the oldest React its peer range allows
+# while the lockfile installs the newest. Run it after `pnpm install`; it
+# rewrites manifests and the lockfile, which is fine on a throwaway checkout and
+# is why such a job cannot use --frozen-lockfile afterwards.
+#
+# The root is pinned as well as the packages, always. A package declared at the
+# root (@rxova/ts-utils, whose `react` peer resolves there) otherwise keeps the
+# newer React while the suite renders with the older one: two Reacts, and every
+# hook call fails with "Invalid hook call".
+
+inputs:
+  react-version:
+    description: The `react` and `react-dom` version, such as `18.2.0`.
+    required: true
+  types-version:
+    description: The `@types/react` version, such as `18.3.27`. Empty leaves the types alone.
+    required: false
+    default: ''
+  types-dom-version:
+    description: The `@types/react-dom` version, such as `18.3.7`. Empty leaves it alone.
+    required: false
+    default: ''
+  filters:
+    description: >-
+      Space-separated pnpm filters (package names or globs such as `@rxova/react-*`)
+      to pin as well as the root. Empty pins the root only.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Pin React at the root and in the filtered packages
+      shell: bash
+      env:
+        REACT_VERSION: ${{ inputs.react-version }}
+        TYPES_VERSION: ${{ inputs.types-version }}
+        TYPES_DOM_VERSION: ${{ inputs.types-dom-version }}
+        FILTERS: ${{ inputs.filters }}
+      run: bash "$GITHUB_ACTION_PATH/pin-react.sh"
