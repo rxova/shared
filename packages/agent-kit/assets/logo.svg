@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" color="#6b3df0" role="img" aria-labelledby="title desc">
+  <title id="title">agent-kit logo</title>
+  <desc id="desc">A terminal prompt turned face, &gt;_&lt;: an agent squinting at a mistake it was stopped from making.</desc>
+  <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m8 18 15 10-15 10" />
+    <path d="m56 18-15 10 15 10" />
+    <path d="M25 46h14" />
+  </g>
+</svg>
