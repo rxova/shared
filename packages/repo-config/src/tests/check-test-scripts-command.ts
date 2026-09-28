@@ -1,8 +1,8 @@
-import { expandDirs } from '@/internal/files/expand-dirs';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { readConfig } from '@/config/read-config';
+import { expandDirs } from "@/internal/files/expand-dirs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-test-scripts`: every workspace with a
@@ -15,23 +15,23 @@ export const checkTestScriptsCommand = ({
   root = process.cwd(),
 }: { root?: string } = {}): number => {
   try {
-    const { globs = ['packages/*', 'apps/*'] } = readConfig(root).testScripts ?? {};
+    const { globs = ["packages/*", "apps/*"] } = readConfig(root).testScripts ?? {};
     const suites = expandDirs(root, globs).filter((dir) =>
       readdirSync(join(root, dir)).some((file) => /^vitest\.config\.[cm]?[jt]s$/.test(file)),
     );
     const missing = suites.filter((dir) => {
-      const manifest = join(root, dir, 'package.json');
+      const manifest = join(root, dir, "package.json");
       if (!existsSync(manifest)) return true;
       return (
-        (JSON.parse(readFileSync(manifest, 'utf8')) as PackageManifest).scripts?.test === undefined
+        (JSON.parse(readFileSync(manifest, "utf8")) as PackageManifest).scripts?.test === undefined
       );
     });
     if (missing.length > 0) {
       console.error(
         [
-          'check-test-scripts: these workspaces have a vitest config but no `test` script, so no task runs them:',
+          "check-test-scripts: these workspaces have a vitest config but no `test` script, so no task runs them:",
           ...missing.map((dir) => `  ${dir}`),
-        ].join('\n'),
+        ].join("\n"),
       );
       return 1;
     }

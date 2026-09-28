@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process';
-import type { Shell } from '@/pack-smoke/pack-smoke.types';
+import { spawnSync } from "node:child_process";
+import type { Shell } from "@/pack-smoke/pack-smoke.types";
 
 /**
  * Runs a command in `cwd` and returns stdout and stderr together, since a CLI
@@ -8,11 +8,11 @@ import type { Shell } from '@/pack-smoke/pack-smoke.types';
  * command as given.
  */
 export const captureOutput: Shell = (command, args, cwd) => {
-  const result = spawnSync(command, args, { cwd, encoding: 'utf8' });
+  const result = spawnSync(command, args, { cwd, encoding: "utf8" });
   const output = `${result.stdout}${result.stderr}`;
   if (result.status !== 0) {
     throw new Error(
-      `\`${[command, ...args].join(' ')}\` exited with ${String(result.status)}:\n${output}`,
+      `\`${[command, ...args].join(" ")}\` exited with ${String(result.status)}:\n${output}`,
     );
   }
   return output;

@@ -1,7 +1,7 @@
-import { join } from 'node:path';
-import type { Reader } from '@/config/config.types';
-import { isShippedPath } from '@/internal/changeset/is-shipped-path';
-import type { PackageManifest } from '@/manifest/manifest.types';
+import { join } from "node:path";
+import type { Reader } from "@/config/config.types";
+import { isShippedPath } from "@/internal/changeset/is-shipped-path";
+import type { PackageManifest } from "@/manifest/manifest.types";
 
 /**
  * The paths in `changed` (relative to the repository root) that a published
@@ -17,15 +17,15 @@ export const shippedChanges = (
 ): string[] => {
   const files = new Map(
     published.flatMap((dir) => {
-      const manifest = read(join(root, 'packages', dir, 'package.json'));
+      const manifest = read(join(root, "packages", dir, "package.json"));
       if (manifest === undefined) return [];
       return [[dir, (JSON.parse(manifest) as PackageManifest).files ?? []] as const];
     }),
   );
 
   return changed.filter((file) => {
-    const [top, dir = '', ...rest] = file.split('/');
+    const [top, dir = "", ...rest] = file.split("/");
     const shipped = files.get(dir);
-    return top === 'packages' && shipped !== undefined && isShippedPath(rest.join('/'), shipped);
+    return top === "packages" && shipped !== undefined && isShippedPath(rest.join("/"), shipped);
   });
 };

@@ -1,6 +1,6 @@
-import { assertOnlyKeys } from '@/internal/config/assert-only-keys';
-import { failConfig } from '@/internal/config/fail-config';
-import { isRecord } from '@/internal/config/is-record';
+import { assertOnlyKeys } from "@/internal/config/assert-only-keys";
+import { failConfig } from "@/internal/config/fail-config";
+import { isRecord } from "@/internal/config/is-record";
 
 /**
  * `parent[key]` as an object holding only the `allowed` keys, or undefined
@@ -16,7 +16,7 @@ export const readSection = (
   const value = parent[key];
   if (value === undefined) return undefined;
   const at = `${path}.${key}`;
-  if (!isRecord(value)) return failConfig(at, 'an object');
+  if (!isRecord(value)) return failConfig(at, "an object");
   assertOnlyKeys(value, at, allowed);
   return value;
 };

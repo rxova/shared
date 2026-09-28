@@ -1,7 +1,7 @@
-import { join } from 'node:path';
-import type { Reader } from '@/config/config.types';
-import { metadataOverrides } from '@/internal/changeset/metadata-overrides';
-import { packagesNamed } from '@/internal/changeset/packages-named';
+import { join } from "node:path";
+import type { Reader } from "@/config/config.types";
+import { metadataOverrides } from "@/internal/changeset/metadata-overrides";
+import { packagesNamed } from "@/internal/changeset/packages-named";
 
 /**
  * One line per problem in the changeset `files` (paths relative to `root`, as

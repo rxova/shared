@@ -1,6 +1,6 @@
-import { join } from 'node:path';
-import type { FixtureRun } from '@/config/config.types';
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
+import { join } from "node:path";
+import type { FixtureRun } from "@/config/config.types";
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
 
 /**
  * Runs each configured bin against the scratch project the way a user would:
@@ -15,12 +15,12 @@ export const runFixtures = (
 ): void => {
   for (const { bin, args, fixture, expect } of runs) {
     if (fixture !== undefined) fs.write(join(scratch, fixture.path), fixture.contents);
-    const printed = output('npx', ['--no-install', bin, ...args], scratch);
+    const printed = output("npx", ["--no-install", bin, ...args], scratch);
     const result = fixture === undefined ? printed : fs.read(join(scratch, fixture.path));
     const missing = expect.filter((text) => !result.includes(text));
     if (missing.length > 0) {
       throw new Error(
-        `\`${[bin, ...args].join(' ')}\` left ${fixture?.path ?? 'its output'} without ${missing.map((text) => `"${text}"`).join(', ')}`,
+        `\`${[bin, ...args].join(" ")}\` left ${fixture?.path ?? "its output"} without ${missing.map((text) => `"${text}"`).join(", ")}`,
       );
     }
   }

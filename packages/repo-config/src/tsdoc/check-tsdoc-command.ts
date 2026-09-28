@@ -1,6 +1,6 @@
-import { missingTsdoc } from '@/internal/tsdoc/missing-tsdoc';
-import { tsdocSources } from '@/internal/tsdoc/tsdoc-sources';
-import { readConfig } from '@/config/read-config';
+import { missingTsdoc } from "@/internal/tsdoc/missing-tsdoc";
+import { tsdocSources } from "@/internal/tsdoc/tsdoc-sources";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-tsdoc`: every callable export of every published
@@ -20,9 +20,9 @@ export const checkTsdocCommand = ({ root = process.cwd() }: { root?: string } = 
     if (missing.length > 0) {
       console.error(
         [
-          'check-tsdoc: these public exports have no TSDoc summary:',
+          "check-tsdoc: these public exports have no TSDoc summary:",
           ...missing.map(({ pkg, name, where }) => `  ${pkg}#${name} (${where})`),
-        ].join('\n'),
+        ].join("\n"),
       );
       return 1;
     }

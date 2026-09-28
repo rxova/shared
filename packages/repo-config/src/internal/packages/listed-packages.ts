@@ -1,5 +1,5 @@
-import { packageManifests } from '@/internal/packages/package-manifests';
-import { readDotted } from '@/internal/packages/read-dotted';
+import { packageManifests } from "@/internal/packages/package-manifests";
+import { readDotted } from "@/internal/packages/read-dotted";
 
 /**
  * The packages `list-packages` prints: with a `marker` (a dotted manifest key
@@ -12,20 +12,20 @@ export const listedPackages = (root: string, marker?: string): { dir: string; na
   packageManifests(root, { published: marker === undefined })
     .flatMap(({ dir, manifest }) => {
       const mark = marker === undefined ? dir : readDotted(manifest, marker);
-      if ([undefined, null, false, ''].includes(mark as never)) return [];
-      const label = readDotted(manifest, 'rxova.label');
+      if ([undefined, null, false, ""].includes(mark as never)) return [];
+      const label = readDotted(manifest, "rxova.label");
       const name = manifest.name ?? dir;
       const key =
-        typeof label === 'string'
+        typeof label === "string"
           ? label
-          : marker !== undefined && typeof mark === 'string'
+          : marker !== undefined && typeof mark === "string"
             ? mark
             : name;
       return [{ dir, name, key }];
     })
     .sort(
       (a, b) =>
-        a.key.localeCompare(b.key, undefined, { sensitivity: 'base' }) ||
+        a.key.localeCompare(b.key, undefined, { sensitivity: "base" }) ||
         a.dir.localeCompare(b.dir),
     )
     .map(({ dir, name }) => ({ dir, name }));

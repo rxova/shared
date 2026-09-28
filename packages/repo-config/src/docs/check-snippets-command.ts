@@ -1,9 +1,9 @@
-import { fencedSnippets } from '@/internal/docs/fenced-snippets';
-import { snippetProblems } from '@/internal/docs/snippet-problems';
-import { expandGlobs } from '@/internal/files/expand-globs';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { readConfig } from '@/config/read-config';
+import { fencedSnippets } from "@/internal/docs/fenced-snippets";
+import { snippetProblems } from "@/internal/docs/snippet-problems";
+import { expandGlobs } from "@/internal/files/expand-globs";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-snippets`: every `ts`, `tsx`, `js` and `jsx` code
@@ -17,13 +17,13 @@ import { readConfig } from '@/config/read-config';
 export const checkSnippetsCommand = ({ root = process.cwd() }: { root?: string } = {}): number => {
   try {
     const {
-      include = ['README.md', 'packages/*/README.md', 'packages/*/llms.txt'],
-      skipInfo = ['live'],
+      include = ["README.md", "packages/*/README.md", "packages/*/llms.txt"],
+      skipInfo = ["live"],
     } = readConfig(root).snippets ?? {};
     const files = expandGlobs(root, include);
     let checked = 0;
     const problems = files.flatMap((file) =>
-      fencedSnippets(readFileSync(join(root, file), 'utf8'))
+      fencedSnippets(readFileSync(join(root, file), "utf8"))
         .filter(({ info }) => !info.split(/\s+/).some((word) => skipInfo.includes(word)))
         .flatMap((snippet) => {
           checked += 1;
@@ -34,7 +34,7 @@ export const checkSnippetsCommand = ({ root = process.cwd() }: { root?: string }
     );
     if (problems.length > 0) {
       console.error(
-        ['check-snippets: these code snippets would not run as written:', ...problems].join('\n'),
+        ["check-snippets: these code snippets would not run as written:", ...problems].join("\n"),
       );
       return 1;
     }

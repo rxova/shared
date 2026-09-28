@@ -1,4 +1,4 @@
-import { failConfig } from '@/internal/config/fail-config';
+import { failConfig } from "@/internal/config/fail-config";
 
 /** `section[key]` as a non-empty string, or undefined when it is absent. */
 export const readString = (
@@ -8,6 +8,6 @@ export const readString = (
 ): string | undefined => {
   const value = section[key];
   if (value === undefined) return undefined;
-  if (typeof value === 'string' && value !== '') return value;
-  return failConfig(`${path}.${key}`, 'a non-empty string');
+  if (typeof value === "string" && value !== "") return value;
+  return failConfig(`${path}.${key}`, "a non-empty string");
 };

@@ -1,6 +1,6 @@
-import type { PackageLlmsConfig } from '@/config/config.types';
-import { idsFromSource } from '@/internal/llms/ids-from-source';
-import { LLMS_FILE } from '@/internal/llms/llms-file';
+import type { PackageLlmsConfig } from "@/config/config.types";
+import { idsFromSource } from "@/internal/llms/ids-from-source";
+import { LLMS_FILE } from "@/internal/llms/llms-file";
 
 /**
  * The terms a package's `llms.txt` must mention and does not: each
@@ -17,7 +17,7 @@ export const llmsTermFailures = (
   const stale =
     idPattern === undefined
       ? []
-      : [...new Set(body.match(new RegExp(idPattern, 'g')) ?? [])].filter(
+      : [...new Set(body.match(new RegExp(idPattern, "g")) ?? [])].filter(
           (match) => !ids.includes(match),
         );
   return [

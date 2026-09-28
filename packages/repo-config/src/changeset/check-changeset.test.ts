@@ -56,11 +56,11 @@ describe("checkChangeset", () => {
     expect(checkChangeset(changed, PUBLISHED, {}, { present }).exitCode).toBe(1);
   });
 
-  it('decides on the shipped paths when they are given, and lists them', () => {
-    const changed = ['packages/example/README.md'];
+  it("decides on the shipped paths when they are given, and lists them", () => {
+    const changed = ["packages/example/README.md"];
     expect(checkChangeset(changed, PUBLISHED, {}, { shipped: [] }).exitCode).toBe(0);
     const verdict = checkChangeset(changed, PUBLISHED, {}, { shipped: changed });
     expect(verdict.exitCode).toBe(1);
-    expect(verdict.message).toContain('  packages/example/README.md');
+    expect(verdict.message).toContain("  packages/example/README.md");
   });
 });

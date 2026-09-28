@@ -1,8 +1,8 @@
-import { readFile } from '@/internal/config/read-file';
-import { runCommand } from '@/internal/verify/run-command';
-import type { Reader } from '@/config/config.types';
-import type { Runner } from '@/verify/verify.types';
-import { readPackageConfig } from '@/config/read-package-config';
+import { readFile } from "@/internal/config/read-file";
+import { runCommand } from "@/internal/verify/run-command";
+import type { Reader } from "@/config/config.types";
+import type { Runner } from "@/verify/verify.types";
+import { readPackageConfig } from "@/config/read-package-config";
 
 /**
  * `rxova-repo-config check-exports [--profile <p>]`: the package in the
@@ -21,17 +21,17 @@ export const checkExportsCommand = (
   }: { cwd?: string; run?: Runner; read?: Reader } = {},
 ): number => {
   try {
-    const flag = argv.find((arg) => arg === '--profile' || arg.startsWith('--profile='));
-    const fromFlag = flag?.includes('=')
-      ? flag.slice(flag.indexOf('=') + 1)
+    const flag = argv.find((arg) => arg === "--profile" || arg.startsWith("--profile="));
+    const fromFlag = flag?.includes("=")
+      ? flag.slice(flag.indexOf("=") + 1)
       : flag && argv[argv.indexOf(flag) + 1];
     const profile =
-      flag === undefined ? readPackageConfig(cwd, read).exports?.profile : (fromFlag ?? '');
+      flag === undefined ? readPackageConfig(cwd, read).exports?.profile : (fromFlag ?? "");
     if (profile !== undefined && !/^[a-z][a-z0-9-]*$/.test(profile)) {
       throw new Error(`--profile needs an attw profile name such as esm-only, found "${profile}"`);
     }
-    run('publint --strict');
-    run(`attw --pack .${profile === undefined ? '' : ` --profile ${profile}`}`);
+    run("publint --strict");
+    run(`attw --pack .${profile === undefined ? "" : ` --profile ${profile}`}`);
     return 0;
   } catch (failure) {
     console.error(`check-exports failed — ${(failure as Error).message}`);

@@ -11,7 +11,7 @@ export interface Step {
 }
 
 /** How `check-llms` compares a package's `llms.txt` with its source. */
-export type LlmsApi = 'exact' | 'documented' | 'props' | 'none';
+export type LlmsApi = "exact" | "documented" | "props" | "none";
 
 /** The `llms.txt` rules a package can set for itself, in its own `package.json#repoConfig.llms`. */
 export interface PackageLlmsConfig {
@@ -33,7 +33,7 @@ export interface PackageLlmsConfig {
 /** `repoConfig.llms`: the rules for every published package, which each may override. */
 export interface LlmsConfig extends PackageLlmsConfig {
   /** `index` (default) reads `src/index.ts`; `subpaths` also reads every `src/<dir>/index.ts`. */
-  entries?: 'index' | 'subpaths';
+  entries?: "index" | "subpaths";
   /** The `## ` headings the file needs; `A|B` accepts either. `API` is added for `api: "exact"`. */
   sections?: string[];
   /** The root `llms.txt` exists and links every package's file (default true). */
@@ -60,7 +60,7 @@ export interface RepoConfig {
      * `code` (default): a package's code changed, markdown and tests aside.
      * `shipped`: anything the package's tarball ships changed, its README and llms.txt included.
      */
-    scope?: 'code' | 'shipped';
+    scope?: "code" | "shipped";
     /** Where `add-changeset` looks for packages (default `packages`, `apps`). */
     roots?: string[];
     /** A name prefix `add-changeset` also accepts without: `journey-` lets `core` name `@rxova/journey-core`. */
@@ -145,7 +145,7 @@ export interface FixtureRun {
 export interface PackageConfig {
   packSmoke?: {
     /** `auto` (default): import the package when it has a JavaScript entry. `never`: skip the probe. */
-    load?: 'auto' | 'never';
+    load?: "auto" | "never";
     /** `false` runs no bin; an entry replaces the `--version` check for that bin. */
     bins?: false | Record<string, BinCheck>;
     run?: FixtureRun[];

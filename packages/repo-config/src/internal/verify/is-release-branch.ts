@@ -1,4 +1,4 @@
-import { RELEASE_BRANCH } from '@/internal/verify/release-branch';
+import { RELEASE_BRANCH } from "@/internal/verify/release-branch";
 
 /**
  * Whether this run checks the release pull request: GitHub sets

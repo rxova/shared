@@ -1,14 +1,14 @@
-import { changesetFiles } from '@/internal/changeset/changeset-files';
-import { changesetProblems } from '@/internal/changeset/changeset-problems';
-import { gitDiff } from '@/internal/changeset/git-diff';
-import { labelsOf } from '@/internal/changeset/labels-of';
-import { shippedChanges } from '@/internal/changeset/shipped-changes';
-import { readFile } from '@/internal/config/read-file';
-import type { Differ } from '@/changeset/changeset.types';
-import type { Reader } from '@/config/config.types';
-import { checkChangeset } from '@/changeset/check-changeset';
-import { publishedDirs } from '@/changeset/published-dirs';
-import { readConfig } from '@/config/read-config';
+import { changesetFiles } from "@/internal/changeset/changeset-files";
+import { changesetProblems } from "@/internal/changeset/changeset-problems";
+import { gitDiff } from "@/internal/changeset/git-diff";
+import { labelsOf } from "@/internal/changeset/labels-of";
+import { shippedChanges } from "@/internal/changeset/shipped-changes";
+import { readFile } from "@/internal/config/read-file";
+import type { Differ } from "@/changeset/changeset.types";
+import type { Reader } from "@/config/config.types";
+import { checkChangeset } from "@/changeset/check-changeset";
+import { publishedDirs } from "@/changeset/published-dirs";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-changeset`: a change to a published package needs a
@@ -38,7 +38,7 @@ export const checkChangesetCommand = (
   const head = env.HEAD_SHA;
 
   if (!base || !head) {
-    console.error('check-changeset: BASE_SHA and HEAD_SHA must be set');
+    console.error("check-changeset: BASE_SHA and HEAD_SHA must be set");
     return 1;
   }
 
@@ -50,8 +50,8 @@ export const checkChangesetCommand = (
     const verdict = checkChangeset(
       changed,
       dirs,
-      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? '' },
-      config.scope === 'shipped'
+      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? "" },
+      config.scope === "shipped"
         ? { present, shipped: shippedChanges(changed, dirs, root, read) }
         : { present },
     );
@@ -62,7 +62,7 @@ export const checkChangesetCommand = (
       });
       if (problems.length > 0) {
         console.error(
-          ['check-changeset: fix these changesets before merging.', ...problems].join('\n'),
+          ["check-changeset: fix these changesets before merging.", ...problems].join("\n"),
         );
         return 1;
       }

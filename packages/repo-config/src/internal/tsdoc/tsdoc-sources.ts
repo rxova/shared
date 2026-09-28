@@ -1,6 +1,6 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { packageManifests } from '@/internal/packages/package-manifests';
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { packageManifests } from "@/internal/packages/package-manifests";
 
 /** One published package's public entry, and the tsconfig its program is built with. */
 export interface TsdocSource {
