@@ -220,4 +220,108 @@ describe("packSmoke", () => {
       "pack:smoke ok — @ installs, imports and requires from a tarball",
     );
   });
+
+  describe('with package.json#repoConfig.packSmoke', () => {
+    it('skips the probe with load: never', () => {
+      const { fs } = memoryScratch({
+        name: '@rxova/brand',
+        version: '1.0.0',
+        exports: { '.': './src/index.ts' },
+        files: ['src'],
+        repoConfig: { packSmoke: { load: 'never' } },
+      });
+      const sh = vi.fn(fakeNpm({ contents: [...HEALTHY_TARBALL, 'package/src/index.ts'] }));
+      expect(packSmoke({ pkgDir: '/pkg', sh, fs })).toBe(
+        'pack:smoke ok — @rxova/brand@1.0.0 installs, is not loaded (nothing to probe) from a tarball',
+      );
+      expect(sh).not.toHaveBeenCalledWith('node', expect.anything(), SCRATCH);
+    });
+
+    it('probes each JavaScript subpath of a subpath-only package', () => {
+      const { fs, files } = memoryScratch({
+        name: 'kit',
+        version: '1.0.0',
+        exports: { './a': './dist/a.js', './b': './dist/b.js' },
+      });
+      const probes: string[] = [];
+      const sh: Shell = (command, args, cwd) => {
+        if (command === 'node') probes.push(files.get(join(SCRATCH, 'probe.mjs')) ?? '');
+        return fakeNpm({
+          contents: [...HEALTHY_TARBALL, 'package/dist/a.js', 'package/dist/b.js'],
+        })(command, args, cwd);
+      };
+      packSmoke({ pkgDir: '/pkg', sh, fs });
+      expect(probes).toHaveLength(2);
+      expect(probes[1]).toContain('"kit/b"');
+      const failing: Shell = (command, args, cwd) =>
+        command === 'node' ? 'boom' : sh(command, args, cwd);
+      expect(() => packSmoke({ pkgDir: '/pkg', sh: failing, fs })).toThrow(
+        'probe failed for kit/a: boom',
+      );
+    });
+
+    it('runs configured bin checks and fixture runs through the combined output', () => {
+      const { fs, files } = memoryScratch({
+        name: '@rxova/codemod',
+        version: '1.0.1',
+        bin: { 'rxova-codemod': './dist/bin.cjs' },
+        exports: { './transforms/*': './dist/transforms/*.cjs' },
+        repoConfig: {
+          packSmoke: {
+            bins: { 'rxova-codemod': { args: ['--help'], expect: 'input-otp-to-otp' } },
+            run: [
+              {
+                bin: 'rxova-codemod',
+                args: ['input-otp-to-otp', 'fixture.tsx'],
+                fixture: { path: 'fixture.tsx', contents: 'OTPInput' },
+                expect: ['OtpInput'],
+              },
+            ],
+          },
+        },
+      });
+      const output = vi.fn((_: string, args: string[]) => {
+        if (args.includes('fixture.tsx')) files.set(join(SCRATCH, 'fixture.tsx'), 'OtpInput');
+        return 'Transforms:\n  input-otp-to-otp\n';
+      });
+      const sh = vi.fn(
+        fakeNpm({
+          contents: [...HEALTHY_TARBALL, 'package/dist/bin.cjs', 'package/dist/transforms/a.cjs'],
+        }),
+      );
+      expect(packSmoke({ pkgDir: '/pkg', sh, output, fs })).toContain('is not loaded');
+      expect(output).toHaveBeenCalledTimes(2);
+      expect(sh).not.toHaveBeenCalledWith('npx', expect.anything(), SCRATCH);
+    });
+
+    it('fails a stylesheet import that does not resolve', () => {
+      const { fs } = memoryScratch(
+        {
+          name: 'theme',
+          version: '1.0.0',
+          exports: { './theme.css': './src/theme.css' },
+          files: ['src'],
+          repoConfig: { packSmoke: { load: 'never' } },
+        },
+        {
+          extra: {
+            [join(SCRATCH, 'node_modules', 'theme', 'src', 'theme.css')]: "@import './gone.css';",
+          },
+        },
+      );
+      const sh = fakeNpm({ contents: [...HEALTHY_TARBALL, 'package/src/theme.css'] });
+      expect(() => packSmoke({ pkgDir: '/pkg', sh, fs })).toThrow(
+        "stylesheet imports do not resolve in the tarball: src/theme.css: @import './gone.css'",
+      );
+    });
+
+    it('refuses a malformed config before packing', () => {
+      const { fs } = memoryScratch({ name: 'x', repoConfig: { packSmoke: { load: 'maybe' } } });
+      const sh = vi.fn(fakeNpm());
+      expect(() => packSmoke({ pkgDir: '/pkg', sh, fs })).toThrow(
+        'repoConfig.packSmoke.load must be one of',
+      );
+      expect(sh).not.toHaveBeenCalled();
+    });
+  });
 });

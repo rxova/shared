@@ -1,14 +1,14 @@
-import { changesetFiles } from "@/internal/changeset/changeset-files";
-import { gitDiff } from "@/internal/changeset/git-diff";
-import { labelsOf } from "@/internal/changeset/labels-of";
-import { readFile } from "@/internal/config/read-file";
-import { singlePackageProblems } from "@/internal/changeset/single-package-problems";
-import type { Differ } from "@/changeset/changeset.types";
-import type { Reader } from "@/config/config.types";
-import { join } from "node:path";
-import { checkChangeset } from "@/changeset/check-changeset";
-import { publishedDirs } from "@/changeset/published-dirs";
-import { readConfig } from "@/config/read-config";
+import { changesetFiles } from '@/internal/changeset/changeset-files';
+import { changesetProblems } from '@/internal/changeset/changeset-problems';
+import { gitDiff } from '@/internal/changeset/git-diff';
+import { labelsOf } from '@/internal/changeset/labels-of';
+import { shippedChanges } from '@/internal/changeset/shipped-changes';
+import { readFile } from '@/internal/config/read-file';
+import type { Differ } from '@/changeset/changeset.types';
+import type { Reader } from '@/config/config.types';
+import { checkChangeset } from '@/changeset/check-changeset';
+import { publishedDirs } from '@/changeset/published-dirs';
+import { readConfig } from '@/config/read-config';
 
 /**
  * `rxova-repo-config check-changeset`: a change to a published package needs a
@@ -16,10 +16,14 @@ import { readConfig } from "@/config/read-config";
  * version.
  *
  * Run from the repository root with `BASE_SHA` and `HEAD_SHA` set. `PR_LABELS`
- * (comma-separated) and `PR_TITLE` carry the escape hatch. With
- * `repoConfig.changeset.singlePackage` set in the root `package.json`, each
- * changeset must also name exactly one package, so every changelog entry
- * belongs to the package it describes. Returns the process exit code.
+ * (comma-separated) and `PR_TITLE` carry the escape hatch. What counts as a
+ * change is `repoConfig.changeset.scope`: `code` (the default) leaves a
+ * package's markdown and tests out, `shipped` counts everything its tarball
+ * ships, README and `llms.txt` included. The changesets the range adds are
+ * then linted: no summary line the changelog would read as metadata and, with
+ * `repoConfig.changeset.singlePackage`, exactly one package each, so every
+ * changelog entry belongs to the package it describes. Returns the process
+ * exit code.
  */
 export const checkChangesetCommand = (
   env: NodeJS.ProcessEnv = process.env,
@@ -34,30 +38,31 @@ export const checkChangesetCommand = (
   const head = env.HEAD_SHA;
 
   if (!base || !head) {
-    console.error("check-changeset: BASE_SHA and HEAD_SHA must be set");
+    console.error('check-changeset: BASE_SHA and HEAD_SHA must be set');
     return 1;
   }
 
   try {
-    const config = readConfig(root, read);
+    const config = readConfig(root, read).changeset ?? {};
+    const changed = diff(base, head);
     const present = diff(base, head, { existing: true });
+    const dirs = published ?? publishedDirs(root);
     const verdict = checkChangeset(
-      diff(base, head),
-      published ?? publishedDirs(root),
-      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? "" },
-      { present },
+      changed,
+      dirs,
+      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? '' },
+      config.scope === 'shipped'
+        ? { present, shipped: shippedChanges(changed, dirs, root, read) }
+        : { present },
     );
 
-    if (verdict.exitCode === 0 && config.changeset?.singlePackage === true) {
-      const problems = singlePackageProblems(
-        changesetFiles(present).map((file) => join(root, file)),
-        read,
-      );
+    if (verdict.exitCode === 0) {
+      const problems = changesetProblems(root, changesetFiles(present), read, {
+        singlePackage: config.singlePackage === true,
+      });
       if (problems.length > 0) {
         console.error(
-          ["check-changeset: each changeset must name exactly one package.", ...problems].join(
-            "\n",
-          ),
+          ['check-changeset: fix these changesets before merging.', ...problems].join('\n'),
         );
         return 1;
       }
