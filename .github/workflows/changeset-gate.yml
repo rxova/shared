@@ -20,7 +20,7 @@ on:
         description: Node.js version.
         type: string
         required: false
-        default: '24'
+        default: "24"
       repo-config-command:
         description: How to run the rxova-repo-config bin.
         type: string

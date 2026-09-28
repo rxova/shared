@@ -18,17 +18,17 @@ inputs:
   types-version:
     description: The `@types/react` version, such as `18.3.27`. Empty leaves the types alone.
     required: false
-    default: ''
+    default: ""
   types-dom-version:
     description: The `@types/react-dom` version, such as `18.3.7`. Empty leaves it alone.
     required: false
-    default: ''
+    default: ""
   filters:
     description: >-
       Space-separated pnpm filters (package names or globs such as `@rxova/react-*`)
       to pin as well as the root. Empty pins the root only.
     required: false
-    default: ''
+    default: ""
 
 runs:
   using: composite

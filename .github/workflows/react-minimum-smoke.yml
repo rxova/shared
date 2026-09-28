@@ -24,7 +24,7 @@ jobs:
       react-version: ${{ inputs.react-version }}
       types-version: 18.3.27
       types-dom-version: 18.3.7
-      filters: '@rxova/ts-utils'
+      filters: "@rxova/ts-utils"
       build-command: pnpm exec turbo run build --filter=@rxova/repo-config
       test-command: pnpm --filter @rxova/ts-utils exec vitest run --coverage.enabled=false
       typecheck-command: pnpm --filter @rxova/ts-utils typecheck

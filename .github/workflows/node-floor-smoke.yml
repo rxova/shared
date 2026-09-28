@@ -24,7 +24,7 @@ on:
         description: Node.js version for the toolchain (install and build), before the switch.
         type: string
         required: false
-        default: '24'
+        default: "24"
       build-command:
         description: Builds the published packages and @rxova/repo-config's bin if it is built in this repository.
         type: string
@@ -34,7 +34,7 @@ on:
         description: Runs on the floor Node after every pack smoke, from the repository root (a CLI probe, say).
         type: string
         required: false
-        default: ''
+        default: ""
 
 permissions:
   contents: read

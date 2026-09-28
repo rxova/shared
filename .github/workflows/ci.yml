@@ -206,7 +206,7 @@ jobs:
           react-version: 18.2.0
           types-version: 18.3.27
           types-dom-version: 18.3.7
-          filters: '@rxova/ts-utils'
+          filters: "@rxova/ts-utils"
       # The vitest config imports the built preset.
       - name: Build the presets
         run: pnpm exec turbo run build --filter=@rxova/repo-config

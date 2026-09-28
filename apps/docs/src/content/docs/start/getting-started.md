@@ -87,7 +87,7 @@ Renovate takes the org preset:
 
 ```json5
 // .github/renovate.json5
-{ extends: ['github>rxova/shared//renovate/default.json5'] }
+{ extends: ["github>rxova/shared//renovate/default.json5"] }
 ```
 
 Every export, command and action input is listed in the [reference](../../reference/api/).

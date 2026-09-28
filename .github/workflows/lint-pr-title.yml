@@ -18,7 +18,7 @@ on:
         description: Node.js version to run commitlint on.
         type: string
         required: false
-        default: '24'
+        default: "24"
 
 permissions:
   contents: read

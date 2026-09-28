@@ -15,7 +15,7 @@ inputs:
   base:
     description: The path the dist is served under. Defaults to `/packages/<project>/`.
     required: false
-    default: ''
+    default: ""
   framework:
     description: What built the dist (`astro`, `storybook`).
     required: false
@@ -30,9 +30,9 @@ inputs:
     required: false
     default: rxova/rxova-website
   dry-run:
-    description: '`true` prints the request instead of sending it.'
+    description: "`true` prints the request instead of sending it."
     required: false
-    default: 'false'
+    default: "false"
 
 runs:
   using: composite

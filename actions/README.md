@@ -48,7 +48,7 @@ a range resolves to the newest 18). The reusable
     react-version: 18.2.0
     types-version: 18.3.27
     types-dom-version: 18.3.7
-    filters: '@rxova/journey-react'
+    filters: "@rxova/journey-react"
 ```
 
 ## `require-jobs`
