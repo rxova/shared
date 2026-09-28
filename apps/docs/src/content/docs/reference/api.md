@@ -33,32 +33,33 @@ Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/pre
 
 ## `@rxova/claude-kit`
 
-| Command                                                                                           | What it does                                                        |
-| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `rxova-claude-kit list [--profile p]`                                                             | Lists every agent, skill and hook, and the profiles that include it |
-| `rxova-claude-kit install [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `full`) into `.claude`     |
-| `rxova-claude-kit uninstall [--project] [--dry-run]`                                              | Removes exactly what the last install wrote                         |
-| `rxova-claude-kit status [--project]`                                                             | Shows the installed profile and any missing or changed file         |
+| Command                                                                                                        | What it does                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `rxova-claude-kit list [--profile p]`                                                                          | Lists every agent, skill and hook, and the profiles that include it                                                              |
+| `rxova-claude-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `dotnet`, `full`) for Claude Code, OpenCode or both (`--target claude\|opencode\|both`) |
+| `rxova-claude-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes exactly what each install wrote                                                                                          |
+| `rxova-claude-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and any missing or changed file                                                            |
 
-Hooks run on their own; Claude loads skills and hands work to agents when a request matches
-their description, or when you name one (`/rx-kickoff`, "use rx-architect"). See the
-[package README](https://github.com/rxova/shared/tree/main/packages/claude-kit#how-it-works) for how it
-works and an example.
+Hooks run on their own; Claude (or OpenCode) loads skills and hands work to agents when a
+request matches their description, or when you name one (`/rx-kickoff`, "use rx-architect"). In
+OpenCode the hooks run through a plugin the install writes. See the
+[package README](https://github.com/rxova/shared/tree/main/packages/claude-kit#how-it-works) for
+how it works, two worked examples, and what differs in OpenCode.
 
 ### Hooks
 
-| Hook               | What it does                                                                                             |
-| ------------------ | -------------------------------------------------------------------------------------------------------- |
-| `no-bypass`        | Blocks git calls that skip the repository's hooks (`--no-verify`, `HUSKY=0`, …)                          |
-| `no-attribution`   | Blocks commit messages and PR bodies that credit an AI assistant                                         |
-| `danger-zone`      | Blocks `rm -r` outside the project, force pushes to main, discarding work, dropping data, cloud teardown |
-| `dev-server`       | Blocks dev servers and watchers started in the foreground                                                |
-| `config-lock`      | Blocks edits to existing lint, format, type, commit and coverage configs                                 |
-| `secret-guard`     | Blocks writing API keys, tokens and private keys into source files                                       |
-| `quick-check`      | Formats and lints each edited file with the project's tools, and reports problems back                   |
-| `memory-snapshot`  | Saves a snapshot note before compaction and at session end                                               |
-| `handoff-reminder` | Points a new session at the latest handoff note or snapshot                                              |
-| `context-nudge`    | Asks for a handoff note and a compact at 60% and 80% of the context window                               |
+| Hook               | What it does                                                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `no-bypass`        | Blocks git calls that skip the repository's hooks (`--no-verify`, `HUSKY=0`, …)                                             |
+| `no-attribution`   | Blocks commit messages and PR bodies that credit an AI assistant                                                            |
+| `danger-zone`      | Blocks `rm -r` outside the project, force pushes to main, discarding work, dropping data (SQL, `dotnet ef`), cloud teardown |
+| `dev-server`       | Blocks dev servers and watchers started in the foreground                                                                   |
+| `config-lock`      | Blocks edits to existing lint, format, type, commit and coverage configs                                                    |
+| `secret-guard`     | Blocks writing API keys, tokens and private keys into source files                                                          |
+| `quick-check`      | Formats and lints each edited file with the project's tools, and reports problems back                                      |
+| `memory-snapshot`  | Saves a snapshot note before compaction and at session end                                                                  |
+| `handoff-reminder` | Points a new session at the latest handoff note or snapshot                                                                 |
+| `context-nudge`    | Asks for a handoff note and a compact at 60% and 80% of the context window                                                  |
 
 ### Skills
 
@@ -103,25 +104,46 @@ Platforms:
 | `rx-deploy-container`  | Deploy containers to Fly.io, Railway or anywhere Docker runs.                            |
 | `rx-aws`               | Take the fast paths on AWS, with a budget alarm first and a teardown list last.          |
 
+.NET:
+
+| Skill               | Use it to                                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `rx-dotnet-upgrade` | Move a service from .NET 6 or 8 to .NET 10: inventory, baseline, SDK and packages, breaking changes, images, CI. |
+| `rx-dotnet-api`     | Build and upgrade ASP.NET Core APIs: minimal APIs or controllers, validation, ProblemDetails, auth, OpenAPI.     |
+| `rx-efcore`         | Upgrade and use EF Core safely: breaking changes, migrations and production scripts, providers, performance.     |
+| `rx-dotnet-workers` | Run hosted services and messaging reliably: shutdown, scopes, retries, idempotency, outbox, brokers.             |
+| `rx-dotnet-testing` | Test with Shouldly: detect the framework, convert FluentAssertions, WebApplicationFactory, Testcontainers.       |
+
+Datadog:
+
+| Skill                    | Use it to                                                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `rx-datadog-dotnet`      | Instrument a .NET service with the tracer, service tags, log correlation and metrics, and keep it working through an upgrade.       |
+| `rx-datadog-investigate` | Go from an alert or symptom to the failing span and its logs, before and after a deploy, through the Datadog MCP server or the API. |
+| `rx-datadog-monitors`    | Manage monitors, SLOs and dashboards as code, and keep them valid after renames.                                                    |
+
 ### Agents
 
-| Agent            | Model  | Can edit | Use it to                                                               |
-| ---------------- | ------ | -------- | ----------------------------------------------------------------------- |
-| `rx-planner`     | opus   | no       | Turn a request into a sliced plan grounded in the code.                 |
-| `rx-architect`   | opus   | no       | Design the system for a time-boxed build: parts, data, boundaries.      |
-| `rx-security`    | opus   | no       | Find what would embarrass the demo: secrets, auth gaps, RLS, injection. |
-| `rx-reviewer`    | sonnet | no       | Review a diff and report only defects it can back.                      |
-| `rx-researcher`  | sonnet | no       | Answer "how do I do X with Y" from official docs, with sources.         |
-| `rx-builder`     | sonnet | yes      | Build one slice end to end, with tests.                                 |
-| `rx-debugger`    | sonnet | yes      | Find a bug's root cause and fix it with a regression test.              |
-| `rx-test-writer` | sonnet | yes      | Add tests that check behaviour.                                         |
-| `rx-build-fixer` | sonnet | yes      | Turn a red build green with the smallest honest diff.                   |
-| `rx-ui`          | sonnet | yes      | Build and polish UI: responsive, accessible, every state.               |
-| `rx-db`          | sonnet | yes      | Design schemas, migrations, policies and demo seed data.                |
-| `rx-deployer`    | sonnet | yes      | Ship to the chosen platform and prove the live URL works.               |
-| `rx-pitch`       | sonnet | yes      | Write the demo script and the pitch.                                    |
-| `rx-scout`       | haiku  | no       | Find where things live without flooding the context.                    |
-| `rx-doc-writer`  | haiku  | yes      | Write a README a judge can follow in five minutes.                      |
+| Agent                | Model  | Can edit | Use it to                                                                                                                                                   |
+| -------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rx-planner`         | opus   | no       | Turn a request into a sliced plan grounded in the code.                                                                                                     |
+| `rx-architect`       | opus   | no       | Design the system for a time-boxed build: parts, data, boundaries.                                                                                          |
+| `rx-security`        | opus   | no       | Find what would embarrass the demo: secrets, auth gaps, RLS, injection.                                                                                     |
+| `rx-reviewer`        | sonnet | no       | Review a diff and report only defects it can back.                                                                                                          |
+| `rx-researcher`      | sonnet | no       | Answer "how do I do X with Y" from official docs, with sources.                                                                                             |
+| `rx-builder`         | sonnet | yes      | Build one slice end to end, with tests.                                                                                                                     |
+| `rx-debugger`        | sonnet | yes      | Find a bug's root cause and fix it with a regression test.                                                                                                  |
+| `rx-test-writer`     | sonnet | yes      | Add tests that check behaviour.                                                                                                                             |
+| `rx-build-fixer`     | sonnet | yes      | Turn a red build green with the smallest honest diff.                                                                                                       |
+| `rx-ui`              | sonnet | yes      | Build and polish UI: responsive, accessible, every state.                                                                                                   |
+| `rx-db`              | sonnet | yes      | Design schemas, migrations, policies and demo seed data.                                                                                                    |
+| `rx-deployer`        | sonnet | yes      | Ship to the chosen platform and prove the live URL works.                                                                                                   |
+| `rx-pitch`           | sonnet | yes      | Write the demo script and the pitch.                                                                                                                        |
+| `rx-scout`           | haiku  | no       | Find where things live without flooding the context.                                                                                                        |
+| `rx-doc-writer`      | haiku  | yes      | Write a README a judge can follow in five minutes.                                                                                                          |
+| `rx-dotnet-migrator` | sonnet | yes      | Upgrade one .NET service to .NET 10: baseline, change, build, fix, test, smoke, with a log.                                                                 |
+| `rx-dotnet-reviewer` | sonnet | no       | Review a .NET diff: async, DI lifetimes, EF Core safety, behaviour the upgrade changed.                                                                     |
+| `rx-observability`   | sonnet | no       | Investigate production behaviour in Datadog and report with evidence; changes nothing unless asked. Has no tool list, so it can use the Datadog MCP server. |
 
 ## GitHub Actions
 
