@@ -17,8 +17,12 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   `src/install/profiles.ts`. `content/` ships as-is; `src/hooks/hooks-entry.ts` is built as a
   standalone `dist/hooks.js` (its own tsdown config, no shared chunks) because the installer copies
   that one file out of the package.
-- `packages/repo-config/presets/*.js` — plain JavaScript on purpose: ESLint and the commit-msg hook load
-  them before anything is built.
+- `packages/repo-config/presets/*.js` — plain JavaScript on purpose: ESLint, Prettier, lint-staged,
+  changesets and the commit-msg hook load them before anything is built. Their tests live in
+  `src/presets/` and import them by their public specifier.
+- `packages/repo-config/src/vitest/base-vitest-config.ts` is loaded from source by the package's own
+  `vitest.config.ts`, before the `@/` alias exists, so it imports its helpers by relative path (the
+  one place that does).
 - `actions/*` — composite GitHub Actions other repositories use as
   `rxova/shared/actions/<name>@<ref>`. This repository's workflows use them through
   `./actions/<name>`, so its own CI exercises every change. Keep inputs backward compatible: a
@@ -39,7 +43,8 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   exactly `functionName` (kebab-case file, camelCase export), `<function-name>.test.ts` beside it
   holds its tests, `<name>.types.ts` holds types only, `<name>.fixtures.ts` the fakes several
   suites share. Files sit in topic folders (`scope/`, `changeset/`, `pack-smoke/`, …), never loose
-  under `src/`; only `index.ts` (and ts-utils's `react.ts`) live at the root, and they re-export
+  under `src/`; only `index.ts` (plus ts-utils's `react.ts` and repo-config's subpath barrels
+  `tsdown.ts`, `vitest.ts`, `playwright.ts` and `knip.ts`) live at the root, and they re-export
   only. Barrels, types and fixtures are excluded from coverage, so logic there is logic nobody
   measures.
 - No relative imports in source. A package names its own files as `@/<topic>/<file>`; each

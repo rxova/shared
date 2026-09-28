@@ -7,8 +7,10 @@ export default defineConfig(
     entry: {
       index: "src/index.ts",
       cli: "src/cli/cli.ts",
-      tsdown: "src/tsdown/base-build-config.ts",
-      vitest: "src/vitest/base-vitest-config.ts",
+      tsdown: "src/tsdown.ts",
+      vitest: "src/vitest.ts",
+      playwright: "src/playwright.ts",
+      knip: "src/knip.ts",
     },
   }),
 );

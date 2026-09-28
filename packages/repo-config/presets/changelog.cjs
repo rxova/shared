@@ -4,9 +4,10 @@
 // unconditionally. Wrapping the generator is the only way to drop the line while
 // keeping the pull-request and commit links, which are the part worth having.
 //
-// Resolution: changesets calls resolveFrom(<repo>/.changeset, changelog[0]), so
-// the config value is "./changelog-no-thanks.cjs" — relative to .changeset/,
-// not to the repo root.
+// Use: `"changelog": ["@rxova/repo-config/changelog", { "repo": "<owner>/<repo>" }]` in
+// .changeset/config.json. changesets resolves the name from .changeset/, so the root
+// devDependency on @rxova/repo-config is found; @changesets/changelog-github is an
+// optional peer the repository installs.
 //
 // Re-verify after any @changesets/changelog-github bump: this rewrites a
 // rendered string, so a change to its output format makes it a silent no-op
@@ -25,10 +26,10 @@ const ATTRIBUTION = / Thanks \[@[^\]]+\]\([^)]+\)(?:, \[@[^\]]+\]\([^)]+\))*!/g;
 // collapsed here rather than avoided.
 const EMPTY_PREFIX = /^(\n\n)- - /;
 
-module.exports = {
-  ...github,
-  getReleaseLine: async (changeset, type, options) =>
-    (await github.getReleaseLine(changeset, type, options))
-      .replace(ATTRIBUTION, "")
-      .replace(EMPTY_PREFIX, "$1- "),
-};
+// Assigned one by one, not as an object literal, so Node's CommonJS lexer sees
+// the names and `import { getReleaseLine } from` works as TypeScript says it does.
+exports.getDependencyReleaseLine = github.getDependencyReleaseLine;
+exports.getReleaseLine = async (changeset, type, options) =>
+  (await github.getReleaseLine(changeset, type, options))
+    .replace(ATTRIBUTION, "")
+    .replace(EMPTY_PREFIX, "$1- ");
