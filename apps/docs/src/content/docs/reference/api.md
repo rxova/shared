@@ -19,17 +19,25 @@ description: Every export, command and action this repository publishes.
 
 ## `@rxova/repo-config`
 
-| Command                                 | What it does                                                        |
-| --------------------------------------- | ------------------------------------------------------------------- |
-| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate, from `package.json#repoConfig.verify.steps` |
-| `rxova-repo-config check-changeset`     | Requires a changeset when a published package changed               |
-| `rxova-repo-config check-scope`         | Reports `code-changed=false` for a release commit                   |
-| `rxova-repo-config node-floor`          | Reads the one `engines.node` floor the packages share               |
-| `rxova-repo-config pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball    |
-| `rxova-repo-config check-llms [root]`   | Holds each `llms.txt` to the package exports                        |
+| Command                                 | What it does                                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate, from `package.json#repoConfig.verify.steps`                                 |
+| `rxova-repo-config check-changeset`     | Requires a changeset when a published package changed                                               |
+| `rxova-repo-config check-scope`         | Reports `code-changed=false` for a release commit                                                   |
+| `rxova-repo-config node-floor`          | Reads the one `engines.node` floor the packages share                                               |
+| `rxova-repo-config pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball, and checks what the tarball ships |
+| `rxova-repo-config check-llms [root]`   | Holds each `llms.txt` to the package exports                                                        |
+
+`pack-smoke` also fails when a `files` entry (nested paths and globs included), the README, the
+license or any `exports`, `main`, `types` or bin target is missing from the tarball; when it ships
+`src/`, `e2e/`, `__tests__` or `*.test.*` / `*.spec.*` files that no `files` entry names; and when a
+built entry lost the `'use client'` directive its source opens with. `workspace:` dependencies,
+optional dependencies and peers resolve the way `pnpm publish` writes them.
 
 Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
-`/tsconfig.base.json`.
+`/tsconfig.base.json`. `baseVitestConfig` holds every file to 95% coverage; a package can override
+single axes with `thresholds` (`{ branches: 88 }`), and change what is measured or discovered with
+`coverageInclude`, `exclude` and `testExclude`.
 
 ## `@rxova/agent-kit`
 
