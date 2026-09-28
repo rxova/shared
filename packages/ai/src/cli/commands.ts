@@ -2,9 +2,16 @@ import type { CommandEntry } from '@/cli/cli.types';
 
 /** Every `rxova-ai` command, by name, each loaded when it runs. */
 export const commands = (): Record<string, CommandEntry> => ({
+  list: {
+    summary: 'show every agent, skill and hook, and which profiles include it [--profile p]',
+    load: async () => {
+      const { listCommand } = await import('@/install/list-command');
+      return (argv) => listCommand(argv);
+    },
+  },
   install: {
     summary:
-      'copy the agents, skills and hook runner and register the hooks [--project] [--dry-run] [--force]',
+      'install a profile (core, hackathon, full) [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]',
     load: async () => {
       const { installCommand } = await import('@/install/install-command');
       return (argv) => installCommand(argv);
@@ -18,7 +25,7 @@ export const commands = (): Record<string, CommandEntry> => ({
     },
   },
   status: {
-    summary: 'show what is installed and what is missing or changed [--project]',
+    summary: 'show the installed profile and anything missing or changed [--project]',
     load: async () => {
       const { statusCommand } = await import('@/install/status-command');
       return (argv) => statusCommand(argv);

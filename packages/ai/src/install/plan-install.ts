@@ -7,14 +7,16 @@ import { installCopies } from '@/install/install-copies';
  */
 export const planInstall = ({
   packageDir,
+  items,
   previous,
   exists,
 }: {
   packageDir: string;
+  items: readonly string[];
   previous: Manifest | undefined;
   exists: (relative: string) => boolean;
 }): InstallPlan => {
-  const copies = installCopies(packageDir);
+  const copies = installCopies(packageDir, items);
   const owned = new Set(previous?.files ?? []);
   return {
     copies,

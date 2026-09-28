@@ -1,8 +1,9 @@
+import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import type { InstallEnv } from '@/install/install.types';
 import { withoutOwnHooks } from '@/install/without-own-hooks';
 import { defaultEnv } from '@/internal/install/default-env';
-import { parseFlags } from '@/internal/install/parse-flags';
+import { parseOptions } from '@/internal/install/parse-options';
 import { readManifest } from '@/internal/install/read-manifest';
 import { readSettings } from '@/internal/install/read-settings';
 import { removeFiles } from '@/internal/install/remove-files';
@@ -19,13 +20,9 @@ export const uninstallCommand = (
   env: InstallEnv = defaultEnv(),
 ): number => {
   const { io } = env;
-  const { flags, unknown } = parseFlags(argv, ['--project', '--dry-run']);
-  if (unknown.length > 0) {
-    io.err(`rxova-ai uninstall: unknown option ${unknown.join(' ')}`);
-    return 1;
-  }
   try {
-    const target = targetDir(flags.has('--project'), env);
+    const options = parseOptions(argv, ['project', 'dry-run']);
+    const target = targetDir(options.project === true, env);
     const manifest = readManifest(target);
     const settings = readSettings(target);
     const cleaned = withoutOwnHooks(settings);
@@ -35,14 +32,17 @@ export const uninstallCommand = (
       return 0;
     }
     const files = [...(manifest?.files ?? []), MANIFEST];
-    if (flags.has('--dry-run')) {
+    if (options['dry-run'] === true) {
       io.out(`Would remove from ${target}:`);
       for (const file of files) io.out(`  remove  ${file}`);
       if (hooksChanged) io.out('  update  settings.json (drop the rx-ai hooks)');
       return 0;
     }
-    removeFiles(target, files);
-    if (hooksChanged) writeJson(join(target, 'settings.json'), cleaned);
+    const dropSettings = manifest?.createdSettings === true && Object.keys(cleaned).length === 0;
+    removeFiles(target, [...files, ...(dropSettings ? ['settings.json'] : [])]);
+    // The kit's own directory also holds hook state the manifest does not list.
+    rmSync(join(target, 'rx-ai'), { recursive: true, force: true });
+    if (hooksChanged && !dropSettings) writeJson(join(target, 'settings.json'), cleaned);
     io.out(`Removed rx-ai from ${target}.`);
     return 0;
   } catch (failure) {

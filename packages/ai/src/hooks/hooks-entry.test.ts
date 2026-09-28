@@ -4,28 +4,36 @@ import { describe, expect, it, vi } from 'vitest';
 import { main } from '@/hooks/hooks-entry';
 
 const bash = (command: string) => JSON.stringify({ tool_name: 'Bash', tool_input: { command } });
+const io = (stdin: () => string) => ({ stdin, stdout: vi.fn(), stderr: vi.fn() });
 
 describe('main', () => {
-  it('runs the named guard over stdin and reports a block on stderr', () => {
-    const stderr = vi.fn();
-    expect(main(['no-bypass'], () => bash('git commit -n'), stderr)).toBe(2);
-    expect(stderr).toHaveBeenCalledWith(expect.stringContaining('no-bypass'));
+  it('runs the named hook over stdin and reports a block on stderr', () => {
+    const streams = io(() => bash('git commit -n'));
+    expect(main(['no-bypass'], streams)).toBe(2);
+    expect(streams.stderr).toHaveBeenCalledWith(expect.stringContaining('no-bypass'));
+    expect(streams.stdout).not.toHaveBeenCalled();
   });
 
-  it('exits 0 quietly when the call is allowed, stdin fails, or no guard is named', () => {
-    const stderr = vi.fn();
-    expect(main(['no-bypass'], () => bash('git status'), stderr)).toBe(0);
+  it('writes a hook’s reply to stdout', () => {
+    const streams = io(() => '{}');
+    expect(main(['x'], streams, () => ({ code: 0, stdout: 'reply' }))).toBe(0);
+    expect(streams.stdout).toHaveBeenCalledWith('reply');
+  });
+
+  it('exits 0 quietly when the call is allowed, stdin fails, or no hook is named', () => {
+    const allowed = io(() => bash('git status'));
+    expect(main(['no-bypass'], allowed)).toBe(0);
+    const failing = io(() => {
+      throw new Error('closed');
+    });
+    expect(main(['no-bypass'], failing)).toBe(0);
     expect(
       main(
-        ['no-bypass'],
-        () => {
-          throw new Error('closed');
-        },
-        stderr,
+        [],
+        io(() => bash('git commit -n')),
       ),
     ).toBe(0);
-    expect(main([], () => bash('git commit -n'), stderr)).toBe(0);
-    expect(stderr).not.toHaveBeenCalled();
+    expect(allowed.stderr).not.toHaveBeenCalled();
   });
 });
 
@@ -34,8 +42,8 @@ const SPAWN_TIMEOUT = 60_000;
 
 describe('the runner as a process', () => {
   const script = fileURLToPath(new URL('./hooks-entry.ts', import.meta.url));
-  const run = (guard: string, input: string) =>
-    spawnSync(process.execPath, ['--import', 'tsx', script, guard], { input, encoding: 'utf8' });
+  const run = (hook: string, input: string) =>
+    spawnSync(process.execPath, ['--import', 'tsx', script, hook], { input, encoding: 'utf8' });
 
   it(
     'exits 2 with the reason on stderr, or 0',

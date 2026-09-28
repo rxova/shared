@@ -23,9 +23,27 @@ describe('uninstallCommand', () => {
       'settings.json': `${JSON.stringify({ model: 'x' }, null, 2)}\n`,
     });
     installCommand([], env);
+    writeTree(target, { 'rx-ai/state/nudge-s1.json': '1' });
     expect(uninstallCommand([], env)).toBe(0);
     expect(readdirSync(target).sort()).toEqual(['agents', 'settings.json']);
     expect(readdirSync(join(target, 'agents'))).toEqual(['theirs.md']);
+    expect(JSON.parse(readFileSync(join(target, 'settings.json'), 'utf8'))).toEqual({ model: 'x' });
+  });
+
+  it('removes settings.json too when the install created it and nothing else is left in it', () => {
+    const { env, target } = scratch();
+    installCommand([], env);
+    installCommand(['--add', 'rx-pitch'], env);
+    expect(uninstallCommand([], env)).toBe(0);
+    expect(readdirSync(target)).toEqual([]);
+  });
+
+  it('keeps a created settings.json that has gained other settings', () => {
+    const { env, target } = scratch();
+    installCommand([], env);
+    const settings = JSON.parse(readFileSync(join(target, 'settings.json'), 'utf8')) as object;
+    writeTree(target, { 'settings.json': JSON.stringify({ ...settings, model: 'x' }) });
+    expect(uninstallCommand([], env)).toBe(0);
     expect(JSON.parse(readFileSync(join(target, 'settings.json'), 'utf8'))).toEqual({ model: 'x' });
   });
 
@@ -58,9 +76,9 @@ describe('uninstallCommand', () => {
     const { env, target } = scratch();
     installCommand(['--project'], env);
     expect(uninstallCommand(['--project', '--dry-run'], env)).toBe(0);
-    expect(env.io.out).toHaveBeenCalledWith('  remove  agents/rx-one.md');
+    expect(env.io.out).toHaveBeenCalledWith('  remove  agents/rx-planner.md');
     expect(env.io.out).toHaveBeenCalledWith(expect.stringContaining('drop the rx-ai hooks'));
-    expect(existsSync(join(env.cwd, '.claude/agents/rx-one.md'))).toBe(true);
+    expect(existsSync(join(env.cwd, '.claude/agents/rx-planner.md'))).toBe(true);
     expect(existsSync(target)).toBe(false);
   });
 

@@ -1,4 +1,4 @@
-import type { HookInput } from '@/hooks/guard.types';
+import type { HookInput } from '@/hooks/hook.types';
 
 /** The command of a Bash tool call, or undefined for any other call. */
 export const bashCommand = (input: HookInput): string | undefined => {

@@ -12,19 +12,24 @@ export const writeTree = (root: string, files: Record<string, string>): void => 
   }
 };
 
+const doc = (name: string, body: string) =>
+  `---\nname: ${name}\ndescription: ${name} does a thing\n---\n\n${body}\n`;
+
 /**
- * A scratch home, project and built package: two agents, a skill with a supporting file, and
- * the hook runner. The io records what the command printed.
+ * A scratch home, project and built package. Two agents and two skills: `rx-planner` and
+ * `rx-verify` are in the core profile, `rx-pitch` and `rx-demo` are not; `rx-verify` has a
+ * supporting file. The io records what a command printed.
  */
 export const scratchEnv = (version = '1.0.0') => {
   const root = mkdtempSync(join(tmpdir(), 'rx-ai-install-'));
   const packageDir = join(root, 'pkg');
   writeTree(packageDir, {
     'package.json': JSON.stringify({ version }),
-    'content/agents/rx-one.md': 'one',
-    'content/agents/rx-two.md': 'two',
-    'content/skills/rx-skill/SKILL.md': 'skill',
-    'content/skills/rx-skill/notes/extra.md': 'extra',
+    'content/agents/rx-planner.md': doc('rx-planner', 'plans'),
+    'content/agents/rx-pitch.md': doc('rx-pitch', 'pitches'),
+    'content/skills/rx-verify/SKILL.md': doc('rx-verify', 'verifies'),
+    'content/skills/rx-verify/notes/extra.md': 'extra',
+    'content/skills/rx-demo/SKILL.md': doc('rx-demo', 'demos'),
     'dist/hooks.js': '// runner',
   });
   const env: InstallEnv = {

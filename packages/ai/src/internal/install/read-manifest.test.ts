@@ -19,8 +19,28 @@ describe('readManifest', () => {
     expect(readManifest(target)).toBeUndefined();
   });
 
-  it('keeps only the string entries of the file list', () => {
-    writeTree(target, { 'rx-ai/manifest.json': '{"version":"1.0.0","files":["a",2,"b"]}' });
-    expect(readManifest(target)).toEqual({ version: '1.0.0', files: ['a', 'b'] });
+  it('keeps only the string entries of the lists', () => {
+    writeTree(target, {
+      'rx-ai/manifest.json':
+        '{"version":"1.0.0","profile":"full","items":["x",1],"files":["a",2,"b"]}',
+    });
+    expect(readManifest(target)).toEqual({
+      version: '1.0.0',
+      profile: 'full',
+      items: ['x'],
+      files: ['a', 'b'],
+      createdSettings: false,
+    });
+  });
+
+  it('reads a manifest from before profiles as core with no items', () => {
+    writeTree(target, { 'rx-ai/manifest.json': '{"version":"0.1.0","files":["a"]}' });
+    expect(readManifest(target)).toEqual({
+      version: '0.1.0',
+      profile: 'core',
+      items: [],
+      files: ['a'],
+      createdSettings: false,
+    });
   });
 });
