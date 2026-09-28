@@ -8,7 +8,7 @@ inputs:
       Vitest browser mode. Leave empty to install every browser Playwright ships,
       or the set `install-script` installs.
     required: false
-    default: ''
+    default: ""
   working-directory:
     description: >-
       Directory whose `node_modules` holds Playwright, for a workspace that only
@@ -16,7 +16,7 @@ inputs:
       from `playwright`, falling back to `@playwright/test`, resolved from there,
       and the install commands run there.
     required: false
-    default: '.'
+    default: "."
   install-script:
     description: >-
       A package.json script that installs the full browser set, run with

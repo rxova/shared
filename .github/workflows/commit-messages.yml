@@ -22,7 +22,7 @@ on:
         description: Node.js version.
         type: string
         required: false
-        default: '24'
+        default: "24"
       repo-config-command:
         description: >-
           How to run the rxova-repo-config bin. rxova/shared runs it from source;
@@ -31,13 +31,13 @@ on:
         required: false
         default: pnpm exec rxova-repo-config
       check-scope:
-        description: '`false` skips `check-scope` and always reports `code-changed: true`.'
+        description: "`false` skips `check-scope` and always reports `code-changed: true`."
         type: boolean
         required: false
         default: true
     outputs:
       code-changed:
-        description: '`true` unless the commit is a release commit (version and changelog only).'
+        description: "`true` unless the commit is a release commit (version and changelog only)."
         value: ${{ jobs.commitlint.outputs.code-changed }}
 
 permissions:

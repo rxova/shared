@@ -28,7 +28,7 @@ on:
         description: Node.js version.
         type: string
         required: false
-        default: '24'
+        default: "24"
       verify-command:
         description: >-
           Runs before publishing — a snapshot goes to the real registry, and a
@@ -41,7 +41,7 @@ on:
         description: Builds what gets published. Empty when `verify-command` already builds.
         type: string
         required: false
-        default: ''
+        default: ""
 
 permissions:
   contents: read
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      HUSKY: '0'
+      HUSKY: "0"
     permissions:
       contents: read
       id-token: write # trusted publishing
@@ -63,7 +63,7 @@ jobs:
       - uses: rxova/shared/actions/setup-pnpm@main
         with:
           node-version: ${{ inputs.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@^11.5.1
       - run: pnpm install --frozen-lockfile
@@ -89,5 +89,5 @@ jobs:
       - name: Publish
         env:
           TAG: ${{ inputs.tag }}
-          NPM_CONFIG_PROVENANCE: 'true'
+          NPM_CONFIG_PROVENANCE: "true"
         run: pnpm exec changeset publish --tag "$TAG" --no-git-tag

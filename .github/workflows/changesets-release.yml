@@ -44,7 +44,7 @@ on:
         description: Node.js version.
         type: string
         required: false
-        default: '24'
+        default: "24"
       run-verify:
         description: Run `pnpm run verify` before versioning or publishing.
         type: boolean
@@ -59,15 +59,15 @@ on:
         description: The version commit's message.
         type: string
         required: false
-        default: 'chore: version packages'
+        default: "chore: version packages"
       pr-title:
         description: The version pull request's title.
         type: string
         required: false
-        default: 'chore: version packages'
+        default: "chore: version packages"
     outputs:
       published:
-        description: '`true` when this run published.'
+        description: "`true` when this run published."
         value: ${{ jobs.release.outputs.published }}
       published-packages:
         description: The changesets/action `published-packages` JSON (`[{ name, version }]`).
@@ -85,7 +85,7 @@ jobs:
     env:
       # The version commit would otherwise fire the pre-commit hook. CI already
       # gated this code on the pull request.
-      HUSKY: '0'
+      HUSKY: "0"
     permissions:
       contents: write # version commit and tags
       pull-requests: write # the version pull request
@@ -103,7 +103,7 @@ jobs:
       - uses: rxova/shared/actions/setup-pnpm@main
         with:
           node-version: ${{ inputs.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
       - uses: rxova/shared/actions/turbo-cache@main
         if: inputs.turbo-cache
       - name: Upgrade npm for trusted publishing
@@ -123,4 +123,4 @@ jobs:
           commit-message: ${{ inputs.commit-message }}
           pr-title: ${{ inputs.pr-title }}
         env:
-          NPM_CONFIG_PROVENANCE: 'true'
+          NPM_CONFIG_PROVENANCE: "true"
