@@ -70,6 +70,14 @@ describe('quickCheck', () => {
     expect(path.ran).toEqual(['ruff format /py/app.py', 'ruff check --quiet /py/app.py']);
   });
 
+  it('formats C# with dotnet format whitespace in the file’s folder, needing no project file', () => {
+    const context = contextWith();
+    expect(quickCheck.run(edit('/svc/src/Api/Program.cs', '/svc'), context)).toEqual({ code: 0 });
+    expect(context.ran).toEqual([
+      'dotnet format whitespace /svc/src/Api --folder --include /svc/src/Api/Program.cs',
+    ]);
+  });
+
   it('trims a long report to 40 lines', () => {
     const context = contextWith({
       files: web,

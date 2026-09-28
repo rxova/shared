@@ -22,6 +22,8 @@ const FAKES = {
   google: ['AI', 'za', repeat('C', 35)].join(''),
   supabase: ['sb', 'secret', repeat('k7', 12)].join('_'),
   serviceRole: jwt({ role: 'service_role', iss: 'supabase' }),
+  datadog: ['DD', 'API', 'KEY='].join('_') + repeat('0a1b', 8),
+  azure: 'AccountKey=' + repeat('Ab9+', 21) + 'xy==',
 };
 
 const write = (file_path: string, content: string): HookInput => ({

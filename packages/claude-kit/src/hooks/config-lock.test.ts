@@ -15,6 +15,8 @@ const existing = contextWith({
     '/repo/.prettierrc': '',
     '/repo/vitest.config.ts': '',
     '/repo/src/app.ts': '',
+    '/repo/stylecop.json': '',
+    '/repo/Directory.Build.props': '',
   },
 });
 
@@ -24,6 +26,7 @@ describe('configLock', () => {
     ['/repo/packages/a/tsconfig.build.json', 'Write'],
     ['/repo/.prettierrc', 'MultiEdit'],
     ['/repo/vitest.config.ts', 'Edit'],
+    ['/repo/stylecop.json', 'Edit'],
   ])('blocks changing an existing %s', (path, tool) => {
     const verdict = configLock(edit(path, tool), existing);
     expect(verdict.block).toBe(true);
@@ -37,6 +40,7 @@ describe('configLock', () => {
   it('allows creating a config, and editing any other file', () => {
     expect(configLock(edit('/repo/biome.json', 'Write'), existing).block).toBe(false);
     expect(configLock(edit('/repo/src/app.ts'), existing).block).toBe(false);
+    expect(configLock(edit('/repo/Directory.Build.props'), existing).block).toBe(false);
   });
 
   it('ignores reads, other tools and a missing path', () => {

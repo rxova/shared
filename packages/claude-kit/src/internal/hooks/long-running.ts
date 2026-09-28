@@ -22,6 +22,7 @@ export const longRunning = (words: readonly string[]): boolean => {
     return args[0] === 'manage.py' && args[1] === 'runserver';
   if (program === 'docker')
     return args.includes('up') && !args.includes('-d') && !args.includes('--detach');
+  if (program === 'dotnet') return args[0] === 'run' || args[0] === 'watch';
   if (program === 'tsc') return args.includes('--watch') || args.includes('-w');
   return false;
 };

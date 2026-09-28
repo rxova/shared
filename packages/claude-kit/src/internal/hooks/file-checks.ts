@@ -12,13 +12,22 @@ export interface Check {
 
 /**
  * The format and lint commands for one file, from the tools the project has installed: Biome, or
- * else Prettier and ESLint, for web files; Ruff for Python (from the project's `.venv`, or PATH).
+ * else Prettier and ESLint, for web files; Ruff for Python (from the project's `.venv`, or PATH);
+ * `dotnet format whitespace` for C#, which needs no build (analyzer checks do, so they are left out).
  */
 export const fileChecks = (file: string, root: string, context: HookContext): Check[] => {
   const ext = extname(file);
   const bin = (name: string) => join(root, 'node_modules', '.bin', name);
   const has = (name: string) => context.exists(bin(name));
 
+  if (ext === '.cs')
+    return [
+      {
+        program: 'dotnet',
+        args: ['format', 'whitespace', root, '--folder', '--include', file],
+        reports: false,
+      },
+    ];
   if (ext === '.py') {
     const venv = join(root, '.venv', 'bin', 'ruff');
     const ruff = context.exists(venv) ? venv : 'ruff';

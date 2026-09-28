@@ -18,4 +18,7 @@ export const CONFIG_FILES: readonly RegExp[] = [
   /^(vitest|jest)\.config\.[cm]?[jt]s$/,
   /^\.?ruff\.toml$/,
   /^\.golangci\.ya?ml$/,
+  /^stylecop\.json$/,
+  /\.ruleset$/,
+  /^\.globalconfig$/,
 ];

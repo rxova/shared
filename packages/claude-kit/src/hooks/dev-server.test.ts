@@ -26,6 +26,8 @@ describe('devServer', () => {
     'tsc -w',
     'fastapi run app.py',
     'nodemon server.js',
+    'dotnet run --project src/Api',
+    'dotnet watch',
     'cd web && pnpm dev',
   ])('blocks %s in the foreground', (command) => {
     expect(blocked(command)).toBe(true);
@@ -42,6 +44,8 @@ describe('devServer', () => {
     'python script.py',
     'npx prettier --check .',
     'expo export',
+    'dotnet build',
+    'dotnet test --filter Unit',
     'FOO=1',
     'pnpm',
     'fastapi --help',
