@@ -1,0 +1,103 @@
+name: Pages deploy
+
+# Reusable: builds the docs site at `/<repository>/` and publishes it to GitHub
+# Pages. Skipped on a template repository, and quietly skipped (with a notice)
+# until Pages is switched on: Settings → Pages → Source: GitHub Actions.
+#
+#   on:
+#     push:
+#       branches: [main]
+#   concurrency:
+#     group: pages
+#     cancel-in-progress: false
+#   jobs:
+#     pages:
+#       permissions: { contents: read, pages: write, id-token: write }
+#       uses: rxova/shared/.github/workflows/pages-deploy.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      build-command:
+        description: Builds the docs site.
+        type: string
+        required: false
+        default: pnpm exec turbo run build --filter=docs
+      path:
+        description: The built site.
+        type: string
+        required: false
+        default: apps/docs/dist
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    if: ${{ !github.event.repository.is_template }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: read
+    outputs:
+      enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - name: Check that Pages is enabled
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/pages" --silent 2>/dev/null; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::GitHub Pages is not enabled; skipping the deploy. Settings → Pages → Source: GitHub Actions."
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.pages.outputs.enabled == 'true'
+        uses: actions/checkout@v7
+      - if: steps.pages.outputs.enabled == 'true'
+        uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - if: steps.pages.outputs.enabled == 'true'
+        uses: rxova/shared/actions/turbo-cache@main
+      - if: steps.pages.outputs.enabled == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the docs at the Pages base path
+        if: steps.pages.outputs.enabled == 'true'
+        env:
+          DOCS_URL: https://${{ github.repository_owner }}.github.io
+          DOCS_BASE_URL: /${{ github.event.repository.name }}/
+        run: ${{ inputs.build-command }}
+
+      - if: steps.pages.outputs.enabled == 'true'
+        uses: actions/configure-pages@v6
+      - if: steps.pages.outputs.enabled == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ inputs.path }}
+
+  deploy:
+    name: deploy
+    needs: build
+    if: needs.build.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

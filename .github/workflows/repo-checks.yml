@@ -1,0 +1,67 @@
+name: Repo checks
+
+# Reusable: lint, formatting, build and typecheck in one job, plus a check that
+# every package with a vitest config is in the task graph.
+#
+#   jobs:
+#     checks:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.code-changed == 'true'
+#       uses: rxova/shared/.github/workflows/repo-checks.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      build-command:
+        description: >-
+          The build. The docs site is left out by default: `docs-build.yml` builds it at the
+          base path Pages serves it from, the only build of it whose output matters.
+        type: string
+        required: false
+        default: pnpm exec turbo run build --filter='!docs'
+      extra-command:
+        description: Runs after the format check, before the build (a workflow linter, say).
+        type: string
+        required: false
+        default: ""
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: lint · format · types · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-cache@main
+      - run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Extra checks
+        if: inputs.extra-command != ''
+        run: ${{ inputs.extra-command }}
+      - name: Build
+        run: ${{ inputs.build-command }}
+      - name: Typecheck
+        run: pnpm exec turbo run typecheck
+      # Turbo only runs suites it knows about: a package with a vitest config
+      # but no `test` script would be skipped without a word.
+      - name: Every package with tests is in the task graph
+        run: ${{ inputs.repo-config-command }} check-test-scripts

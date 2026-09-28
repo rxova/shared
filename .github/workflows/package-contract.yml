@@ -1,0 +1,41 @@
+name: Package contract
+
+# Reusable: publint and Are The Types Wrong over every package, then the pack
+# smoke, which packs the real tarball, installs it into a scratch project and
+# imports it with plain Node. The root `package.json` needs `check:exports` and
+# `pack:smoke` scripts.
+#
+#   jobs:
+#     pack-smoke:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.code-changed == 'true'
+#       uses: rxova/shared/.github/workflows/package-contract.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: package contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-cache@main
+      - run: pnpm install --frozen-lockfile
+      - name: Publint and Are The Types Wrong
+        run: pnpm run check:exports
+      - name: Pack smoke test
+        run: pnpm run pack:smoke

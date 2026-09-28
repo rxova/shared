@@ -1,0 +1,52 @@
+name: Supply chain
+
+# Reusable: the advisory audit, one version per dependency (sherif), unused
+# files, exports and dependencies (knip), and the dedupe check. The root
+# `package.json` needs `audit:check`, `sherif:check` and `knip:check` scripts and
+# a `//#dedupe:check` Turbo task.
+#
+#   jobs:
+#     supply-chain:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.code-changed == 'true'
+#       uses: rxova/shared/.github/workflows/supply-chain.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+
+permissions:
+  contents: read
+
+jobs:
+  supply-chain:
+    name: audit · sherif · knip · dedupe
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-cache@main
+      - run: pnpm install --frozen-lockfile
+      # Not a Turbo task: its verdict changes with the advisory database, not
+      # with any file in the tree, so a cached pass could replay over a fresh
+      # CVE. `timeout-minutes` is the backstop for an unreachable registry.
+      - name: Audit dependencies
+        timeout-minutes: 5
+        run: pnpm run audit:check
+      - name: Check dependency versions across the workspace
+        run: pnpm run sherif:check
+      - name: Check for unused files, exports and dependencies
+        run: pnpm run knip:check
+      # Last, and it has to stay last: `pnpm dedupe --check` removes the
+      # modules directory when CI is set, so any step after it runs without
+      # node_modules and fails looking for its own binary.
+      - name: Check dependency dedupe
+        run: pnpm exec turbo run //#dedupe:check
