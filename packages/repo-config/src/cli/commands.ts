@@ -134,7 +134,8 @@ export const commands = (): Record<string, CommandEntry> => ({
   'coverage-summary': {
     summary: 'write the coverage totals to the job summary [coverage-summary.json]',
     load: async () => {
-      const { coverageSummaryCommand } = await import('@/coverage/coverage-summary-command');
+      const { coverageSummaryCommand } =
+        await import('@/coverage-summary/coverage-summary-command');
       return (argv) => coverageSummaryCommand(argv[0]);
     },
   },
