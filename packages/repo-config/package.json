@@ -1,6 +1,6 @@
 {
   "name": "@rxova/repo-config",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Repo maintenance for rxova monorepos: the verify gate, the changeset gate, pack smoke, llms.txt checks, and the shared build, test, lint and commit presets.",
   "license": "MIT",
   "author": "Jonatan Kruszewski",

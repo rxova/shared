@@ -1,5 +1,11 @@
 # @rxova/ts-utils
 
+## 0.2.1
+
+### Patch Changes
+
+- [#27](https://github.com/rxova/shared/pull/27) [`13167fc`](https://github.com/rxova/shared/commit/13167fc22a3692718a5d4964848ed84b9e92f8e3) - Republish with the rewritten README, so the package page on npm shows it.
+
 ## 0.2.0
 
 ### Minor Changes
