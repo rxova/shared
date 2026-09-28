@@ -1,5 +1,5 @@
 {
-  "name": "@rxova/toolbox",
+  "name": "@rxova/ts-utils",
   "version": "0.0.0",
   "description": "Small, dependency-free runtime helpers shared across the rxova packages.",
   "license": "MIT",
@@ -7,9 +7,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rxova/shared.git",
-    "directory": "packages/toolbox"
+    "directory": "packages/ts-utils"
   },
-  "homepage": "https://github.com/rxova/shared/tree/main/packages/toolbox#readme",
+  "homepage": "https://github.com/rxova/shared/tree/main/packages/ts-utils#readme",
   "bugs": "https://github.com/rxova/shared/issues",
   "publishConfig": {
     "access": "public"

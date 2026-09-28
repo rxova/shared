@@ -3,19 +3,19 @@ title: Reference
 description: Every export, command and action this repository publishes.
 ---
 
-## `@rxova/toolbox`
+## `@rxova/ts-utils`
 
-| Export                                               | What it answers                                                              |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `isObjectLike` / `isRecord` / `isPlainObject`        | Any non-null object / not an array / an object literal or null-prototype bag |
-| `tryRead` / `readProperty` / `readString`            | Property reads that never throw                                              |
-| `hasProperty` / `safeKeys` / `isInstanceOf`          | `in`, `Object.keys` and `instanceof` that never throw                        |
-| `objectTag` / `arrayItems`                           | The `[object Tag]` string; a copy of an array                                |
-| `isError` / `errorMessage`                           | A real `Error` from any realm; the text to show for anything thrown          |
-| `shallowEqual`                                       | `Object.is` per own key                                                      |
-| `isDevelopment` / `createDevWarner`                  | Development detection; prefixed, coded, warn-once diagnostics                |
-| `canUseDOM` / `deepFreeze` / `clamp`                 | DOM presence; recursive freeze; a bounded number                             |
-| `useIsomorphicLayoutEffect` (`@rxova/toolbox/react`) | `useLayoutEffect` in the browser, `useEffect` on the server                  |
+| Export                                                | What it answers                                                              |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `isObjectLike` / `isRecord` / `isPlainObject`         | Any non-null object / not an array / an object literal or null-prototype bag |
+| `tryRead` / `readProperty` / `readString`             | Property reads that never throw                                              |
+| `hasProperty` / `safeKeys` / `isInstanceOf`           | `in`, `Object.keys` and `instanceof` that never throw                        |
+| `objectTag` / `arrayItems`                            | The `[object Tag]` string; a copy of an array                                |
+| `isError` / `errorMessage`                            | A real `Error` from any realm; the text to show for anything thrown          |
+| `shallowEqual`                                        | `Object.is` per own key                                                      |
+| `isDevelopment` / `createDevWarner`                   | Development detection; prefixed, coded, warn-once diagnostics                |
+| `canUseDOM` / `deepFreeze` / `clamp`                  | DOM presence; recursive freeze; a bounded number                             |
+| `useIsomorphicLayoutEffect` (`@rxova/ts-utils/react`) | `useLayoutEffect` in the browser, `useEffect` on the server                  |
 
 ## `@rxova/tooling`
 

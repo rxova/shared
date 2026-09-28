@@ -6,11 +6,11 @@ description: Add the shared packages and actions to a repository.
 ## Runtime helpers
 
 ```sh
-pnpm add -D @rxova/toolbox
+pnpm add -D @rxova/ts-utils
 ```
 
 ```ts
-import { errorMessage, isRecord } from '@rxova/toolbox';
+import { errorMessage, isRecord } from '@rxova/ts-utils';
 ```
 
 Add it as a dev dependency of a published package so its build inlines the helpers. The package
