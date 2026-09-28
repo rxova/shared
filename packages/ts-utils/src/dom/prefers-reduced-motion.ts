@@ -1,4 +1,4 @@
-import { matchMediaList } from '@/internal/dom/match-media-list';
+import { matchMediaList } from "@/internal/dom/match-media-list";
 
 /**
  * Whether the user asked the system for less motion, read once, now. False on
@@ -9,4 +9,4 @@ import { matchMediaList } from '@/internal/dom/match-media-list';
  * `useMediaQuery('(prefers-reduced-motion: reduce)')` from `@rxova/ts-utils/react`.
  */
 export const prefersReducedMotion = (): boolean =>
-  matchMediaList('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  matchMediaList("(prefers-reduced-motion: reduce)")?.matches ?? false;

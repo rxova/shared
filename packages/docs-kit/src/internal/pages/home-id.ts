@@ -3,4 +3,4 @@
  * literal `index`, not the empty string; assuming `''` sends every twin's
  * `source:` to `/index/`, a route no site serves.
  */
-export const HOME_ID = 'index';
+export const HOME_ID = "index";

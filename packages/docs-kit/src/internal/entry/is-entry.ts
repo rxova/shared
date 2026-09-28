@@ -1,5 +1,5 @@
-import { pathToFileURL } from 'node:url';
-import { resolveLink } from '@/internal/entry/resolve-link';
+import { pathToFileURL } from "node:url";
+import { resolveLink } from "@/internal/entry/resolve-link";
 
 /**
  * Whether the module at `moduleUrl` is the script Node was started with. A bin reached through
@@ -10,4 +10,4 @@ export const isEntry = (
   moduleUrl: string,
   started: string | undefined = process.argv[1],
 ): boolean =>
-  started !== undefined && started !== '' && pathToFileURL(resolveLink(started)).href === moduleUrl;
+  started !== undefined && started !== "" && pathToFileURL(resolveLink(started)).href === moduleUrl;

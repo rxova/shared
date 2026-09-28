@@ -1,4 +1,4 @@
-import type { MdxToMarkdownOptions } from '@/markdown/markdown.types';
+import type { MdxToMarkdownOptions } from "@/markdown/markdown.types";
 
 /**
  * The part of a Starlight `docs` collection entry the pages are built from.
@@ -45,5 +45,5 @@ export interface DocsPagesOptions {
   /** The section a page belongs to. Defaults to `sectionOf`. */
   readonly sectionOf?: ((id: string) => string) | undefined;
   /** The Markdown rules beyond origin, base and route: components, `expand`, `fenceOpen`. */
-  readonly markdown?: Omit<MdxToMarkdownOptions, 'origin' | 'base' | 'fromRoute'> | undefined;
+  readonly markdown?: Omit<MdxToMarkdownOptions, "origin" | "base" | "fromRoute"> | undefined;
 }

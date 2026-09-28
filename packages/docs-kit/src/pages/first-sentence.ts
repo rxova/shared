@@ -1,5 +1,5 @@
-import { MAX_DESCRIPTION } from '@/internal/pages/max-description';
-import { splitFenced } from '@/markdown/split-fenced';
+import { MAX_DESCRIPTION } from "@/internal/pages/max-description";
+import { splitFenced } from "@/markdown/split-fenced";
 
 /**
  * The first sentence of a page body, for a page whose frontmatter has no
@@ -15,14 +15,14 @@ import { splitFenced } from '@/markdown/split-fenced';
  */
 export const firstSentence = (body: string): string | undefined => {
   const prose = splitFenced(body)
-    .unfenced.split('\n')
+    .unfenced.split("\n")
     .filter(
       (line) =>
-        line.trim() !== '' && !/^\s*(?:[`~]{3}|#|<|import\b|export\b|:::|\||-{3,})/.test(line),
+        line.trim() !== "" && !/^\s*(?:[`~]{3}|#|<|import\b|export\b|:::|\||-{3,})/.test(line),
     )
-    .join(' ')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/[*_`[\]]/g, '')
+    .join(" ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`[\]]/g, "")
     .trim();
 
   const sentence = new RegExp(`^(.{20,${String(MAX_DESCRIPTION)}}?[.!?])\\s`).exec(
@@ -32,6 +32,6 @@ export const firstSentence = (body: string): string | undefined => {
   if (prose.length <= 20) return undefined;
 
   const clipped = prose.slice(0, MAX_DESCRIPTION);
-  const lastSpace = clipped.lastIndexOf(' ');
-  return `${(lastSpace > 20 ? clipped.slice(0, lastSpace) : clipped).replace(/[,;:—-]$/, '')}…`;
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > 20 ? clipped.slice(0, lastSpace) : clipped).replace(/[,;:—-]$/, "")}…`;
 };

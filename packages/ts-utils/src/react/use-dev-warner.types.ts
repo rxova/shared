@@ -1,8 +1,8 @@
-import type { DevWarnerOptions } from '@/dev-warner/create-dev-warner.types';
+import type { DevWarnerOptions } from "@/dev-warner/create-dev-warner.types";
 
 export interface UseDevWarnerOptions<Detail = unknown> extends Pick<
   DevWarnerOptions,
-  'prefix' | 'docsUrl' | 'enabled'
+  "prefix" | "docsUrl" | "enabled"
 > {
   /**
    * Receives each warning instead of the console, as the `detail` passed to

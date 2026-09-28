@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 /**
  * The absolute prefix this build's URLs carry — origin plus base — read back
@@ -13,10 +13,10 @@ export const sitePrefix = async (
   mdFiles: readonly string[],
 ): Promise<string | undefined> => {
   for (const md of [...mdFiles].sort()) {
-    if (md === 'index.md') continue;
-    const head = (await readFile(join(distDir, md), 'utf8')).slice(0, 2048);
+    if (md === "index.md") continue;
+    const head = (await readFile(join(distDir, md), "utf8")).slice(0, 2048);
     const source = /^source:\s*(\S+)\s*$/m.exec(head)?.[1];
-    const tail = `${md.replace(/\.md$/, '')}/`;
+    const tail = `${md.replace(/\.md$/, "")}/`;
     if (source?.endsWith(tail) === true) return source.slice(0, -tail.length);
   }
   return undefined;

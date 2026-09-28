@@ -1,7 +1,7 @@
-import { llmsHead } from '@/internal/llms/llms-head';
-import { groupPages } from '@/llms/group-pages';
-import type { LlmsOptions } from '@/llms/llms.types';
-import type { DocsPage } from '@/pages/docs-pages.types';
+import { llmsHead } from "@/internal/llms/llms-head";
+import { groupPages } from "@/llms/group-pages";
+import type { LlmsOptions } from "@/llms/llms.types";
+import type { DocsPage } from "@/pages/docs-pages.types";
 
 /**
  * `llms-full.txt`: every page inlined, in the order the index lists them, each
@@ -16,9 +16,9 @@ export const llmsFull = (
   const grouped = groupPages(pages, { sections, optional });
   const ordered = [...grouped.groups.flatMap((group) => group.pages), ...grouped.optional];
   return [
-    llmsHead(project, summary).join('\n'),
+    llmsHead(project, summary).join("\n"),
     ...ordered.map((page) =>
-      ['---', '', `# ${page.title}`, '', `Source: ${page.htmlUrl}`, '', page.body, ''].join('\n'),
+      ["---", "", `# ${page.title}`, "", `Source: ${page.htmlUrl}`, "", page.body, ""].join("\n"),
     ),
-  ].join('\n');
+  ].join("\n");
 };

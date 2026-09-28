@@ -22,10 +22,10 @@ Three page files and one line of Astro config. Every difference between sites is
 `astro.config.mjs`:
 
 ```js
-import { fileURLToPath } from 'node:url';
-import { rehypeMdLinks } from '@rxova/docs-kit';
+import { fileURLToPath } from "node:url";
+import { rehypeMdLinks } from "@rxova/docs-kit";
 
-const docsRoot = fileURLToPath(new URL('src/content/docs', import.meta.url));
+const docsRoot = fileURLToPath(new URL("src/content/docs", import.meta.url));
 
 export default defineConfig({
   site,
@@ -38,22 +38,22 @@ export default defineConfig({
 `src/lib/docs.ts` — the site's own settings, in one place:
 
 ```ts
-import { getCollection } from 'astro:content';
-import { docsPages, type LlmsOptions } from '@rxova/docs-kit';
+import { getCollection } from "astro:content";
+import { docsPages, type LlmsOptions } from "@rxova/docs-kit";
 
 export const pages = async () =>
-  docsPages(await getCollection('docs'), {
+  docsPages(await getCollection("docs"), {
     origin: import.meta.env.SITE,
     base: import.meta.env.BASE_URL,
   });
 
 export const llms: LlmsOptions = {
-  project: 'overlock',
-  summary: ['A deterministic CLI that reads a git patch and reports …'],
+  project: "overlock",
+  summary: ["A deterministic CLI that reads a git patch and reports …"],
   sections: [
-    ['root', 'About'],
-    ['learn', 'Learn'],
-    ['reference', 'Reference'],
+    ["root", "About"],
+    ["learn", "Learn"],
+    ["reference", "Reference"],
   ],
 };
 ```
@@ -61,25 +61,25 @@ export const llms: LlmsOptions = {
 `src/pages/[...slug].md.ts`:
 
 ```ts
-import type { APIRoute, GetStaticPaths } from 'astro';
-import { renderMarkdown, type DocsPage } from '@rxova/docs-kit';
-import { pages } from '../lib/docs';
+import type { APIRoute, GetStaticPaths } from "astro";
+import { renderMarkdown, type DocsPage } from "@rxova/docs-kit";
+import { pages } from "../lib/docs";
 
 export const prerender = true;
 export const getStaticPaths: GetStaticPaths = async () =>
   (await pages()).map((page) => ({ params: { slug: page.id }, props: { page } }));
 export const GET: APIRoute = ({ props }) =>
   new Response(renderMarkdown((props as { page: DocsPage }).page), {
-    headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
   });
 ```
 
 `src/pages/llms.txt.ts` (and `llms-full.txt.ts` with `llmsFull(await pages(), llms)`):
 
 ```ts
-import type { APIRoute } from 'astro';
-import { llmsIndex } from '@rxova/docs-kit';
-import { llms, pages } from '../lib/docs';
+import type { APIRoute } from "astro";
+import { llmsIndex } from "@rxova/docs-kit";
+import { llms, pages } from "../lib/docs";
 
 export const prerender = true;
 export const GET: APIRoute = async () =>
@@ -87,9 +87,9 @@ export const GET: APIRoute = async () =>
     llmsIndex(await pages(), {
       ...llms,
       mount: `${import.meta.env.SITE}${import.meta.env.BASE_URL}`,
-      preamble: ['## Run it', '', '    npx overlock', ''],
+      preamble: ["## Run it", "", "    npx overlock", ""],
     }),
-    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+    { headers: { "Content-Type": "text/plain; charset=utf-8" } },
   );
 ```
 

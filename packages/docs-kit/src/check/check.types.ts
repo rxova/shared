@@ -1,4 +1,4 @@
-import type { ComponentRules } from '@/markdown/markdown.types';
+import type { ComponentRules } from "@/markdown/markdown.types";
 
 /** A pattern that must not match, and what a match means. */
 export type Forbidden = readonly [pattern: RegExp, meaning: string];

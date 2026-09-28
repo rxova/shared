@@ -1,10 +1,10 @@
-import { absolutizeUrls } from '@/internal/markdown/absolutize-urls';
-import { componentRules } from '@/internal/markdown/component-rules';
-import { resolveRelativeLinks } from '@/internal/markdown/resolve-relative-links';
-import { stripImports } from '@/internal/markdown/strip-imports';
-import { unwrapComponents } from '@/internal/markdown/unwrap-components';
-import { mapUnfenced } from '@/markdown/map-unfenced';
-import type { MdxToMarkdownOptions } from '@/markdown/markdown.types';
+import { absolutizeUrls } from "@/internal/markdown/absolutize-urls";
+import { componentRules } from "@/internal/markdown/component-rules";
+import { resolveRelativeLinks } from "@/internal/markdown/resolve-relative-links";
+import { stripImports } from "@/internal/markdown/strip-imports";
+import { unwrapComponents } from "@/internal/markdown/unwrap-components";
+import { mapUnfenced } from "@/markdown/map-unfenced";
+import type { MdxToMarkdownOptions } from "@/markdown/markdown.types";
 
 /**
  * A docs page's Markdown/MDX source as the plain Markdown served at its `.md`
@@ -25,8 +25,8 @@ export const mdxToMarkdown = (
   source: string,
   {
     origin,
-    base = '/',
-    fromRoute = '/index.md',
+    base = "/",
+    fromRoute = "/index.md",
     components,
     expand = [],
     fenceOpen,
@@ -47,6 +47,6 @@ export const mdxToMarkdown = (
       ),
     fenceOpen,
   )
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 };

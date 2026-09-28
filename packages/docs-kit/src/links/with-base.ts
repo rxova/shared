@@ -1,4 +1,4 @@
-import { trimTrailingSlashes } from '@/internal/links/trim-trailing-slashes';
+import { trimTrailingSlashes } from "@/internal/links/trim-trailing-slashes";
 
 /**
  * A site-root-relative URL prefixed with the site's `base`.
@@ -11,9 +11,9 @@ import { trimTrailingSlashes } from '@/internal/links/trim-trailing-slashes';
  * Left alone: relative, protocol-relative (`//host`) and absolute URLs, and a
  * URL that already carries the base — so applying it twice is a no-op.
  */
-export const withBase = (url: string, base = '/'): string => {
+export const withBase = (url: string, base = "/"): string => {
   const prefix = trimTrailingSlashes(base);
-  if (prefix === '' || !url.startsWith('/') || url.startsWith('//')) return url;
+  if (prefix === "" || !url.startsWith("/") || url.startsWith("//")) return url;
   if (url === prefix || url.startsWith(`${prefix}/`)) return url;
   return prefix + url;
 };

@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { useIsomorphicLayoutEffect } from '@/react/use-isomorphic-layout-effect';
+import { useRef } from "react";
+import { useIsomorphicLayoutEffect } from "@/react/use-isomorphic-layout-effect";
 
 /**
  * A ref that always holds the value from the latest committed render, for a

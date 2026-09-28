@@ -1,4 +1,4 @@
-import type { DocsPage } from '@/pages/docs-pages.types';
+import type { DocsPage } from "@/pages/docs-pages.types";
 
 /**
  * The document served at a page's `.md` route. The frontmatter is not
@@ -8,19 +8,19 @@ import type { DocsPage } from '@/pages/docs-pages.types';
  * a colon.
  */
 export const renderMarkdown = (
-  page: Pick<DocsPage, 'title' | 'description' | 'htmlUrl' | 'body'>,
+  page: Pick<DocsPage, "title" | "description" | "htmlUrl" | "body">,
 ): string =>
   [
-    '---',
+    "---",
     `title: ${JSON.stringify(page.title)}`,
-    ...(page.description === undefined || page.description === ''
+    ...(page.description === undefined || page.description === ""
       ? []
       : [`description: ${JSON.stringify(page.description)}`]),
     `source: ${page.htmlUrl}`,
-    '---',
-    '',
+    "---",
+    "",
     `# ${page.title}`,
-    '',
+    "",
     page.body,
-    '',
-  ].join('\n');
+    "",
+  ].join("\n");

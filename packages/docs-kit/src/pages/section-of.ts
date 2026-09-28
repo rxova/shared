@@ -1,4 +1,4 @@
-import { HOME_ID } from '@/internal/pages/home-id';
+import { HOME_ID } from "@/internal/pages/home-id";
 
 /**
  * Which llms.txt section a page belongs to: its top-level directory, or `root`
@@ -8,6 +8,6 @@ import { HOME_ID } from '@/internal/pages/home-id';
  * `sectionOf` to `docsPages`.
  */
 export const sectionOf = (id: string): string => {
-  const slash = id.indexOf('/');
-  return id === HOME_ID || slash === -1 ? 'root' : id.slice(0, slash);
+  const slash = id.indexOf("/");
+  return id === HOME_ID || slash === -1 ? "root" : id.slice(0, slash);
 };

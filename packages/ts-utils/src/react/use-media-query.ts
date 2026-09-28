@@ -1,5 +1,5 @@
-import { useCallback, useSyncExternalStore } from 'react';
-import { matchMediaList } from '@/internal/dom/match-media-list';
+import { useCallback, useSyncExternalStore } from "react";
+import { matchMediaList } from "@/internal/dom/match-media-list";
 
 /**
  * Whether `query` matches, kept current while the component is mounted —
@@ -16,9 +16,9 @@ export const useMediaQuery = (query: string, serverValue = false): boolean => {
     (onChange: () => void) => {
       const list = matchMediaList(query);
       if (list === undefined) return () => undefined;
-      list.addEventListener('change', onChange);
+      list.addEventListener("change", onChange);
       return () => {
-        list.removeEventListener('change', onChange);
+        list.removeEventListener("change", onChange);
       };
     },
     [query],

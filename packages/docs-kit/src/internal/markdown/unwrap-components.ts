@@ -1,4 +1,4 @@
-import { escapeRegExp } from '@/internal/markdown/escape-regexp';
+import { escapeRegExp } from "@/internal/markdown/escape-regexp";
 
 /**
  * Removes layout component tags that sit alone on their line, keeping the
@@ -16,12 +16,12 @@ export const unwrapComponents = (
     out = out.replace(
       new RegExp(
         `^[ \\t]*<${escapeRegExp(name)}\\b[^>]*\\b(?:label|title)="([^"]*)"[^>]*>[ \\t]*$`,
-        'gm',
+        "gm",
       ),
-      `${'#'.repeat(level)} $1\n`,
+      `${"#".repeat(level)} $1\n`,
     );
   }
   if (unwrap.length === 0) return out;
-  const names = unwrap.map(escapeRegExp).join('|');
-  return out.replace(new RegExp(`^[ \\t]*<\\/?(?:${names})\\b[^>]*>[ \\t]*$`, 'gm'), '');
+  const names = unwrap.map(escapeRegExp).join("|");
+  return out.replace(new RegExp(`^[ \\t]*<\\/?(?:${names})\\b[^>]*>[ \\t]*$`, "gm"), "");
 };

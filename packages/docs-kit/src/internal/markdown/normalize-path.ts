@@ -6,10 +6,10 @@
  */
 export const normalizePath = (path: string): string => {
   const out: string[] = [];
-  for (const segment of path.split('/')) {
-    if (segment === '' || segment === '.') continue;
-    if (segment === '..') out.pop();
+  for (const segment of path.split("/")) {
+    if (segment === "" || segment === ".") continue;
+    if (segment === "..") out.pop();
     else out.push(segment);
   }
-  return `/${out.join('/')}`;
+  return `/${out.join("/")}`;
 };

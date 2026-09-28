@@ -1,5 +1,5 @@
-import { mapUnfenced } from '@/markdown/map-unfenced';
-import type { SplitDocument } from '@/markdown/split-fenced.types';
+import { mapUnfenced } from "@/markdown/map-unfenced";
+import type { SplitDocument } from "@/markdown/split-fenced.types";
 
 /**
  * The document split into what a rule may look at: the prose outside fences,
@@ -22,5 +22,5 @@ export const splitFenced = (text: string): SplitDocument => {
       return line;
     },
   );
-  return { unfenced: unfenced.join('\n'), openers };
+  return { unfenced: unfenced.join("\n"), openers };
 };

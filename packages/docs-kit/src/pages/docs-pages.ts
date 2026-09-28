@@ -1,11 +1,11 @@
-import { HOME_ID } from '@/internal/pages/home-id';
-import { withBase } from '@/links/with-base';
-import { mdxToMarkdown } from '@/markdown/mdx-to-markdown';
-import type { DocsEntry, DocsPage, DocsPagesOptions } from '@/pages/docs-pages.types';
-import { firstSentence } from '@/pages/first-sentence';
-import { htmlRoute } from '@/pages/html-route';
-import { mdRoute } from '@/pages/md-route';
-import { sectionOf as defaultSectionOf } from '@/pages/section-of';
+import { HOME_ID } from "@/internal/pages/home-id";
+import { withBase } from "@/links/with-base";
+import { mdxToMarkdown } from "@/markdown/mdx-to-markdown";
+import type { DocsEntry, DocsPage, DocsPagesOptions } from "@/pages/docs-pages.types";
+import { firstSentence } from "@/pages/first-sentence";
+import { htmlRoute } from "@/pages/html-route";
+import { mdRoute } from "@/pages/md-route";
+import { sectionOf as defaultSectionOf } from "@/pages/section-of";
 
 /**
  * Every documentation page, normalized to Markdown and sorted by id: the one
@@ -22,8 +22,8 @@ export const docsPages = (
   entries: readonly DocsEntry[],
   {
     origin,
-    base = '/',
-    exclude = (entry) => entry.data.template === 'splash',
+    base = "/",
+    exclude = (entry) => entry.data.template === "splash",
     excludeIds,
     sectionOf = defaultSectionOf,
     markdown = {},
@@ -36,8 +36,8 @@ export const docsPages = (
   return entries
     .filter((entry) => !exclude(entry) && !excludedId(entry.id))
     .map((entry): DocsPage => {
-      const body = entry.body ?? '';
-      const id = entry.id === '' ? HOME_ID : entry.id;
+      const body = entry.body ?? "";
+      const id = entry.id === "" ? HOME_ID : entry.id;
       const route = mdRoute(id);
       return {
         id,
@@ -50,5 +50,5 @@ export const docsPages = (
         body: mdxToMarkdown(body, { ...markdown, origin, base, fromRoute: route }),
       };
     })
-    .sort((a, b) => a.id.localeCompare(b.id, 'en'));
+    .sort((a, b) => a.id.localeCompare(b.id, "en"));
 };

@@ -1,14 +1,14 @@
-import { readFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
-import type { CheckMdRoutesOptions, CheckMdRoutesResult } from '@/check/check.types';
-import { twinFor } from '@/check/twin-for';
-import { collectFiles } from '@/internal/check/collect-files';
-import { forbiddenMarkup } from '@/internal/check/forbidden-markup';
-import { isUntwinned } from '@/internal/check/is-untwinned';
-import { sitePrefix } from '@/internal/check/site-prefix';
-import { componentRules } from '@/internal/markdown/component-rules';
-import { escapeRegExp } from '@/internal/markdown/escape-regexp';
-import { splitFenced } from '@/markdown/split-fenced';
+import { readFile, stat } from "node:fs/promises";
+import { join } from "node:path";
+import type { CheckMdRoutesOptions, CheckMdRoutesResult } from "@/check/check.types";
+import { twinFor } from "@/check/twin-for";
+import { collectFiles } from "@/internal/check/collect-files";
+import { forbiddenMarkup } from "@/internal/check/forbidden-markup";
+import { isUntwinned } from "@/internal/check/is-untwinned";
+import { sitePrefix } from "@/internal/check/site-prefix";
+import { componentRules } from "@/internal/markdown/component-rules";
+import { escapeRegExp } from "@/internal/markdown/escape-regexp";
+import { splitFenced } from "@/markdown/split-fenced";
 
 /**
  * Checks the agent-facing surfaces of a built site: every page has a `.md`
@@ -24,7 +24,7 @@ import { splitFenced } from '@/markdown/split-fenced';
 export const checkMdRoutes = async (
   distDir: string,
   {
-    untwinned = ['404.html'],
+    untwinned = ["404.html"],
     maxFullBytes = 800 * 1024,
     maxIndexBytes = 24 * 1024,
     components,
@@ -33,13 +33,13 @@ export const checkMdRoutes = async (
   }: CheckMdRoutesOptions = {},
 ): Promise<CheckMdRoutesResult> => {
   const failures: string[] = [];
-  const htmlFiles = await collectFiles(distDir, '.html');
-  const mdFiles = new Set(await collectFiles(distDir, '.md'));
+  const htmlFiles = await collectFiles(distDir, ".html");
+  const mdFiles = new Set(await collectFiles(distDir, ".md"));
 
   for (const html of htmlFiles) {
     if (isUntwinned(html, untwinned)) continue;
     // A redirect stub (Astro writes one per `redirects` entry) has no content to twin.
-    if (/<meta[^>]+http-equiv=["']?refresh/i.test(await readFile(join(distDir, html), 'utf8'))) {
+    if (/<meta[^>]+http-equiv=["']?refresh/i.test(await readFile(join(distDir, html), "utf8"))) {
       continue;
     }
     const twin = twinFor(html);
@@ -53,11 +53,11 @@ export const checkMdRoutes = async (
   const twinLink =
     prefix === undefined
       ? undefined
-      : new RegExp(`\\]\\(${escapeRegExp(prefix)}([^)\\s#]*\\.md)`, 'g');
+      : new RegExp(`\\]\\(${escapeRegExp(prefix)}([^)\\s#]*\\.md)`, "g");
   const markup = [...forbiddenMarkup(componentRules(components).unwrap), ...forbidden];
 
   for (const md of [...mdFiles].sort()) {
-    const { unfenced, openers } = splitFenced(await readFile(join(distDir, md), 'utf8'));
+    const { unfenced, openers } = splitFenced(await readFile(join(distDir, md), "utf8"));
     const report = (found: string | undefined, why: string) => {
       if (found !== undefined)
         failures.push(`${md} contains ${why}: ${JSON.stringify(found.slice(0, 60))}`);
@@ -69,14 +69,14 @@ export const checkMdRoutes = async (
         why,
       );
     }
-    for (const [, target = ''] of twinLink === undefined ? [] : unfenced.matchAll(twinLink)) {
+    for (const [, target = ""] of twinLink === undefined ? [] : unfenced.matchAll(twinLink)) {
       if (!mdFiles.has(target)) failures.push(`${md} links to ${target}, which is not a twin`);
     }
   }
 
   const budgets = [
-    ['llms-full.txt', maxFullBytes, 'split it or raise the budget deliberately'],
-    ['llms.txt', maxIndexBytes, 'it is an index — collapse a section rather than raising this'],
+    ["llms-full.txt", maxFullBytes, "split it or raise the budget deliberately"],
+    ["llms.txt", maxIndexBytes, "it is an index — collapse a section rather than raising this"],
   ] as const;
   for (const [name, budget, advice] of budgets) {
     const found = await stat(join(distDir, name)).catch(() => undefined);

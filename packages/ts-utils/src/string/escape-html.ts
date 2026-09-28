@@ -1,4 +1,4 @@
-import { HTML_ENTITIES } from '@/internal/string/html-entities';
+import { HTML_ENTITIES } from "@/internal/string/html-entities";
 
 /**
  * Text made safe to put between tags or inside a quoted attribute, in HTML and
