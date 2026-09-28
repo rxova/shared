@@ -1,6 +1,6 @@
 ---
 name: rx-ui
-description: Builds and polishes user interface: responsive layout, accessibility, dark mode, and loading, empty and error states, using the project's own component library and styling. Use when building a screen or making an existing one demo-ready.
+description: Builds and polishes user interface (responsive layout, accessibility, dark mode, and loading, empty and error states), using the project's own component library and styling. Use when building a screen or making an existing one demo-ready.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 ---
