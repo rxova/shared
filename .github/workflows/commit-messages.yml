@@ -1,0 +1,86 @@
+name: Commit messages
+
+# Reusable: the root job of a CI graph. Lints the branch commits on a pull
+# request or the pushed commit on a push, and decides whether the commit touched
+# the tree at all (`code-changed` is false only for a release commit: version
+# and changelog only). Every other job then gates on it:
+#
+#   jobs:
+#     commitlint:
+#       uses: rxova/shared/.github/workflows/commit-messages.yml@main
+#     checks:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.code-changed == 'true'
+#
+# Run it on push as well as pull_request: a skipped job skips its dependents,
+# so gating it on pull_request alone would silently skip the whole graph on main.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: '24'
+      repo-config-command:
+        description: >-
+          How to run the rxova-repo-config bin. rxova/shared runs it from source;
+          everyone else keeps the default.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+      check-scope:
+        description: '`false` skips `check-scope` and always reports `code-changed: true`.'
+        type: boolean
+        required: false
+        default: true
+    outputs:
+      code-changed:
+        description: '`true` unless the commit is a release commit (version and changelog only).'
+        value: ${{ jobs.commitlint.outputs.code-changed }}
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    name: commit messages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      code-changed: ${{ steps.scope.outputs.code-changed || 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: pnpm install --frozen-lockfile
+
+      - name: Decide whether this commit touched the tree
+        id: scope
+        if: inputs.check-scope
+        env:
+          BASE_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.head.sha || github.sha }}
+        run: ${{ inputs.repo-config-command }} check-scope
+
+      - name: Lint the branch commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --verbose --from "$BASE_SHA" --to "$HEAD_SHA"
+
+      # On main this is the merged commit, already linted on its pull request,
+      # plus the changesets `chore: version packages` commit. Cheap, and it is
+      # what keeps this job unskippable.
+      - name: Lint the pushed commit
+        if: github.event_name == 'push'
+        run: pnpm exec commitlint --last --verbose

@@ -1,0 +1,53 @@
+name: Changeset gate
+
+# Reusable: requires a changeset when a pull request changes a published
+# package, through `rxova-repo-config check-changeset` (configured by the
+# caller's `repoConfig.changeset`). The `skip-changeset` label and a
+# `[skip-changeset]` title are the escape hatches; the job still runs and
+# reports rather than being skipped, so honouring either is visible in a log.
+#
+#   jobs:
+#     changeset:
+#       needs: [commitlint]
+#       uses: rxova/shared/.github/workflows/changeset-gate.yml@main
+#
+# Only pull requests are checked, and never the changesets release branch.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: '24'
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+
+permissions:
+  contents: read
+
+jobs:
+  changeset:
+    name: changeset present
+    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: pnpm install --frozen-lockfile
+      - name: Require a changeset when a published package changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: ${{ inputs.repo-config-command }} check-changeset

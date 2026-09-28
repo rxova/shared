@@ -1,0 +1,92 @@
+name: Node floor smoke
+
+# Reusable: installs each published package's packed tarball on exactly the
+# oldest Node its `engines` promises, and imports it there. The unit matrix runs
+# the newest release of each major, which says little about the floor: minors
+# add APIs, and `>=22.13` is a promise about 22.13. The floor is read from the
+# manifests (`rxova-repo-config node-floor`), so lowering the promise moves the
+# job with it.
+#
+#   jobs:
+#     compat:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.code-changed == 'true'
+#       uses: rxova/shared/.github/workflows/node-floor-smoke.yml@main
+#
+# Plain `node` from the switch on, never pnpm or Turbo: Turbo does not hash the
+# Node binary, so it would replay a result from another version, and the
+# toolchain has floors of its own that a project is free to go below.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version for the toolchain (install and build), before the switch.
+        type: string
+        required: false
+        default: '24'
+      build-command:
+        description: Builds the published packages and @rxova/repo-config's bin if it is built in this repository.
+        type: string
+        required: false
+        default: pnpm exec turbo run build --filter='./packages/*'
+      extra-command:
+        description: Runs on the floor Node after every pack smoke, from the repository root (a CLI probe, say).
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  floor:
+    name: packages on their oldest node
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-cache@main
+        with:
+          key: node-floor
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        run: ${{ inputs.build-command }}
+      # Resolved rather than taken from `node_modules/.bin`: the shim is a shell
+      # script, and this way the same line works where repo-config is a
+      # workspace package (rxova/shared) and where it is a dependency.
+      - name: Locate the rxova-repo-config bin
+        id: cli
+        run: |
+          node -e "
+            const path = require('node:path');
+            const manifest = require.resolve('@rxova/repo-config/package.json');
+            const bin = require(manifest).bin['rxova-repo-config'];
+            console.log('path=' + path.join(path.dirname(manifest), bin));
+          " >> "$GITHUB_OUTPUT"
+      - name: Read the Node floor from engines
+        id: floor
+        run: node "${{ steps.cli.outputs.path }}" node-floor
+      - name: Switch to Node ${{ steps.floor.outputs.version }}
+        if: steps.floor.outputs.version != ''
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ steps.floor.outputs.version }}
+      - name: Pack, install and import each package on the floor
+        if: steps.floor.outputs.version != ''
+        env:
+          CLI: ${{ steps.cli.outputs.path }}
+          PACKAGES: ${{ steps.floor.outputs.packages }}
+        run: |
+          node --version
+          for dir in $PACKAGES; do
+            echo "::group::$dir"
+            (cd "$dir" && node "$CLI" pack-smoke)
+            echo "::endgroup::"
+          done
+      - name: Extra check on the floor
+        if: steps.floor.outputs.version != '' && inputs.extra-command != ''
+        run: ${{ inputs.extra-command }}

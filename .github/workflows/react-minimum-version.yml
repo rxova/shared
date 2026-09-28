@@ -1,0 +1,110 @@
+name: React minimum version
+
+# Reusable: runs a suite against the oldest React a peer range allows, while
+# the lockfile installs the newest. It pins React at the workspace root as well
+# as in `filters` (actions/pin-react): a package declared at the root, such as
+# @rxova/ts-utils, resolves its `react` peer there, and pinning only the package
+# under test leaves two Reacts in the tree — every hook call then fails.
+#
+#   jobs:
+#     react-minimum:
+#       needs: [commitlint]
+#       uses: rxova/shared/.github/workflows/react-minimum-version.yml@main
+#       with:
+#         react-version: 18.2.0
+#         types-version: 18.3.27
+#         types-dom-version: 18.3.7
+#         filters: '@rxova/journey-react'
+#         test-command: pnpm --workspace-root vitest run packages/react --coverage.enabled=false
+#         typecheck-command: pnpm --filter @rxova/journey-react typecheck
+#
+# A separate job rather than a matrix leg: it rewrites the lockfile, which
+# --frozen-lockfile forbids. The checkout is throwaway, so nothing leaves the runner.
+
+on:
+  workflow_call:
+    inputs:
+      react-version:
+        description: Exact `react` and `react-dom` version, such as `18.2.0`.
+        type: string
+        required: true
+      types-version:
+        description: Exact `@types/react` version. Empty leaves the types alone.
+        type: string
+        required: false
+        default: ''
+      types-dom-version:
+        description: Exact `@types/react-dom` version. Empty leaves it alone.
+        type: string
+        required: false
+        default: ''
+      filters:
+        description: Space-separated pnpm filters to pin as well as the root. Empty pins the root only.
+        type: string
+        required: false
+        default: ''
+      build-command:
+        description: Runs after the pin, before the tests (for suites that import built dists).
+        type: string
+        required: false
+        default: ''
+      test-command:
+        description: The suite to run against the pinned React.
+        type: string
+        required: true
+      typecheck-command:
+        description: Runs after the tests. Empty skips it.
+        type: string
+        required: false
+        default: ''
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: '24'
+      node-options:
+        description: NODE_OPTIONS for every step (the caller's workflow `env` does not reach here).
+        type: string
+        required: false
+        default: ''
+      playwright-browsers:
+        description: Space-separated browsers for Vitest browser mode, such as `chromium`. Empty skips Playwright.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  react-minimum:
+    name: react ${{ inputs.react-version }}
+    if: github.head_ref != 'changeset-release/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: ${{ inputs.node-options }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: pnpm install --frozen-lockfile
+      - uses: rxova/shared/actions/setup-playwright@main
+        if: inputs.playwright-browsers != ''
+        with:
+          browsers: ${{ inputs.playwright-browsers }}
+      - uses: rxova/shared/actions/pin-react@main
+        with:
+          react-version: ${{ inputs.react-version }}
+          types-version: ${{ inputs.types-version }}
+          types-dom-version: ${{ inputs.types-dom-version }}
+          filters: ${{ inputs.filters }}
+      - name: Build
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+      - name: Test against React ${{ inputs.react-version }}
+        run: ${{ inputs.test-command }}
+      - name: Typecheck against React ${{ inputs.react-version }}
+        if: inputs.typecheck-command != ''
+        run: ${{ inputs.typecheck-command }}
