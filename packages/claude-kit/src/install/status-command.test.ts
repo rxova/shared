@@ -48,6 +48,13 @@ describe('statusCommand', () => {
     expect(statusCommand([], env)).toBe(1);
   });
 
+  it('cannot compare a file whose source is gone, and does not flag it', () => {
+    const { env } = scratch();
+    installCommand([], env);
+    rmSync(join(env.packageDir, 'dist/hooks.js'));
+    expect(statusCommand([], env)).toBe(0);
+  });
+
   it('does not flag a file this version no longer ships as changed', () => {
     const { env } = scratch();
     installCommand([], env);

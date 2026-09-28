@@ -2,19 +2,19 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runHook } from '@/hooks/run-hook';
+import { runHooks } from '@/hooks/run-hooks';
 import { isEntry } from '@/internal/entry/is-entry';
 import { liveContext } from '@/internal/hooks/live-context';
 
 /**
  * The hook runner the installer copies into `.claude/rx-ai/`, built as one file that imports only
- * Node: `node hooks.js <hook>` reads the hook input from stdin, writes the hook's message to
+ * Node: `node hooks.js <hook>[,<hook>…]` reads the hook input from stdin, writes the hook's message to
  * stderr and its reply to stdout, and returns the exit code.
  */
 export const main = (
   argv: readonly string[],
   io: { stdin: () => string; stdout: (text: string) => void; stderr: (text: string) => void },
-  run: (name: string, raw: string) => ReturnType<typeof runHook> = runHook,
+  run: (names: string, raw: string) => ReturnType<typeof runHooks> = runHooks,
 ): number => {
   let raw: string;
   try {
@@ -38,7 +38,7 @@ if (isEntry(import.meta.url)) {
       stdout: (text) => process.stdout.write(`${text}\n`),
       stderr: (text) => process.stderr.write(`${text}\n`),
     },
-    (name, raw) => runHook(name, raw, liveContext(stateDir)),
+    (names, raw) => runHooks(names, raw, liveContext(stateDir)),
   );
 }
 /* v8 ignore stop */

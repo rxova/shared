@@ -35,6 +35,7 @@ export const scratchEnv = (version = '1.0.0') => {
   const env: InstallEnv = {
     home: join(root, 'home'),
     cwd: join(root, 'project'),
+    configHome: join(root, 'home', '.config'),
     packageDir,
     io: { out: vi.fn(), err: vi.fn() },
   };
