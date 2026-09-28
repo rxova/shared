@@ -12,7 +12,7 @@ import { readManifest } from '@/internal/install/read-manifest';
 import { readSettings } from '@/internal/install/read-settings';
 
 /**
- * `rxova-claude-kit status [--target claude|opencode|both] [--project]`: for each installed
+ * `rxova-agent-kit status [--target claude|opencode|both] [--project]`: for each installed
  * target, the installed profile and version against this one, files missing or different from
  * this version, and for Claude Code whether the hook entries are all there. Exits 1 when
  * anything is out of step or nothing is installed, so it can gate a script.
@@ -83,7 +83,7 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
     }
     return healthy ? 0 : 1;
   } catch (failure) {
-    io.err(`rxova-claude-kit status: ${(failure as Error).message}`);
+    io.err(`rxova-agent-kit status: ${(failure as Error).message}`);
     return 1;
   }
 };

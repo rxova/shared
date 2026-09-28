@@ -31,19 +31,19 @@ description: Every export, command and action this repository publishes.
 Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
 `/tsconfig.base.json`.
 
-## `@rxova/claude-kit`
+## `@rxova/agent-kit`
 
-| Command                                                                                                        | What it does                                                                                                                     |
-| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `rxova-claude-kit list [--profile p]`                                                                          | Lists every agent, skill and hook, and the profiles that include it                                                              |
-| `rxova-claude-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `dotnet`, `full`) for Claude Code, OpenCode or both (`--target claude\|opencode\|both`) |
-| `rxova-claude-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes exactly what each install wrote                                                                                          |
-| `rxova-claude-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and any missing or changed file                                                            |
+| Command                                                                                                       | What it does                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `rxova-agent-kit list [--profile p]`                                                                          | Lists every agent, skill and hook, and the profiles that include it                                                              |
+| `rxova-agent-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `dotnet`, `full`) for Claude Code, OpenCode or both (`--target claude\|opencode\|both`) |
+| `rxova-agent-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes exactly what each install wrote                                                                                          |
+| `rxova-agent-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and any missing or changed file                                                            |
 
 Hooks run on their own; Claude (or OpenCode) loads skills and hands work to agents when a
 request matches their description, or when you name one (`/rx-kickoff`, "use rx-architect"). In
 OpenCode the hooks run through a plugin the install writes. See the
-[package README](https://github.com/rxova/shared/tree/main/packages/claude-kit#how-it-works) for
+[package README](https://github.com/rxova/shared/tree/main/packages/agent-kit#how-it-works) for
 how it works, two worked examples, and what differs in OpenCode.
 
 ### Hooks

@@ -12,7 +12,7 @@ import type { OpencodeHooks } from '@/install/opencode-hooks';
 export const opencodePlugin = (
   runner: string,
   grouped: OpencodeHooks,
-): string => `// rx-kit: runs the rxova claude-kit hooks inside OpenCode. Written by rxova-claude-kit install; reinstall to change it.
+): string => `// rx-kit: runs the rxova agent-kit hooks inside OpenCode. Written by rxova-agent-kit install; reinstall to change it.
 import { spawn } from 'node:child_process';
 
 const RUNNER = ${JSON.stringify(runner)};

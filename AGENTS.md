@@ -11,7 +11,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   vitest preset only. This repository runs the scripts from source with `tsx`.
 - `packages/ts-utils` — `@rxova/ts-utils`: small dependency-free runtime helpers, plus a `/react`
   entry. Neutral platform, es2020, no side effects: consumers inline it at build time.
-- `packages/claude-kit` — `@rxova/claude-kit`: the `rxova-claude-kit` bin that installs Claude Code agents, skills and
+- `packages/agent-kit` — `@rxova/agent-kit`: the `rxova-agent-kit` bin that installs Claude Code agents, skills and
   hooks into `.claude` (Claude Code) and `.opencode` (OpenCode, through a generated plugin), in profiles. Agents and skills are Markdown under `content/`; every
   hook is a `HookSpec` in `src/hooks/hooks-table.ts`, and profiles live in
   `src/install/profiles.ts`. `content/` ships as-is; `src/hooks/hooks-entry.ts` is built as a

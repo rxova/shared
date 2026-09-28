@@ -9,7 +9,7 @@ const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
 describe('publishedDirs', () => {
   it('finds the non-private packages of this repository', () => {
-    expect(publishedDirs(REPO_ROOT).sort()).toEqual(['claude-kit', 'repo-config', 'ts-utils']);
+    expect(publishedDirs(REPO_ROOT).sort()).toEqual(['agent-kit', 'repo-config', 'ts-utils']);
   });
 
   it('leaves a private package out', () => {

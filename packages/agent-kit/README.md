@@ -1,4 +1,4 @@
-# @rxova/claude-kit
+# @rxova/agent-kit
 
 A kit for Claude Code and OpenCode, for building fast without breaking things: new products on
 a deadline, and backend services moved from .NET 6 and 8 to .NET 10.
@@ -17,10 +17,10 @@ Install a profile, not everything: every installed agent and skill description i
 every session.
 
 ```sh
-npx @rxova/claude-kit install --profile hackathon            # everything for building a product fast
-npx @rxova/claude-kit install --profile dotnet --target both # .NET and Datadog, for Claude Code and OpenCode
-npx @rxova/claude-kit install                                 # core: the guards and the everyday set
-npx @rxova/claude-kit list                                    # every item, and which profiles include it
+npx @rxova/agent-kit install --profile hackathon            # everything for building a product fast
+npx @rxova/agent-kit install --profile dotnet --target both # .NET and Datadog, for Claude Code and OpenCode
+npx @rxova/agent-kit install                                 # core: the guards and the everyday set
+npx @rxova/agent-kit list                                    # every item, and which profiles include it
 ```
 
 ## How it works
@@ -80,12 +80,12 @@ are picked by how well a request matches their description, so name one when it 
 
 ## Commands
 
-| Command                                                                                                        | What it does                                                                                                                                                                                                                                                                                                                         |
-| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `rxova-claude-kit list [--profile p]`                                                                          | Every agent, skill and hook, the profiles that include it, and what it is for.                                                                                                                                                                                                                                                       |
-| `rxova-claude-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile, with items added or skipped, for Claude Code (`--target claude`, the default on a first install), OpenCode (`opencode`) or both. Run again to update: with no `--target` it updates the targets already installed, and with no `--profile` it keeps each one's last selection, so `--add x` alone adds one item. |
-| `rxova-claude-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes the files each install wrote and its hook entries in `settings.json`. Every other file and setting is left as it was. With no `--target`, every installed target.                                                                                                                                                            |
-| `rxova-claude-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and version, and any file that is missing or edited, or hook that is missing. Exits 1 when anything is out of step.                                                                                                                                                                            |
+| Command                                                                                                       | What it does                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rxova-agent-kit list [--profile p]`                                                                          | Every agent, skill and hook, the profiles that include it, and what it is for.                                                                                                                                                                                                                                                       |
+| `rxova-agent-kit install [--target t] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile, with items added or skipped, for Claude Code (`--target claude`, the default on a first install), OpenCode (`opencode`) or both. Run again to update: with no `--target` it updates the targets already installed, and with no `--profile` it keeps each one's last selection, so `--add x` alone adds one item. |
+| `rxova-agent-kit uninstall [--target t] [--project] [--dry-run]`                                              | Removes the files each install wrote and its hook entries in `settings.json`. Every other file and setting is left as it was. With no `--target`, every installed target.                                                                                                                                                            |
+| `rxova-agent-kit status [--target t] [--project]`                                                             | Shows each installed target's profile and version, and any file that is missing or edited, or hook that is missing. Exits 1 when anything is out of step.                                                                                                                                                                            |
 
 | Target     | User install                                          | With `--project` |
 | ---------- | ----------------------------------------------------- | ---------------- |

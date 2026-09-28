@@ -5,7 +5,7 @@ import { defaultEnv } from '@/internal/install/default-env';
 import { parseOptions } from '@/internal/install/parse-options';
 
 /**
- * `rxova-claude-kit list [--profile name]`: every agent, skill and hook, the profiles that include it,
+ * `rxova-agent-kit list [--profile name]`: every agent, skill and hook, the profiles that include it,
  * and what it is for; with `--profile`, only that profile's items.
  */
 export const listCommand = (argv: readonly string[], env: InstallEnv = defaultEnv()): number => {
@@ -46,7 +46,7 @@ export const listCommand = (argv: readonly string[], env: InstallEnv = defaultEn
     );
     return 0;
   } catch (failure) {
-    io.err(`rxova-claude-kit list: ${(failure as Error).message}`);
+    io.err(`rxova-agent-kit list: ${(failure as Error).message}`);
     return 1;
   }
 };

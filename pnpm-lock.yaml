@@ -243,7 +243,7 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  packages/claude-kit:
+  packages/agent-kit:
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
