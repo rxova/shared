@@ -10,7 +10,7 @@ describe('parseSteps', () => {
   });
 
   it('refuses anything but an array', () => {
-    expect(() => parseSteps({})).toThrow('tooling.verify.steps must be an array');
+    expect(() => parseSteps({})).toThrow('repoConfig.verify.steps must be an array');
   });
 
   it.each([
@@ -20,7 +20,7 @@ describe('parseSteps', () => {
     ['pnpm lint'],
   ])('refuses the step %j, by position', (step) => {
     expect(() => parseSteps([{ name: 'ok', command: 'ok' }, step])).toThrow(
-      'tooling.verify.steps[1] must be a { name, command } pair of strings',
+      'repoConfig.verify.steps[1] must be a { name, command } pair of strings',
     );
   });
 });

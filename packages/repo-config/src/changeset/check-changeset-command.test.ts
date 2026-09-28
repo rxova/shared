@@ -56,7 +56,7 @@ describe('checkChangesetCommand', () => {
   });
 
   describe('with singlePackage set', () => {
-    const manifest = JSON.stringify({ tooling: { changeset: { singlePackage: true } } });
+    const manifest = JSON.stringify({ repoConfig: { changeset: { singlePackage: true } } });
     const changed = ['packages/example/src/index.ts', '.changeset/a.md'];
 
     it('passes a changeset that names one package', () => {
@@ -78,8 +78,8 @@ describe('checkChangesetCommand', () => {
   });
 
   it('reports a malformed config instead of throwing', () => {
-    const files = { [join('/repo', 'package.json')]: '{"tooling":{"changeset":1}}' };
+    const files = { [join('/repo', 'package.json')]: '{"repoConfig":{"changeset":1}}' };
     expect(checkChangesetCommand(range, deps([], files))).toBe(1);
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('tooling.changeset must be'));
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('repoConfig.changeset must be'));
   });
 });

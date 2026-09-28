@@ -23,13 +23,13 @@ describe('parseConfig', () => {
   });
 
   it.each([
-    [[], 'package.json#tooling must be an object'],
+    [[], 'package.json#repoConfig must be an object'],
     [{ verfy: {} }, 'unknown key "verfy"'],
-    [{ verify: [] }, 'package.json#tooling.verify must be an object'],
+    [{ verify: [] }, 'package.json#repoConfig.verify must be an object'],
     [{ verify: { step: [] } }, 'unknown key "step"'],
-    [{ verify: { steps: {} } }, 'tooling.verify.steps must be an array'],
-    [{ verify: { steps: [{ name: 'x' }] } }, 'tooling.verify.steps[0] must be'],
-    [{ changeset: true }, 'tooling.changeset must be an object'],
+    [{ verify: { steps: {} } }, 'repoConfig.verify.steps must be an array'],
+    [{ verify: { steps: [{ name: 'x' }] } }, 'repoConfig.verify.steps[0] must be'],
+    [{ changeset: true }, 'repoConfig.changeset must be an object'],
     [{ changeset: { single: true } }, 'unknown key "single"'],
     [{ changeset: { singlePackage: 'yes' } }, 'singlePackage must be a boolean'],
   ])('rejects %j', (raw, message) => {

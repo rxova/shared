@@ -9,7 +9,7 @@ import { selectSteps } from '@/verify/select-steps';
 /**
  * `rxova-repo-config verify [--only a,b]`: the pre-push gate. The list is
  * `defaultSteps()` unless the root `package.json` names its own under
- * `tooling.verify.steps`. Returns the process exit code rather than taking it,
+ * `repoConfig.verify.steps`. Returns the process exit code rather than taking it,
  * so tests can call it.
  */
 export const verifyCommand = (
