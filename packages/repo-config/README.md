@@ -176,7 +176,7 @@ repository root, except `pack-smoke` and `check-exports`, which run from a packa
 | `rxova-repo-config lint-changesets`                | Fails a waiting changeset with a summary line `@changesets/changelog-github` reads as metadata (`commit:`, `pr:`, `author:`), and, with `singlePackage`, one naming two packages. |
 | `rxova-repo-config add-changeset <pkg> <bump> <…>` | Writes a one-package changeset without the prompt. `<pkg>` is a name, a name without its scope, or a directory. `--help` lists the packages.                                      |
 | `rxova-repo-config version`                        | The release `version` script: `changeset version`, the root version synced from `changeset.syncRootVersionFrom`, then `pnpm install --lockfile-only`.                             |
-| `rxova-repo-config check-scope`                    | Writes `code-changed` to `GITHUB_OUTPUT`: `false` for a release commit, which holds only version and changelog edits. Reads `BASE_SHA`, `HEAD_SHA`; always exits 0.               |
+| `rxova-repo-config check-scope`                    | Writes `code-changed` (`false` for a release commit or a documentation-only range, see [Scope](#scope)), `docs-only` and `docs-changed` to `GITHUB_OUTPUT`. Always exits 0.       |
 | `rxova-repo-config check-majors`                   | Fails when the published packages (or `majors.packages`) are not on one major version.                                                                                            |
 | `rxova-repo-config node-floor`                     | Writes `version` (the single `engines.node` floor all published packages share) and `packages` to `GITHUB_OUTPUT`.                                                                |
 | `rxova-repo-config pack-smoke [dir]`               | Packs the package, installs it in a scratch project, loads it, runs its bins and checks the tarball: see [Pack smoke](#pack-smoke).                                               |
@@ -292,6 +292,9 @@ unknown key is an error, not a silent default.
 | `postPublish.importPattern`      | `post-publish-smoke`                 | None: every published package is imported. A regex source.                                         |
 | `postPublish.peers`              | `post-publish-smoke`                 | None. Installed beside the packages, the way a consumer provides peers.                            |
 | `llms`                           | `check-llms`                         | See [llms.txt](#llmstxt).                                                                          |
+| `scope.ignore`                   | `check-scope`                        | `["**/*.md", "**/*.mdx"]`: documentation, see [Scope](#scope).                                     |
+| `scope.keep`                     | `check-scope`                        | `packages/*/*/**` and test and fixture folders: code even where `ignore` matches.                  |
+| `scope.site`                     | `check-scope`                        | `["apps/docs/**"]`: the docs site, reported as `docs-changed`.                                     |
 | `testScripts.globs`              | `check-test-scripts`                 | `["packages/*", "apps/*"]`                                                                         |
 | `fileSize.max`                   | `check-file-size`                    | `500` lines.                                                                                       |
 | `fileSize.extensions`            | `check-file-size`                    | `ts`, `tsx`, `js`, `mjs`, `cjs`, `astro`, `css`, `yaml`, `yml`, `json`                             |
@@ -332,6 +335,11 @@ A full example:
     "packages": { "marker": "rxova.slug" },
     "postPublish": { "importPattern": "^@rxova/react-", "peers": { "react": "^19" } },
     "llms": { "api": "documented", "entries": "subpaths" },
+    "scope": {
+      "ignore": ["**/*.md", "**/*.mdx"],
+      "keep": ["packages/*/*/**"],
+      "site": ["docs/**"]
+    },
     "testScripts": { "globs": ["packages/*", "apps/*"] },
     "fileSize": { "max": 500, "ignore": ["pnpm-lock.yaml"], "allow": [] }
   }
@@ -344,6 +352,23 @@ A full example:
 - With `changeset.scope: "shipped"`, a README or `llms.txt` edit needs a changeset too; `src/` and
   `tsdown.config.*` count when `files` lists `dist`.
 - `add-changeset` leaves out the packages in `.changeset/config.json#ignore`.
+
+### Scope
+
+`check-scope` tells CI which jobs a range needs. It writes `code-changed=false`, and the build,
+test and package jobs gated on it skip, when every changed file is one of:
+
+- release bookkeeping: a changeset, a changelog, or a `package.json` whose only edit is its version;
+- documentation: a path `scope.ignore` matches and `scope.keep` does not, that the range did not
+  delete (a check may expect the file, as `pack-smoke` expects a README).
+
+The default `keep` leaves Markdown below a package's top level (content a package ships, which its
+tests read) and in test and fixture folders counted as code; a package's README stays
+documentation. `llms.txt` is not Markdown, so an edit to it runs everything. `docs-only=true`
+marks a documentation range, for a light job such as `docs-checks.yml` (formatting, plus
+`check-snippets` or `check-banned` where a repository runs them), and `docs-changed=true` a range
+that touched `scope.site`, so the docs site still builds. A range that cannot be read runs
+everything, and `"ignore": []` turns the documentation skip off.
 
 ## Presets
 

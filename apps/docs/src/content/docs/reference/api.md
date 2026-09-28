@@ -43,31 +43,38 @@ run after `astro build`.
 
 ## `@rxova/repo-config`
 
-| Command                                         | What it does                                                                                        |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `rxova-repo-config verify [--only a,b]`         | Runs the pre-push gate, from `package.json#repoConfig.verify.steps`                                 |
-| `rxova-repo-config pre-push`                    | The `.husky/pre-push` hook: skips a delete-only push, else verifies                                 |
-| `rxova-repo-config check-changeset`             | Requires a changeset when a published package changed, and lints the ones added                     |
-| `rxova-repo-config lint-changesets`             | Fails changesets the changelog would misread, or that name two packages under `singlePackage`       |
-| `rxova-repo-config add-changeset <pkg> <bump>`  | Writes a one-package changeset without the prompt                                                   |
-| `rxova-repo-config version`                     | `changeset version`, then the root version sync and a lockfile refresh                              |
-| `rxova-repo-config check-scope`                 | Reports `code-changed=false` for a release commit                                                   |
-| `rxova-repo-config check-majors`                | Requires the published packages to share one major version                                          |
-| `rxova-repo-config node-floor`                  | Reads the one `engines.node` floor the packages share                                               |
-| `rxova-repo-config pack-smoke [dir]`            | Packs, installs, imports and requires a package from its tarball, and checks what the tarball ships |
-| `rxova-repo-config check-exports [--profile p]` | `publint --strict` and `attw --pack .`, with the package's `repoConfig.exports.profile`             |
-| `rxova-repo-config post-publish-smoke`          | Installs and loads what npm serves after a release (`PUBLISHED_PACKAGES`)                           |
-| `rxova-repo-config check-llms [root]`           | Holds each `llms.txt` to the package source, per `repoConfig.llms`                                  |
-| `rxova-repo-config check-tsdoc`                 | Requires a TSDoc summary on every callable public export                                            |
-| `rxova-repo-config check-banned`                | Fails docs that name removed APIs (`repoConfig.docs.banned`)                                        |
-| `rxova-repo-config check-snippets`              | Requires every code fence in the READMEs and `llms.txt` files to parse                              |
-| `rxova-repo-config check-test-scripts`          | Requires a `test` script wherever a `vitest.config.*` is                                            |
-| `rxova-repo-config check-file-size`             | Fails tracked files over `repoConfig.fileSize.max` lines                                            |
-| `rxova-repo-config coverage-summary [path]`     | Writes the coverage totals to the job summary                                                       |
-| `rxova-repo-config list-packages`               | Prints the packages a CI matrix runs over (`--marker`, `--github-output`)                           |
+| Command                                         | What it does                                                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `rxova-repo-config verify [--only a,b]`         | Runs the pre-push gate, from `package.json#repoConfig.verify.steps`                                     |
+| `rxova-repo-config pre-push`                    | The `.husky/pre-push` hook: skips a delete-only push, else verifies                                     |
+| `rxova-repo-config check-changeset`             | Requires a changeset when a published package changed, and lints the ones added                         |
+| `rxova-repo-config lint-changesets`             | Fails changesets the changelog would misread, or that name two packages under `singlePackage`           |
+| `rxova-repo-config add-changeset <pkg> <bump>`  | Writes a one-package changeset without the prompt                                                       |
+| `rxova-repo-config version`                     | `changeset version`, then the root version sync and a lockfile refresh                                  |
+| `rxova-repo-config check-scope`                 | Reports `code-changed=false` for a release commit or a documentation-only range, per `repoConfig.scope` |
+| `rxova-repo-config check-majors`                | Requires the published packages to share one major version                                              |
+| `rxova-repo-config node-floor`                  | Reads the one `engines.node` floor the packages share                                                   |
+| `rxova-repo-config pack-smoke [dir]`            | Packs, installs, imports and requires a package from its tarball, and checks what the tarball ships     |
+| `rxova-repo-config check-exports [--profile p]` | `publint --strict` and `attw --pack .`, with the package's `repoConfig.exports.profile`                 |
+| `rxova-repo-config post-publish-smoke`          | Installs and loads what npm serves after a release (`PUBLISHED_PACKAGES`)                               |
+| `rxova-repo-config check-llms [root]`           | Holds each `llms.txt` to the package source, per `repoConfig.llms`                                      |
+| `rxova-repo-config check-tsdoc`                 | Requires a TSDoc summary on every callable public export                                                |
+| `rxova-repo-config check-banned`                | Fails docs that name removed APIs (`repoConfig.docs.banned`)                                            |
+| `rxova-repo-config check-snippets`              | Requires every code fence in the READMEs and `llms.txt` files to parse                                  |
+| `rxova-repo-config check-test-scripts`          | Requires a `test` script wherever a `vitest.config.*` is                                                |
+| `rxova-repo-config check-file-size`             | Fails tracked files over `repoConfig.fileSize.max` lines                                                |
+| `rxova-repo-config coverage-summary [path]`     | Writes the coverage totals to the job summary                                                           |
+| `rxova-repo-config list-packages`               | Prints the packages a CI matrix runs over (`--marker`, `--github-output`)                               |
 
 Every setting lives under `repoConfig` in the root `package.json`, and per package (`packSmoke`,
 `llms`, `exports.profile`) in that package's own; the full schema is in the package README.
+
+`check-scope` skips the heavy CI jobs for a documentation-only range: every changed file matches
+`repoConfig.scope.ignore` (default `**/*.md`, `**/*.mdx`) and not `repoConfig.scope.keep` (default
+`packages/*/*/**` and test and fixture folders, where Markdown is content a test reads), and none was
+deleted. Changesets and changelogs count as well. `docs-only` then runs the light `docs-checks` job
+instead, and `docs-changed` (a file under `repoConfig.scope.site`, default `apps/docs/**`) keeps the
+docs site's build. `"ignore": []` turns the skip off.
 
 `pack-smoke` also fails when a `files` entry (nested paths and globs included), the README, the
 license or any `exports`, `main`, `types` or bin target is missing from the tarball; when it ships
@@ -269,15 +276,16 @@ Datadog:
 
 Called at the job level as `uses: rxova/shared/.github/workflows/<file>@main`.
 
-| Workflow                    | Inputs                                                                                                                                                                        | Outputs                           | What it does                                                                          |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
-| `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`                    | Lints the branch or pushed commits and runs `check-scope`: the root job of a CI graph |
-| `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                 | Lints the PR title, read live from the API                                            |
-| `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                 | `check-changeset` on pull requests, with labels and title from the event              |
-| `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                 | Pins the oldest React at the root and in `filters`, then builds, tests and typechecks |
-| `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                 | Runs `pack-smoke` for each published package on the Node floor its `engines` promises |
-| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages` | The version pull request, then publishing with npm trusted publishing and provenance  |
-| `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                 | Publishes a snapshot prerelease under a dist-tag other than `latest`                  |
+| Workflow                    | Inputs                                                                                                                                                                        | Outputs                                     | What it does                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`, `docs-only`, `docs-changed` | Lints the branch or pushed commits and runs `check-scope`: the root job of a CI graph                     |
+| `docs-checks.yml`           | `node-version`, `command`                                                                                                                                                     | —                                           | The light job for a documentation-only range: prettier by default, plus any prose checks the caller names |
+| `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                           | Lints the PR title, read live from the API                                                                |
+| `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                           | `check-changeset` on pull requests, with labels and title from the event                                  |
+| `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                           | Pins the oldest React at the root and in `filters`, then builds, tests and typechecks                     |
+| `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                           | Runs `pack-smoke` for each published package on the Node floor its `engines` promises                     |
+| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages`           | The version pull request, then publishing with npm trusted publishing and provenance                      |
+| `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                           | Publishes a snapshot prerelease under a dist-tag other than `latest`                                      |
 
 ## Renovate preset
 

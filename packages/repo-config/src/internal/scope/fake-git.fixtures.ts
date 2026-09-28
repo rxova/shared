@@ -1,9 +1,14 @@
 import type { Git } from "@/scope/scope.types";
 
-/** A fake repository: `names` lists files, `patch` returns a diff per file. */
-export const fakeGit = (files: string[], patches: Record<string, string> = {}): Git => ({
+/** A fake repository: `names` lists files, `patch` returns a diff per file, `deleted` the removed ones. */
+export const fakeGit = (
+  files: string[],
+  patches: Record<string, string> = {},
+  deleted: string[] = [],
+): Git => ({
   names: () => files,
   patch: (_base, _head, file) => patches[file] ?? "",
+  deleted: () => deleted,
 });
 
 /** A patch that moves only the version line of a manifest. */

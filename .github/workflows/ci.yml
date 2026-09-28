@@ -215,10 +215,14 @@ jobs:
       - name: Typecheck against React 18 types
         run: pnpm --filter @rxova/ts-utils typecheck
 
+  # Also on a documentation-only range that touched the site: its content is
+  # what this build validates, links included.
   docs:
     name: docs build
     needs: [commitlint]
-    if: needs.commitlint.outputs.code-changed == 'true'
+    if: >-
+      needs.commitlint.outputs.code-changed == 'true' ||
+      needs.commitlint.outputs.docs-changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -235,6 +239,16 @@ jobs:
           DOCS_BASE_URL: /${{ github.event.repository.name }}/
         run: pnpm exec turbo run build --filter=docs
 
+  # What a documentation-only range runs in place of `checks`: formatting. The
+  # changeset gate below and `docs` above still run on their own terms.
+  docs-checks:
+    name: docs checks
+    needs: [commitlint]
+    if: needs.commitlint.outputs.docs-only == 'true'
+    uses: ./.github/workflows/docs-checks.yml
+    with:
+      command: pnpm run prettier:check
+
   # Still runs and reports on a labelled pull request rather than being skipped
   # by an `if:`, so that honouring the label is visible in a log.
   changeset:
@@ -248,8 +262,9 @@ jobs:
   # that never skips. Matrix jobs skipped before expansion report under their
   # unexpanded name, and a `skipped` report never satisfies a required context,
   # so requiring the jobs one by one does not work. `skipped` is an answer this
-  # workflow gives deliberately (a release commit, a push with no pull request),
-  # so the gate accepts it; `cancelled` and `failure` it does not.
+  # workflow gives deliberately (a release commit, a documentation-only range,
+  # a push with no pull request), so the gate accepts it; `cancelled` and
+  # `failure` it does not.
   gate:
     name: all checks
     if: always()
@@ -262,6 +277,7 @@ jobs:
       - compat
       - react-minimum
       - docs
+      - docs-checks
       - changeset
     runs-on: ubuntu-latest
     timeout-minutes: 5

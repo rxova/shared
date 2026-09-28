@@ -48,7 +48,7 @@ export const commands = (): Record<string, CommandEntry> => ({
     },
   },
   "check-scope": {
-    summary: "report code-changed=false for a release commit (BASE_SHA, HEAD_SHA)",
+    summary: "report code-changed, docs-only and docs-changed for a range (BASE_SHA, HEAD_SHA)",
     load: async () => {
       const { checkScopeCommand } = await import("@/scope/check-scope-command");
       return () => checkScopeCommand();

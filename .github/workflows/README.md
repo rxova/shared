@@ -13,18 +13,26 @@ This repository's own CI calls them by local path (`./.github/workflows/<name>.y
 a workflow runs on the pull request that makes it. The caller's workflow-level `env` does not reach
 a called workflow, and a called workflow cannot hold more `permissions` than the calling job grants.
 
-| Workflow                    | Inputs                                                                                                                                                                        | Outputs                           | What it does                                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`                    | The root CI job: lints the branch commits (or the pushed commit) and decides with `check-scope` whether the commit touched the tree |
-| `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                 | Lints the PR title, read live from the API and piped to commitlint. Needs `pull-requests: read`                                     |
-| `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                 | `check-changeset` on pull requests (not the release branch), with the base/head SHAs, labels and title from the event               |
-| `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                 | Pins the oldest React at the root and in `filters` (`pin-react`), then builds, tests and typechecks against it                      |
-| `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                 | Builds, reads the Node floor from `engines`, switches to it and runs `pack-smoke` for each published package with plain `node`      |
-| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages` | changesets/action: the version pull request, then publishing with npm trusted publishing and provenance                             |
-| `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                 | Publishes a `changeset version --snapshot` prerelease under a dist-tag other than `latest`, with no git tag                         |
+| Workflow                    | Inputs                                                                                                                                                                        | Outputs                                     | What it does                                                                                                                                                                                       |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`, `docs-only`, `docs-changed` | The root CI job: lints the branch commits (or the pushed commit) and decides with `check-scope` what the range touched; `code-changed` is false for a release commit or a documentation-only range |
+| `docs-checks.yml`           | `node-version`, `command`                                                                                                                                                     | —                                           | The light job for a documentation-only range (`docs-only`): `prettier --check .` by default, plus any prose checks the caller names                                                                |
+| `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                           | Lints the PR title, read live from the API and piped to commitlint. Needs `pull-requests: read`                                                                                                    |
+| `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                           | `check-changeset` on pull requests (not the release branch), with the base/head SHAs, labels and title from the event                                                                              |
+| `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                           | Pins the oldest React at the root and in `filters` (`pin-react`), then builds, tests and typechecks against it                                                                                     |
+| `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                           | Builds, reads the Node floor from `engines`, switches to it and runs `pack-smoke` for each published package with plain `node`                                                                     |
+| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages`           | changesets/action: the version pull request, then publishing with npm trusted publishing and provenance                                                                                            |
+| `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                           | Publishes a `changeset version --snapshot` prerelease under a dist-tag other than `latest`, with no git tag                                                                                        |
 
 `repo-config-command` defaults to `pnpm exec rxova-repo-config`; only rxova/shared, which builds the
 bin, overrides it.
+
+Gate jobs on `commit-messages.yml`'s outputs rather than on `paths-ignore`: a workflow that
+`paths-ignore` skips never reports, so a required check it feeds stays pending, while a skipped job
+passes `require-jobs`. A documentation-only range (see `repoConfig.scope` in the
+[`@rxova/repo-config` README](../../packages/repo-config/README.md)) skips every job gated on
+`code-changed`; gate a docs-site build on `code-changed == 'true' || docs-changed == 'true'` so
+content changes still build it.
 
 ## Examples
 
@@ -41,6 +49,10 @@ jobs:
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
     uses: rxova/shared/.github/workflows/node-floor-smoke.yml@main
+  docs-checks:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.docs-only == 'true'
+    uses: rxova/shared/.github/workflows/docs-checks.yml@main
   react-minimum:
     needs: [commitlint]
     uses: rxova/shared/.github/workflows/react-minimum-version.yml@main
@@ -54,7 +66,7 @@ jobs:
   gate:
     name: all checks
     if: always()
-    needs: [commitlint, changeset, compat, react-minimum]
+    needs: [commitlint, changeset, compat, docs-checks, react-minimum]
     runs-on: ubuntu-latest
     steps:
       - uses: rxova/shared/actions/require-jobs@main

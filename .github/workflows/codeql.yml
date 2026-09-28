@@ -3,8 +3,15 @@ name: CodeQL
 on:
   push:
     branches: [main]
+  # Documentation holds nothing CodeQL analyses. `paths-ignore` is safe here
+  # because no required check waits on this workflow (the ruleset requires
+  # only CI's `all checks`); it skips a pull request whose every file matches.
+  # Pushes to main still run, so the baseline never goes stale.
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.mdx"
   schedule:
     - cron: "17 9 * * 6"
   workflow_dispatch:
