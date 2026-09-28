@@ -42,6 +42,7 @@ const FILES: Record<string, string> = {
   "src/page.astro": "---\nconst title = 'x';\n---\n<h1>{title}</h1>\n",
   "dist/out.ts": "export const ignored = 1 as any;\n",
   "vitest.config.ts": "export default {} as any;\n",
+  "knip.ts": "export default {} as any;\n",
 };
 
 let root = "";
@@ -135,6 +136,7 @@ describe("rxova()", () => {
     const linter = eslint(config);
     expect(await linter.isPathIgnored(join(root, "dist/out.ts"))).toBe(true);
     expect(await linter.isPathIgnored(join(root, "vitest.config.ts"))).toBe(true);
+    expect(await linter.isPathIgnored(join(root, "knip.ts"))).toBe(true);
     expect(await linter.isPathIgnored(join(root, "src/view.tsx"))).toBe(true);
     expect(await linter.isPathIgnored(join(root, "src/lib.ts"))).toBe(false);
   });

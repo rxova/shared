@@ -283,6 +283,7 @@ export const rxova = (options, ...extra) => {
       // Tool config lives outside the type-checked programs; linting it with
       // projectService would demand a tsconfig per config file.
       "**/*.config.{js,cjs,mjs,ts,mts,cts}",
+      "**/knip.{js,cjs,mjs,ts,mts,cts}",
       ...ignores,
     ]),
     // Every plugin a layer loaded (the very object its configs register, or

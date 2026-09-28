@@ -131,7 +131,7 @@ export default defineConfig(reactBuildConfig({ banner: { js: "'use client';" } }
 `recommendedTypeChecked` with `projectService` on `.ts`/`.tsx`/`.mts`/`.cts`, and these rules on
 TypeScript: `no-unused-vars` (`_`-prefixed arguments allowed), `consistent-type-imports` (inline
 fixes), `no-explicit-any` and `no-console`. Build output, caches, `.claude/`, test reports and tool
-config files (`*.config.*`) are ignored. There are no formatting, import-path or project-structure
+config files (`*.config.*`, `knip.*`) are ignored. There are no formatting, import-path or project-structure
 rules: add them through `rules`, `extends` or `extra`.
 
 | Option            | Effect                                                                                                                                                                                                                                  |
