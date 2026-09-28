@@ -7,6 +7,9 @@ import { initCommand } from "@/init/init-command";
 
 const ROOT = "/repo";
 
+/** The in-memory tree is keyed with `/`; `path.join` hands it `\\` on Windows. */
+const key = (file: string): string => file.replaceAll("\\", "/");
+
 /** An in-memory template checkout, and a fake `gh`/`git` that records its calls. */
 const setup = ({
   repo = "ada/idea",
@@ -48,11 +51,11 @@ const setup = ({
   const deps = {
     root: ROOT,
     run,
-    read: (file: string) => files[file],
+    read: (file: string) => files[key(file)],
     write: (file: string, contents: string) => {
-      files[file] = contents;
+      files[key(file)] = contents;
     },
-    exists: (file: string) => file in files,
+    exists: (file: string) => key(file) in files,
   };
   return { files, calls, deps };
 };
@@ -147,7 +150,7 @@ describe("initCommand", () => {
 
   it("fails without a package.json", () => {
     expect(initCommand([], { root: "/nowhere", read: () => undefined, run: () => "a/b" })).toBe(1);
-    expect(log.join("\n")).toContain("/nowhere/package.json is missing");
+    expect(log.join("\n")).toContain("package.json is missing");
   });
 
   it("fails when the example package has no name", () => {
