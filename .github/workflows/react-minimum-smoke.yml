@@ -1,0 +1,30 @@
+name: React minimum smoke
+
+# Runs the reusable react-minimum-version.yml against @rxova/ts-utils, the one
+# React package in this repository, the way a consumer calls it. On demand
+# only: the workflow calls its actions at @main, so a pull request cannot test
+# an action change through it — CI's `react-minimum` job does that through the
+# local action. Dispatch this after merging a change to either.
+
+on:
+  workflow_dispatch:
+    inputs:
+      react-version:
+        description: Exact react version
+        required: false
+        default: 18.2.0
+
+permissions:
+  contents: read
+
+jobs:
+  react-minimum:
+    uses: ./.github/workflows/react-minimum-version.yml
+    with:
+      react-version: ${{ inputs.react-version }}
+      types-version: 18.3.27
+      types-dom-version: 18.3.7
+      filters: '@rxova/ts-utils'
+      build-command: pnpm exec turbo run build --filter=@rxova/repo-config
+      test-command: pnpm --filter @rxova/ts-utils exec vitest run --coverage.enabled=false
+      typecheck-command: pnpm --filter @rxova/ts-utils typecheck

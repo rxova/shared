@@ -27,43 +27,15 @@ concurrency:
 jobs:
   # The root of the graph. It runs on push as well as pull_request on purpose:
   # a skipped job skips its dependents, so gating it on pull_request alone would
-  # silently skip the whole workflow on main.
+  # silently skip the whole workflow on main. The reusable workflows called here
+  # by local path are the ones other rxova repositories call at @main, so every
+  # change to them runs on this repository's pull request first.
   commitlint:
     name: commit messages
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      # Every job that reads the tree is gated on this. The only thing that sets
-      # it to false is a release commit (version + changelog only).
-      code-changed: ${{ steps.scope.outputs.code-changed }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: ./actions/setup-pnpm
-      - run: pnpm install --frozen-lockfile
-
-      - name: Decide whether this commit touched the tree
-        id: scope
-        env:
-          BASE_SHA: >-
-            ${{ github.event_name == 'pull_request'
-            && github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: >-
-            ${{ github.event_name == 'pull_request'
-            && github.event.pull_request.head.sha || github.sha }}
-        run: node --import tsx ./packages/repo-config/src/cli/cli.ts check-scope
-
-      - name: Lint the branch commits
-        if: github.event_name == 'pull_request'
-        run: >-
-          pnpm exec commitlint --verbose
-          --from ${{ github.event.pull_request.base.sha }}
-          --to ${{ github.event.pull_request.head.sha }}
-
-      - name: Lint the pushed commit
-        if: github.event_name == 'push'
-        run: pnpm exec commitlint --last --verbose
+    uses: ./.github/workflows/commit-messages.yml
+    with:
+      # From source: this repository is where the bin is built.
+      repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
 
   checks:
     name: lint · format · types · build
@@ -80,6 +52,15 @@ jobs:
         run: pnpm lint
       - name: Check formatting
         run: pnpm format:check
+      # The reusable workflows are this repository's product as much as the
+      # packages are: a typo in an expression fails in someone else's CI.
+      # shellcheck runs on every `run:` block too (preinstalled on the runner).
+      - name: Lint the workflows
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          bash <(curl -sSfL "https://raw.githubusercontent.com/rhysd/actionlint/v${ACTIONLINT_VERSION}/scripts/download-actionlint.bash") "$ACTIONLINT_VERSION" "$RUNNER_TEMP"
+          "$RUNNER_TEMP/actionlint" -color
       # The docs app is built by the `docs` job below, at the base path Pages
       # serves it from — the only build of it whose output matters.
       - name: Build
@@ -197,45 +178,42 @@ jobs:
         run: pnpm run pack:smoke
 
   # The unit matrix runs the newest release of each Node major, which says little
-  # about the oldest one `engines` promises: minors add APIs, and `>=22.13` is a
-  # promise about 22.13. This installs each packed tarball on exactly that floor,
-  # read from the manifests so lowering the promise moves the job with it.
-  # Plain `node` from the switch on, never pnpm or Turbo: Turbo does not hash the
-  # Node binary, so it would replay a result from another version, and the
-  # toolchain has floors of its own that a project is free to go below.
+  # about the oldest one `engines` promises; this installs each packed tarball on
+  # exactly that floor. The workflow explains the rest.
   compat:
     name: packages on their oldest node
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
+    uses: ./.github/workflows/node-floor-smoke.yml
+
+  # The peer range says `react >=18`, and the lockfile installs 19. This pins the
+  # oldest React at the root as well as in @rxova/ts-utils, and runs its suite
+  # there. Through the action by local path rather than the reusable workflow,
+  # which calls the action at @main: this way the pull request that changes the
+  # action is the one that tests it. `react-minimum-smoke.yml` runs the workflow.
+  react-minimum:
+    name: ts-utils on react 18.2
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true' && github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: ./actions/setup-pnpm
-      - uses: ./actions/turbo-cache
-        with:
-          key: compat
       - run: pnpm install --frozen-lockfile
-      - name: Read the Node floor from engines
-        id: floor
-        run: node --import tsx ./packages/repo-config/src/cli/cli.ts node-floor
-      - name: Build
-        if: steps.floor.outputs.version != ''
-        run: pnpm exec turbo run build --filter='./packages/*'
-      - name: Switch to Node ${{ steps.floor.outputs.version }}
-        if: steps.floor.outputs.version != ''
-        uses: actions/setup-node@v7
+      - uses: ./actions/pin-react
         with:
-          node-version: ${{ steps.floor.outputs.version }}
-      - name: Pack, install and import each package on the floor
-        if: steps.floor.outputs.version != ''
-        env:
-          PACKAGES: ${{ steps.floor.outputs.packages }}
-        run: |
-          node --version
-          for dir in $PACKAGES; do
-            (cd "$dir" && node ../repo-config/dist/cli.js pack-smoke)
-          done
+          react-version: 18.2.0
+          types-version: 18.3.27
+          types-dom-version: 18.3.7
+          filters: '@rxova/ts-utils'
+      # The vitest config imports the built preset.
+      - name: Build the presets
+        run: pnpm exec turbo run build --filter=@rxova/repo-config
+      - name: Test against React 18.2
+        run: pnpm --filter @rxova/ts-utils exec vitest run --coverage.enabled=false
+      - name: Typecheck against React 18 types
+        run: pnpm --filter @rxova/ts-utils typecheck
 
   docs:
     name: docs build
@@ -257,26 +235,14 @@ jobs:
           DOCS_BASE_URL: /${{ github.event.repository.name }}/
         run: pnpm exec turbo run build --filter=docs
 
+  # Still runs and reports on a labelled pull request rather than being skipped
+  # by an `if:`, so that honouring the label is visible in a log.
   changeset:
     name: changeset present
     needs: [commitlint]
-    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: ./actions/setup-pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Require a changeset when a published package changed
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          # Still runs and reports rather than being skipped by an `if:`, so that
-          # honouring the label is visible in a log somebody can read.
-          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: node --import tsx ./packages/repo-config/src/cli/cli.ts check-changeset
+    uses: ./.github/workflows/changeset-gate.yml
+    with:
+      repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
 
   # The single context branch protection should require, and the only job here
   # that never skips. Matrix jobs skipped before expansion report under their
@@ -294,23 +260,16 @@ jobs:
       - supply-chain
       - pack-smoke
       - compat
+      - react-minimum
       - docs
       - changeset
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require every job to have passed or skipped
-        env:
-          RESULTS: ${{ toJSON(needs) }}
-        run: |
-          set -euo pipefail
-          echo "$RESULTS"
-          bad=$(echo "$RESULTS" | jq -r 'to_entries
-            | map(select(.value.result != "success" and .value.result != "skipped"))
-            | .[] | "\(.key): \(.value.result)"')
-          if [ -n "$bad" ]; then
-            echo "::error::a required job did not pass"
-            echo "$bad"
-            exit 1
-          fi
-          echo "every job passed or was deliberately skipped"
+      # Only for the local action below.
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: actions
+      - uses: ./actions/require-jobs
+        with:
+          needs: ${{ toJSON(needs) }}
