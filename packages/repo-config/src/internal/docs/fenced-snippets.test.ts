@@ -21,4 +21,19 @@ describe("fencedSnippets", () => {
       { language: "tsx", info: 'live title="x"', code: "<A />\n", line: 9 },
     ]);
   });
+
+  it("does not read a json fence as js", () => {
+    const source = [
+      "```json",
+      '{ "a": 1 }',
+      "```",
+      "```jsonc",
+      "{}",
+      "```",
+      "```js",
+      "a;",
+      "```",
+    ].join("\n");
+    expect(fencedSnippets(source)).toEqual([{ language: "js", info: "", code: "a;\n", line: 7 }]);
+  });
 });

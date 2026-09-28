@@ -6,9 +6,9 @@ export interface Snippet {
   line: number;
 }
 
-/** Every ` ```ts `, `tsx`, `js` or `jsx` fence in `source`, in order. */
+/** Every ` ```ts `, `tsx`, `js` or `jsx` fence in `source`, in order; `json`, `jsonc` and the like are not `js`. */
 export const fencedSnippets = (source: string): Snippet[] =>
-  [...source.matchAll(/^```(tsx|ts|jsx|js)([^\n]*)\n([\s\S]*?)^```\s*$/gm)].map(
+  [...source.matchAll(/^```(tsx|ts|jsx|js)(?!\w)([^\n]*)\n([\s\S]*?)^```\s*$/gm)].map(
     ({ 0: _, 1: language = "ts", 2: info = "", 3: code = "", index }) => ({
       language,
       info: info.trim(),
