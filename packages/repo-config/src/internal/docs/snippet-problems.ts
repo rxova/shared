@@ -1,5 +1,5 @@
-import ts from 'typescript';
-import type { Snippet } from '@/internal/docs/fenced-snippets';
+import ts from "typescript";
+import type { Snippet } from "@/internal/docs/fenced-snippets";
 
 /**
  * Why a copy-paste snippet would not work: it does not parse as a module of
@@ -8,13 +8,13 @@ import type { Snippet } from '@/internal/docs/fenced-snippets';
  */
 export const snippetProblems = ({ language, code }: Snippet): string[] => {
   const problems: string[] = [];
-  if (/^\s*;</m.test(code)) problems.push('starts JSX with a stray leading semicolon');
+  if (/^\s*;</m.test(code)) problems.push("starts JSX with a stray leading semicolon");
   if (
     /\buseState\s*[<(]/.test(code) &&
     !/React\.useState\s*[<(]/.test(code) &&
     !/import\s*{[^}]*\buseState\b[^}]*}\s*from\s*['"]react['"]/.test(code)
   ) {
-    problems.push('uses useState without importing it');
+    problems.push("uses useState without importing it");
   }
   const { diagnostics = [] } = ts.transpileModule(code, {
     fileName: `snippet.${language}`,
@@ -31,7 +31,7 @@ export const snippetProblems = ({ language, code }: Snippet): string[] => {
       .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error)
       .map(
         (diagnostic) =>
-          `does not parse: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`,
+          `does not parse: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, " ")}`,
       ),
   ];
 };

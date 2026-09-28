@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync } from "node:fs";
 
 /**
  * Everything on standard input, or nothing when it is a terminal: a hook run
@@ -6,5 +6,5 @@ import { readFileSync } from 'node:fs';
  */
 export const readStdin = (
   stdin: { isTTY?: boolean } = process.stdin,
-  read: (fd: number, encoding: 'utf8') => string = readFileSync,
-): string | undefined => (stdin.isTTY === true ? undefined : read(0, 'utf8'));
+  read: (fd: number, encoding: "utf8") => string = readFileSync,
+): string | undefined => (stdin.isTTY === true ? undefined : read(0, "utf8"));

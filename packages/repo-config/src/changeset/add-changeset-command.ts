@@ -1,13 +1,13 @@
-import { changesetBody } from '@/internal/changeset/changeset-body';
-import { changesetFileName } from '@/internal/changeset/changeset-file-name';
-import { parseAddArgs } from '@/internal/changeset/parse-add-args';
-import { resolvePackageToken } from '@/internal/changeset/resolve-package-token';
-import { versionedPackages } from '@/internal/changeset/versioned-packages';
-import { readFile } from '@/internal/config/read-file';
-import type { Reader } from '@/config/config.types';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { readConfig } from '@/config/read-config';
+import { changesetBody } from "@/internal/changeset/changeset-body";
+import { changesetFileName } from "@/internal/changeset/changeset-file-name";
+import { parseAddArgs } from "@/internal/changeset/parse-add-args";
+import { resolvePackageToken } from "@/internal/changeset/resolve-package-token";
+import { versionedPackages } from "@/internal/changeset/versioned-packages";
+import { readFile } from "@/internal/config/read-file";
+import type { Reader } from "@/config/config.types";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config add-changeset <package> <patch|minor|major> <summary…>`:
@@ -25,7 +25,7 @@ export const addChangesetCommand = (
     root = process.cwd(),
     read = readFile,
     write = (file: string, contents: string) => {
-      mkdirSync(join(file, '..'), { recursive: true });
+      mkdirSync(join(file, ".."), { recursive: true });
       writeFileSync(file, contents);
     },
     now = Date.now,
@@ -39,21 +39,21 @@ export const addChangesetCommand = (
   try {
     const { roots, aliasPrefix, includePrivate } = readConfig(root, read).changeset ?? {};
     const packages = versionedPackages(root, read, { roots, aliasPrefix, includePrivate });
-    if (argv.includes('--help') || argv.includes('-h')) {
+    if (argv.includes("--help") || argv.includes("-h")) {
       console.log(
         [
-          'usage: rxova-repo-config add-changeset <package> <patch|minor|major> <summary>',
-          '       rxova-repo-config add-changeset -p <package> -t <patch|minor|major> -s <summary>',
-          '',
-          'packages:',
+          "usage: rxova-repo-config add-changeset <package> <patch|minor|major> <summary>",
+          "       rxova-repo-config add-changeset -p <package> -t <patch|minor|major> -s <summary>",
+          "",
+          "packages:",
           ...packages.map(({ name }) => `  ${name}`),
-        ].join('\n'),
+        ].join("\n"),
       );
       return 0;
     }
     const { token, bump, summary } = parseAddArgs(argv);
     const name = resolvePackageToken(token, packages);
-    const file = join('.changeset', changesetFileName(name, now()));
+    const file = join(".changeset", changesetFileName(name, now()));
     write(join(root, file), changesetBody(name, bump, summary));
     console.log(`add-changeset: wrote ${file} (${name}: ${bump})`);
     return 0;

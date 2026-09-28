@@ -1,5 +1,5 @@
-import { failConfig } from '@/internal/config/fail-config';
-import { readString } from '@/internal/config/read-string';
+import { failConfig } from "@/internal/config/fail-config";
+import { readString } from "@/internal/config/read-string";
 
 /**
  * `section[key]` as a regular expression source that compiles (with `flags`),
@@ -10,7 +10,7 @@ export const readPattern = (
   section: Record<string, unknown>,
   key: string,
   path: string,
-  flags = '',
+  flags = "",
 ): string | undefined => {
   const source = readString(section, key, path);
   if (source === undefined) return undefined;

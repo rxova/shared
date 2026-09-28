@@ -1,5 +1,5 @@
-import { OVERRIDE_PATTERNS } from '@/internal/changeset/override-patterns';
-import { splitFrontmatter } from '@/internal/changeset/split-frontmatter';
+import { OVERRIDE_PATTERNS } from "@/internal/changeset/override-patterns";
+import { splitFrontmatter } from "@/internal/changeset/split-frontmatter";
 
 /**
  * Every summary line of a changeset that `@changesets/changelog-github` would
@@ -10,7 +10,7 @@ export const metadataOverrides = (
   content: string,
 ): { line: number; override: string; text: string }[] => {
   const { summary, firstLine } = splitFrontmatter(content);
-  return summary.split('\n').flatMap((text, index) =>
+  return summary.split("\n").flatMap((text, index) =>
     OVERRIDE_PATTERNS.filter(({ pattern }) => pattern.test(text)).map(({ name }) => ({
       line: firstLine + index,
       override: name,

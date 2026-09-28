@@ -1,5 +1,5 @@
-import { existsSync, readdirSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
 
 /**
  * Every file under `dir`, as a `/`-separated path relative to it, sorted.
@@ -9,9 +9,9 @@ export const walkFiles = (dir: string): string[] => {
   if (!existsSync(dir)) return [];
   return readdirSync(dir, { withFileTypes: true, recursive: true })
     .filter((entry) => entry.isFile())
-    .map((entry) => relative(dir, join(entry.parentPath, entry.name)).replaceAll('\\', '/'))
+    .map((entry) => relative(dir, join(entry.parentPath, entry.name)).replaceAll("\\", "/"))
     .filter(
-      (path) => !path.split('/').some((part) => part === 'node_modules' || part.startsWith('.')),
+      (path) => !path.split("/").some((part) => part === "node_modules" || part.startsWith(".")),
     )
     .sort();
 };

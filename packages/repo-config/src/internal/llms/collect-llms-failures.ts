@@ -1,10 +1,10 @@
-import { join } from 'node:path';
-import { checkLlmsPackage } from '@/internal/llms/check-llms-package';
-import { checkRootIndex } from '@/internal/llms/check-root-index';
-import type { Failure } from '@/internal/llms/llms.types';
-import { publishedPackages } from '@/internal/llms/published-packages';
-import { readConfig } from '@/config/read-config';
-import { readPackageConfig } from '@/config/read-package-config';
+import { join } from "node:path";
+import { checkLlmsPackage } from "@/internal/llms/check-llms-package";
+import { checkRootIndex } from "@/internal/llms/check-root-index";
+import type { Failure } from "@/internal/llms/llms.types";
+import { publishedPackages } from "@/internal/llms/published-packages";
+import { readConfig } from "@/config/read-config";
+import { readPackageConfig } from "@/config/read-package-config";
 
 /**
  * Every `llms.txt` problem in the repository at `root`: each published
@@ -19,7 +19,7 @@ export const collectLlmsFailures = (root: string): Failure[] => {
     ...packages.flatMap((pkg) =>
       checkLlmsPackage(root, pkg, {
         ...config,
-        ...readPackageConfig(join(root, 'packages', pkg.dir)).llms,
+        ...readPackageConfig(join(root, "packages", pkg.dir)).llms,
       }),
     ),
     ...(config.rootIndex === false ? [] : checkRootIndex(root, packages)),

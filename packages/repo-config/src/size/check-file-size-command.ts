@@ -1,10 +1,10 @@
-import { readFile } from '@/internal/config/read-file';
-import { countLines } from '@/internal/size/count-lines';
-import { gitLsFiles } from '@/internal/size/git-ls-files';
-import { sizeProblems } from '@/internal/size/size-problems';
-import type { Reader } from '@/config/config.types';
-import { join } from 'node:path';
-import { readConfig } from '@/config/read-config';
+import { readFile } from "@/internal/config/read-file";
+import { countLines } from "@/internal/size/count-lines";
+import { gitLsFiles } from "@/internal/size/git-ls-files";
+import { sizeProblems } from "@/internal/size/size-problems";
+import type { Reader } from "@/config/config.types";
+import { join } from "node:path";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-file-size`: no tracked source file grows past
@@ -22,13 +22,13 @@ export const checkFileSizeCommand = ({
   try {
     const {
       max = 500,
-      extensions = ['ts', 'tsx', 'js', 'mjs', 'cjs', 'astro', 'css', 'yaml', 'yml', 'json'],
-      ignore = ['pnpm-lock.yaml'],
+      extensions = ["ts", "tsx", "js", "mjs", "cjs", "astro", "css", "yaml", "yml", "json"],
+      ignore = ["pnpm-lock.yaml"],
       allow = [],
     } = readConfig(root, read).fileSize ?? {};
     const files = list(root)
       .filter((path) => extensions.some((extension) => path.endsWith(`.${extension}`)))
-      .filter((path) => !ignore.includes(path.slice(path.lastIndexOf('/') + 1)))
+      .filter((path) => !ignore.includes(path.slice(path.lastIndexOf("/") + 1)))
       .flatMap((path) => {
         const text = read(join(root, path));
         return text === undefined ? [] : [{ path, lines: countLines(text) }];
@@ -37,9 +37,9 @@ export const checkFileSizeCommand = ({
     if (problems.length > 0) {
       console.error(
         [
-          'check-file-size: split these files or shrink the allow list:',
+          "check-file-size: split these files or shrink the allow list:",
           ...problems.map((p) => `  ${p}`),
-        ].join('\n'),
+        ].join("\n"),
       );
       return 1;
     }

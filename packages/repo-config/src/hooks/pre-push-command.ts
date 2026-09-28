@@ -1,6 +1,6 @@
-import { pushesCode } from '@/internal/hooks/pushes-code';
-import { readStdin } from '@/internal/hooks/read-stdin';
-import { verifyCommand } from '@/verify/verify-command';
+import { pushesCode } from "@/internal/hooks/pushes-code";
+import { readStdin } from "@/internal/hooks/read-stdin";
+import { verifyCommand } from "@/verify/verify-command";
 
 /**
  * `rxova-repo-config pre-push`: the whole `.husky/pre-push` hook. A push that
@@ -18,7 +18,7 @@ export const prePushCommand = (
 ): number => {
   const lines = input();
   if (lines !== undefined && !pushesCode(lines)) {
-    console.log('pre-push: nothing but deletions to push, nothing to verify');
+    console.log("pre-push: nothing but deletions to push, nothing to verify");
     return 0;
   }
   return verify(argv);

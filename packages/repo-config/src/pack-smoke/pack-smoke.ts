@@ -1,23 +1,23 @@
-import { runBinChecks } from '@/internal/pack-smoke/bin-checks';
-import { captureCommand } from '@/internal/pack-smoke/capture-command';
-import { captureOutput } from '@/internal/pack-smoke/capture-output';
-import { cssImportProblems } from '@/internal/pack-smoke/css-import-problems';
-import { runFixtures } from '@/internal/pack-smoke/fixture-runs';
-import { forbiddenFiles } from '@/internal/pack-smoke/forbidden-files';
-import { lostClientDirectives } from '@/internal/pack-smoke/lost-client-directives';
-import { missingFiles } from '@/internal/pack-smoke/missing-files';
-import { missingTargets } from '@/internal/pack-smoke/missing-targets';
-import { probeSource } from '@/internal/pack-smoke/probe-source';
-import { probeTargets } from '@/internal/pack-smoke/probe-targets';
-import { resolveWorkspaceDeps } from '@/internal/pack-smoke/resolve-workspace-deps';
-import { scratchFiles } from '@/internal/pack-smoke/scratch-files';
-import { tarballContents } from '@/internal/pack-smoke/tarball-contents';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
-import { join } from 'node:path';
-import { binsOf } from '@/pack-smoke/bins-of';
-import { shippedFiles } from '@/pack-smoke/shipped-files';
-import { parsePackageConfig } from '@/config/parse-package-config';
+import { runBinChecks } from "@/internal/pack-smoke/bin-checks";
+import { captureCommand } from "@/internal/pack-smoke/capture-command";
+import { captureOutput } from "@/internal/pack-smoke/capture-output";
+import { cssImportProblems } from "@/internal/pack-smoke/css-import-problems";
+import { runFixtures } from "@/internal/pack-smoke/fixture-runs";
+import { forbiddenFiles } from "@/internal/pack-smoke/forbidden-files";
+import { lostClientDirectives } from "@/internal/pack-smoke/lost-client-directives";
+import { missingFiles } from "@/internal/pack-smoke/missing-files";
+import { missingTargets } from "@/internal/pack-smoke/missing-targets";
+import { probeSource } from "@/internal/pack-smoke/probe-source";
+import { probeTargets } from "@/internal/pack-smoke/probe-targets";
+import { resolveWorkspaceDeps } from "@/internal/pack-smoke/resolve-workspace-deps";
+import { scratchFiles } from "@/internal/pack-smoke/scratch-files";
+import { tarballContents } from "@/internal/pack-smoke/tarball-contents";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
+import { join } from "node:path";
+import { binsOf } from "@/pack-smoke/bins-of";
+import { shippedFiles } from "@/pack-smoke/shipped-files";
+import { parsePackageConfig } from "@/config/parse-package-config";
 
 /**
  * Packs the real tarball, installs it into a scratch project, loads it the way
@@ -63,14 +63,14 @@ export const packSmoke = ({
   output?: Shell;
   fs?: ScratchFiles;
 }): string => {
-  const manifest = JSON.parse(fs.read(join(pkgDir, 'package.json'))) as PackageManifest;
-  const name = manifest.name ?? '';
+  const manifest = JSON.parse(fs.read(join(pkgDir, "package.json"))) as PackageManifest;
+  const name = manifest.name ?? "";
   const { packSmoke: config = {} } = parsePackageConfig(manifest.repoConfig);
   const scratch = fs.make();
   try {
-    sh('npm', ['pack', '--ignore-scripts', '--pack-destination', scratch], pkgDir);
-    const tarball = fs.list(scratch).find((file) => file.endsWith('.tgz'));
-    if (tarball === undefined) throw new Error('npm pack produced no tarball');
+    sh("npm", ["pack", "--ignore-scripts", "--pack-destination", scratch], pkgDir);
+    const tarball = fs.list(scratch).find((file) => file.endsWith(".tgz"));
+    if (tarball === undefined) throw new Error("npm pack produced no tarball");
     const peers = resolveWorkspaceDeps(pkgDir, manifest, join(scratch, tarball), scratch, {
       sh,
       fs,
@@ -84,30 +84,30 @@ export const packSmoke = ({
         ...missingTargets(manifest, contents),
       ]),
     ];
-    if (missing.length > 0) throw new Error(`the tarball does not contain ${missing.join(', ')}`);
+    if (missing.length > 0) throw new Error(`the tarball does not contain ${missing.join(", ")}`);
     const leaked = forbiddenFiles(contents, manifest.files ?? []);
     if (leaked.length > 0) {
       throw new Error(
-        `the tarball ships sources or tests: ${leaked.join(', ')} — list them in package.json#files to publish them on purpose`,
+        `the tarball ships sources or tests: ${leaked.join(", ")} — list them in package.json#files to publish them on purpose`,
       );
     }
 
-    fs.write(join(scratch, 'package.json'), JSON.stringify({ name: 'scratch', private: true }));
-    sh('npm', ['install', '--no-audit', '--no-fund', join(scratch, tarball), ...peers], scratch);
+    fs.write(join(scratch, "package.json"), JSON.stringify({ name: "scratch", private: true }));
+    sh("npm", ["install", "--no-audit", "--no-fund", join(scratch, tarball), ...peers], scratch);
 
     // Every bin, as a consumer gets it, then the configured fixture runs.
     runBinChecks(binsOf(manifest), config.bins, { sh, output, scratch });
     runFixtures(config.run ?? [], { output, fs, scratch });
 
     // The library entry, through the exports map, in plain Node with no bundler.
-    const installedDir = join(scratch, 'node_modules', name);
-    const probed = config.load === 'never' ? [] : probeTargets(manifest);
+    const installedDir = join(scratch, "node_modules", name);
+    const probed = config.load === "never" ? [] : probeTargets(manifest);
     for (const target of probed) {
-      const probe = join(scratch, 'probe.mjs');
+      const probe = join(scratch, "probe.mjs");
       fs.write(probe, probeSource(target));
-      const probeOut = sh('node', [probe], scratch).trim();
-      if (probeOut !== 'ok') {
-        throw new Error(`probe failed${target === name ? '' : ` for ${target}`}: ${probeOut}`);
+      const probeOut = sh("node", [probe], scratch).trim();
+      if (probeOut !== "ok") {
+        throw new Error(`probe failed${target === name ? "" : ` for ${target}`}: ${probeOut}`);
       }
     }
 
@@ -116,7 +116,7 @@ export const packSmoke = ({
       fs.read(join(installedDir, path)),
     );
     if (dangling.length > 0) {
-      throw new Error(`stylesheet imports do not resolve in the tarball: ${dangling.join(', ')}`);
+      throw new Error(`stylesheet imports do not resolve in the tarball: ${dangling.join(", ")}`);
     }
 
     // A client entry that lost its directive still imports; only a server
@@ -127,11 +127,11 @@ export const packSmoke = ({
       read: fs.read,
     });
     if (lost.length > 0) {
-      throw new Error(`lost the 'use client' directive: ${lost.join(', ')}`);
+      throw new Error(`lost the 'use client' directive: ${lost.join(", ")}`);
     }
 
-    const loaded = probed.length > 0 ? 'imports and requires' : 'is not loaded (nothing to probe)';
-    return `pack:smoke ok — ${name}@${manifest.version ?? ''} installs, ${loaded} from a tarball`;
+    const loaded = probed.length > 0 ? "imports and requires" : "is not loaded (nothing to probe)";
+    return `pack:smoke ok — ${name}@${manifest.version ?? ""} installs, ${loaded} from a tarball`;
   } finally {
     fs.remove(scratch);
   }

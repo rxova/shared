@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import ts from 'typescript';
+import { existsSync, readFileSync } from "node:fs";
+import ts from "typescript";
 
 /**
  * Every property name declared in an interface or type literal in `file`, as
@@ -20,6 +20,6 @@ export const declaredProps = (file: string): Set<string> => {
     }
     ts.forEachChild(node, visit);
   };
-  visit(ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true));
+  visit(ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true));
   return names;
 };

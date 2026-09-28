@@ -1,6 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import ts from 'typescript';
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import ts from "typescript";
 
 /**
  * The strings of the `as const` array exported as `NAME` from the file a
@@ -9,12 +9,12 @@ import ts from 'typescript';
  * syntax tree, not by running the module, so it needs no build.
  */
 export const idsFromSource = (root: string, reference: string): string[] => {
-  const [path = '', name = ''] = reference.split('#');
+  const [path = "", name = ""] = reference.split("#");
   const file = join(root, path);
   if (!existsSync(file)) throw new Error(`repoConfig.llms.idsFrom: ${path} does not exist`);
   const source = ts.createSourceFile(
     file,
-    readFileSync(file, 'utf8'),
+    readFileSync(file, "utf8"),
     ts.ScriptTarget.Latest,
     true,
   );

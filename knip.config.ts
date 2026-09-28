@@ -14,5 +14,5 @@ export default {
   // Advice nobody has to act on is advice that stops being read.
   treatConfigHintsAsErrors: true,
   // `rxova-repo-config check-exports` runs `attw` from a shell command, where knip cannot see it.
-  ignoreDependencies: ['@arethetypeswrong/cli'],
+  ignoreDependencies: ["@arethetypeswrong/cli"],
 } satisfies KnipConfig;

@@ -1,7 +1,7 @@
-import { dirname, join, relative } from 'node:path';
-import ts from 'typescript';
-import type { TsdocSource } from '@/internal/tsdoc/tsdoc-sources';
-import { needsSummary } from '@/internal/tsdoc/needs-summary';
+import { dirname, join, relative } from "node:path";
+import ts from "typescript";
+import type { TsdocSource } from "@/internal/tsdoc/tsdoc-sources";
+import { needsSummary } from "@/internal/tsdoc/needs-summary";
 
 /**
  * The callable exports of `source`'s entry that carry no TSDoc summary, as
@@ -24,7 +24,7 @@ export const missingTsdoc = (
     const [problem] = [...(loaded.error ? [loaded.error] : []), ...parsed.errors];
     if (problem !== undefined) {
       throw new Error(
-        `${source.tsconfig}: ${ts.flattenDiagnosticMessageText(problem.messageText, ' ')}`,
+        `${source.tsconfig}: ${ts.flattenDiagnosticMessageText(problem.messageText, " ")}`,
       );
     }
     options = parsed.options;
@@ -37,18 +37,18 @@ export const missingTsdoc = (
 
   return checker
     .getExportsOfModule(module)
-    .filter((symbol) => symbol.name !== 'default' && !exclude.includes(symbol.name))
+    .filter((symbol) => symbol.name !== "default" && !exclude.includes(symbol.name))
     .flatMap((symbol) => {
       const target =
         (symbol.flags & ts.SymbolFlags.Alias) !== 0 ? checker.getAliasedSymbol(symbol) : symbol;
       const { declarations = [] } = target;
       if (!needsSummary(target, declarations, checker)) return [];
-      if (ts.displayPartsToString(target.getDocumentationComment(checker)).trim() !== '') return [];
+      if (ts.displayPartsToString(target.getDocumentationComment(checker)).trim() !== "") return [];
       // needsSummary is false without a declaration, so there is a first one.
       return declarations.slice(0, 1).map((first) => {
         const at = first.getSourceFile();
         const { line } = at.getLineAndCharacterOfPosition(first.getStart(at));
-        const path = relative(root, at.fileName).replaceAll('\\', '/');
+        const path = relative(root, at.fileName).replaceAll("\\", "/");
         return { name: symbol.name, where: `${path}:${String(line + 1)}` };
       });
     })

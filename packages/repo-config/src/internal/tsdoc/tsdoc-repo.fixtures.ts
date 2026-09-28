@@ -1,6 +1,6 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 
 const made: string[] = [];
 
@@ -11,13 +11,13 @@ export const cleanupTsdocRepos = (): void => {
 
 /** A throwaway repository holding `files` (path to contents; objects are written as JSON). */
 export const tsdocRepo = (files: Record<string, string | object>): string => {
-  const root = mkdtempSync(join(tmpdir(), 'check-tsdoc-'));
+  const root = mkdtempSync(join(tmpdir(), "check-tsdoc-"));
   made.push(root);
   for (const [path, contents] of Object.entries(files)) {
     mkdirSync(dirname(join(root, path)), { recursive: true });
     writeFileSync(
       join(root, path),
-      typeof contents === 'string' ? contents : JSON.stringify(contents),
+      typeof contents === "string" ? contents : JSON.stringify(contents),
     );
   }
   return root;

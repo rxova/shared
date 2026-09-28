@@ -1,8 +1,8 @@
-import { isReleaseBranch } from '@/internal/verify/is-release-branch';
-import { logGroup } from '@/internal/verify/log-group';
-import { runCommand } from '@/internal/verify/run-command';
-import type { Runner } from '@/verify/verify.types';
-import type { Step } from '@/config/config.types';
+import { isReleaseBranch } from "@/internal/verify/is-release-branch";
+import { logGroup } from "@/internal/verify/log-group";
+import { runCommand } from "@/internal/verify/run-command";
+import type { Runner } from "@/verify/verify.types";
+import type { Step } from "@/config/config.types";
 
 /**
  * Runs the gate in order and stops at the first failure, because the second
@@ -17,7 +17,7 @@ export const runSteps = (
   { run = runCommand, env = process.env }: { run?: Runner; env?: NodeJS.ProcessEnv } = {},
 ): number => {
   const release = isReleaseBranch(env);
-  const fold = env.GITHUB_ACTIONS === 'true';
+  const fold = env.GITHUB_ACTIONS === "true";
   for (const [index, { name, command, skipOnRelease }] of steps.entries()) {
     const title = `verify: [${String(index + 1)}/${String(steps.length)}] ${name}`;
     if (release && skipOnRelease === true) {
@@ -38,6 +38,6 @@ export const runSteps = (
     }
   }
 
-  process.stdout.write('\nverify: all checks passed\n');
+  process.stdout.write("\nverify: all checks passed\n");
   return 0;
 };

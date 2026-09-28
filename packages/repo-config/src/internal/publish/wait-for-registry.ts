@@ -1,5 +1,5 @@
-import { describePackages } from '@/internal/publish/describe-packages';
-import type { PublishedPackage } from '@/internal/publish/published-package.types';
+import { describePackages } from "@/internal/publish/describe-packages";
+import type { PublishedPackage } from "@/internal/publish/published-package.types";
 
 /**
  * Blocks until the registry serves every published version. npm can take

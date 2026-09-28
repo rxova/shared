@@ -10,7 +10,7 @@ export const isShippedPath = (path: string, files: readonly string[] = []): bool
   // The directory a package's build writes, and what it is built from. `dist`
   // is gitignored, so it never shows up in a diff: a change reaches it through
   // the source tsdown compiles and through tsdown's own config.
-  const buildOutput = 'dist';
+  const buildOutput = "dist";
   const buildInput = /^(src\/|tsdown\.config\.[cm]?[jt]s$)/;
   // npm packs these whatever `files` says: the manifest, and a README and a
   // LICENSE (or LICENCE) at the package root, in any case and with any extension.
@@ -22,8 +22,8 @@ export const isShippedPath = (path: string, files: readonly string[] = []): bool
   if (alwaysPacked.test(path)) return true;
 
   return files.some((raw) => {
-    const entry = raw.replace(/^\.\//, '').replace(/\/+$/, '');
-    if (entry.includes('*')) {
+    const entry = raw.replace(/^\.\//, "").replace(/\/+$/, "");
+    if (entry.includes("*")) {
       throw new Error(`files entry "${raw}" is a glob, which the shipped scope does not expand`);
     }
     if (entry === buildOutput && buildInput.test(path)) return true;

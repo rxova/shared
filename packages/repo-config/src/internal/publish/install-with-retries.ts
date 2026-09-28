@@ -1,4 +1,4 @@
-import { npmFailureReason } from '@/internal/publish/npm-failure-reason';
+import { npmFailureReason } from "@/internal/publish/npm-failure-reason";
 
 /**
  * Runs `install`, retrying after 10 s: the registry can list a version a

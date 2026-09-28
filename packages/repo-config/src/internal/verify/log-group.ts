@@ -8,6 +8,6 @@ export const logGroup = <Result>(title: string, fold: boolean, work: () => Resul
   try {
     return work();
   } finally {
-    if (fold) process.stdout.write('::endgroup::\n');
+    if (fold) process.stdout.write("::endgroup::\n");
   }
 };

@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from "typescript";
 
 /**
  * Whether an export is callable, and so needs a summary: a function or method

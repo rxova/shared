@@ -1,6 +1,6 @@
-import type { LlmsConfig } from '@/config/config.types';
-import { LLMS_FILE } from '@/internal/llms/llms-file';
-import type { PublishedPackage } from '@/internal/llms/llms.types';
+import type { LlmsConfig } from "@/config/config.types";
+import { LLMS_FILE } from "@/internal/llms/llms-file";
+import type { PublishedPackage } from "@/internal/llms/llms.types";
 
 /**
  * The shape problems of one package's `llms.txt`: left out of `files`, a
@@ -12,25 +12,25 @@ import type { PublishedPackage } from '@/internal/llms/llms.types';
 export const llmsStructureFailures = (
   pkg: PublishedPackage,
   body: string,
-  { api = 'exact', sections = ['Install|Use', 'Docs'] }: LlmsConfig = {},
+  { api = "exact", sections = ["Install|Use", "Docs"] }: LlmsConfig = {},
 ): string[] => {
   const failures: string[] = [];
   if (!pkg.files.includes(LLMS_FILE)) {
     failures.push(`does not list ${LLMS_FILE} in \`files\`, so the tarball leaves it out`);
   }
-  const lines = body.split('\n');
-  const [title = ''] = lines;
+  const lines = body.split("\n");
+  const [title = ""] = lines;
   if (title !== `# ${pkg.name}`) {
     failures.push(`${LLMS_FILE} must open with "# ${pkg.name}", found ${JSON.stringify(title)}`);
   }
-  if (!lines.slice(1, 4).some((line) => line.startsWith('> '))) {
+  if (!lines.slice(1, 4).some((line) => line.startsWith("> "))) {
     failures.push(`${LLMS_FILE} needs a "> " summary under the title`);
   }
-  const wanted = api === 'exact' && !sections.includes('API') ? [...sections, 'API'] : sections;
+  const wanted = api === "exact" && !sections.includes("API") ? [...sections, "API"] : sections;
   for (const section of wanted) {
-    const [first = '', ...others] = section.split('|').map((heading) => heading.trim());
+    const [first = "", ...others] = section.split("|").map((heading) => heading.trim());
     if ([first, ...others].some((heading) => lines.includes(`## ${heading}`))) continue;
-    const or = others.map((heading) => ` (or "## ${heading}")`).join('');
+    const or = others.map((heading) => ` (or "## ${heading}")`).join("");
     failures.push(`${LLMS_FILE} has no "## ${first}"${or} section`);
   }
   return failures;

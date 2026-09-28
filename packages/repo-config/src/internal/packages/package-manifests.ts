@@ -1,8 +1,8 @@
-import { existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
-import { readFile } from '@/internal/config/read-file';
-import type { Reader } from '@/config/config.types';
-import type { PackageManifest } from '@/manifest/manifest.types';
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { readFile } from "@/internal/config/read-file";
+import type { Reader } from "@/config/config.types";
+import type { PackageManifest } from "@/manifest/manifest.types";
 
 /**
  * Every directory under `<root>/packages` with a manifest, and the manifest,
@@ -14,14 +14,14 @@ export const packageManifests = (
   root: string,
   { published = false, read = readFile }: { published?: boolean; read?: Reader } = {},
 ): { dir: string; manifest: PackageManifest }[] => {
-  const packages = join(root, 'packages');
+  const packages = join(root, "packages");
   if (!existsSync(packages)) return [];
   return readdirSync(packages, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort()
     .flatMap((dir) => {
-      const text = read(join(packages, dir, 'package.json'));
+      const text = read(join(packages, dir, "package.json"));
       if (text === undefined) return [];
       const manifest = JSON.parse(text) as PackageManifest;
       return published && manifest.private === true ? [] : [{ dir, manifest }];

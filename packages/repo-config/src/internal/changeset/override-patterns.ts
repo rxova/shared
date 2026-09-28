@@ -11,7 +11,7 @@
  * blind to code fences.
  */
 export const OVERRIDE_PATTERNS: readonly { name: string; pattern: RegExp }[] = [
-  { name: 'commit:', pattern: /^\s*commit:\s*[^\s]+/i },
-  { name: 'pr: / pull: / pull request:', pattern: /^\s*(?:pr|pull|pull\s+request):\s*#?\d+/i },
-  { name: 'author: / user:', pattern: /^\s*(?:author|user):\s*@?[^\s]+/i },
+  { name: "commit:", pattern: /^\s*commit:\s*[^\s]+/i },
+  { name: "pr: / pull: / pull request:", pattern: /^\s*(?:pr|pull|pull\s+request):\s*#?\d+/i },
+  { name: "author: / user:", pattern: /^\s*(?:author|user):\s*@?[^\s]+/i },
 ];

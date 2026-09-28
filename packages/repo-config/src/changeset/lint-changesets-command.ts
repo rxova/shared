@@ -1,8 +1,8 @@
-import { changesetProblems } from '@/internal/changeset/changeset-problems';
-import { listChangesets } from '@/internal/changeset/list-changesets';
-import { readFile } from '@/internal/config/read-file';
-import type { Reader } from '@/config/config.types';
-import { readConfig } from '@/config/read-config';
+import { changesetProblems } from "@/internal/changeset/changeset-problems";
+import { listChangesets } from "@/internal/changeset/list-changesets";
+import { readFile } from "@/internal/config/read-file";
+import type { Reader } from "@/config/config.types";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config lint-changesets`: every changeset waiting in `.changeset/`
@@ -26,10 +26,10 @@ export const lintChangesetsCommand = ({
     if (problems.length > 0) {
       console.error(
         [
-          'lint-changesets: these changesets would break the changelog.',
+          "lint-changesets: these changesets would break the changelog.",
           ...problems,
-          'Keep `commit:`, `pr:` and `author:` off the start of a summary line; in a code fence, start the line with something else.',
-        ].join('\n'),
+          "Keep `commit:`, `pr:` and `author:` off the start of a summary line; in a code fence, start the line with something else.",
+        ].join("\n"),
       );
       return 1;
     }

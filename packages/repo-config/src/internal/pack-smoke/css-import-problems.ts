@@ -1,7 +1,7 @@
-import { dirname, join, normalize } from 'node:path/posix';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { exportTargets } from '@/internal/pack-smoke/export-targets';
-import { readIfPresent } from '@/internal/pack-smoke/read-if-present';
+import { dirname, join, normalize } from "node:path/posix";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { exportTargets } from "@/internal/pack-smoke/export-targets";
+import { readIfPresent } from "@/internal/pack-smoke/read-if-present";
 
 /**
  * Every relative `@import` in an exported stylesheet that points at nothing in
@@ -16,12 +16,12 @@ export const cssImportProblems = (
   read: (path: string) => string,
 ): string[] =>
   exportTargets(manifest)
-    .filter((target) => target.endsWith('.css') && !target.includes('*'))
+    .filter((target) => target.endsWith(".css") && !target.includes("*"))
     .flatMap((target) => {
       const css = readIfPresent(read, target);
       if (css === undefined) return [];
       return [...css.matchAll(/@import\s+(?:url\(\s*)?['"](\.{1,2}\/[^'"]+)['"]/g)]
-        .map(([, specifier = '']) => specifier)
+        .map(([, specifier = ""]) => specifier)
         .filter((specifier) => !contents.includes(normalize(join(dirname(target), specifier))))
         .map((specifier) => `${target}: @import '${specifier}'`);
     });

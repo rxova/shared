@@ -8,5 +8,5 @@
 export const pushesCode = (input: string): boolean =>
   input
     .split(/\r?\n/)
-    .map((line) => line.trim().split(/\s+/)[1] ?? '')
+    .map((line) => line.trim().split(/\s+/)[1] ?? "")
     .some((sha) => /[^0]/.test(sha));

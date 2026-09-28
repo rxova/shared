@@ -1,4 +1,4 @@
-import { failConfig } from '@/internal/config/fail-config';
+import { failConfig } from "@/internal/config/fail-config";
 
 /** `section[key]` as a positive integer, or undefined when it is absent. */
 export const readCount = (
@@ -8,6 +8,6 @@ export const readCount = (
 ): number | undefined => {
   const value = section[key];
   if (value === undefined) return undefined;
-  if (typeof value === 'number' && Number.isInteger(value) && value > 0) return value;
-  return failConfig(`${path}.${key}`, 'a positive integer');
+  if (typeof value === "number" && Number.isInteger(value) && value > 0) return value;
+  return failConfig(`${path}.${key}`, "a positive integer");
 };

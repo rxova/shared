@@ -1,13 +1,13 @@
-import { captureCommand } from '@/internal/pack-smoke/capture-command';
-import { scratchFiles } from '@/internal/pack-smoke/scratch-files';
-import { installWithRetries } from '@/internal/publish/install-with-retries';
-import { parsePublishedPackages } from '@/internal/publish/parse-published-packages';
-import { pause } from '@/internal/publish/pause';
-import { registryVerifierSource } from '@/internal/publish/registry-verifier-source';
-import { waitForRegistry } from '@/internal/publish/wait-for-registry';
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
-import { join } from 'node:path';
-import { readConfig } from '@/config/read-config';
+import { captureCommand } from "@/internal/pack-smoke/capture-command";
+import { scratchFiles } from "@/internal/pack-smoke/scratch-files";
+import { installWithRetries } from "@/internal/publish/install-with-retries";
+import { parsePublishedPackages } from "@/internal/publish/parse-published-packages";
+import { pause } from "@/internal/publish/pause";
+import { registryVerifierSource } from "@/internal/publish/registry-verifier-source";
+import { waitForRegistry } from "@/internal/publish/wait-for-registry";
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
+import { join } from "node:path";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config post-publish-smoke`: after a release, installs what npm
@@ -37,14 +37,14 @@ export const postPublishSmokeCommand = ({
   now?: () => number;
 } = {}): number => {
   try {
-    const packages = parsePublishedPackages(env.PUBLISHED_PACKAGES ?? '');
+    const packages = parsePublishedPackages(env.PUBLISHED_PACKAGES ?? "");
     const { importPattern, peers = {} } = readConfig(root).postPublish ?? {};
     console.log(`post-publish-smoke: checking ${String(packages.length)} package(s) from npm`);
     waitForRegistry(packages, {
       isPublished: ({ name, version }) => {
         try {
           return (
-            sh('npm', ['view', `${name}@${version}`, 'version', '--prefer-online'], root).trim() ===
+            sh("npm", ["view", `${name}@${version}`, "version", "--prefer-online"], root).trim() ===
             version
           );
         } catch {
@@ -59,26 +59,26 @@ export const postPublishSmokeCommand = ({
     try {
       const dependencies = Object.fromEntries(packages.map(({ name, version }) => [name, version]));
       fs.write(
-        join(scratch, 'package.json'),
+        join(scratch, "package.json"),
         JSON.stringify({
-          name: 'post-publish-smoke',
+          name: "post-publish-smoke",
           private: true,
-          type: 'module',
+          type: "module",
           dependencies: { ...peers, ...dependencies },
         }),
       );
       installWithRetries(
-        () => void sh('npm', ['install', '--no-audit', '--no-fund', '--prefer-online'], scratch),
+        () => void sh("npm", ["install", "--no-audit", "--no-fund", "--prefer-online"], scratch),
         { sleep },
       );
       const pattern = importPattern === undefined ? undefined : new RegExp(importPattern);
       const importable = packages.filter(({ name }) => pattern?.test(name) ?? true);
-      fs.write(join(scratch, 'verify.mjs'), registryVerifierSource(packages, importable));
-      console.log(sh('node', ['verify.mjs'], scratch).trimEnd());
+      fs.write(join(scratch, "verify.mjs"), registryVerifierSource(packages, importable));
+      console.log(sh("node", ["verify.mjs"], scratch).trimEnd());
     } finally {
       fs.remove(scratch);
     }
-    console.log('post-publish-smoke: ok');
+    console.log("post-publish-smoke: ok");
     return 0;
   } catch (failure) {
     console.error(`post-publish-smoke failed — ${(failure as Error).message}`);
