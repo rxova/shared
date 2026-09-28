@@ -47,6 +47,13 @@ export const commands = (): Record<string, CommandEntry> => ({
       return () => versionCommand();
     },
   },
+  init: {
+    summary: "turn a repository created from a template into its own project [--dry-run]",
+    load: async () => {
+      const { initCommand } = await import("@/init/init-command");
+      return (argv) => initCommand(argv);
+    },
+  },
   "check-scope": {
     summary: "report code-changed, docs-only and docs-changed for a range (BASE_SHA, HEAD_SHA)",
     load: async () => {
