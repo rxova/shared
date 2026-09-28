@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { resolveTargets } from '@/install/resolve-targets';
 
@@ -6,14 +7,14 @@ const env = { home: '/home/me', cwd: '/work/app', configHome: '/home/me/.config'
 describe('resolveTargets', () => {
   it('resolves each tool’s user and project directories', () => {
     expect(resolveTargets('both', false, env)).toEqual([
-      { kind: 'claude', root: '/home/me/.claude' },
-      { kind: 'opencode', root: '/home/me/.config/opencode' },
+      { kind: 'claude', root: join('/home/me', '.claude') },
+      { kind: 'opencode', root: join('/home/me/.config', 'opencode') },
     ]);
     expect(resolveTargets('opencode', true, env)).toEqual([
-      { kind: 'opencode', root: '/work/app/.opencode' },
+      { kind: 'opencode', root: join('/work/app', '.opencode') },
     ]);
     expect(resolveTargets('claude', true, env)).toEqual([
-      { kind: 'claude', root: '/work/app/.claude' },
+      { kind: 'claude', root: join('/work/app', '.claude') },
     ]);
   });
 
