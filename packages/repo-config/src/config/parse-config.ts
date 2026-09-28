@@ -37,6 +37,7 @@ export const parseConfig = (raw: unknown): RepoConfig => {
     "packages",
     "postPublish",
     "llms",
+    "scope",
     "testScripts",
     "fileSize",
   ]);
@@ -66,6 +67,7 @@ export const parseConfig = (raw: unknown): RepoConfig => {
     "sections",
     "rootIndex",
   ]);
+  const scope = readSection(raw, "scope", at, ["ignore", "keep", "site"]);
   const testScripts = readSection(raw, "testScripts", at, ["globs"]);
   const fileSize = readSection(raw, "fileSize", at, ["max", "extensions", "ignore", "allow"]);
 
@@ -120,6 +122,13 @@ export const parseConfig = (raw: unknown): RepoConfig => {
         peers: readStringRecord(postPublish, "peers", `${at}.postPublish`),
       }),
     llms: llms && parseLlmsConfig(llms, `${at}.llms`),
+    scope:
+      scope &&
+      compact<Section<"scope">>({
+        ignore: readStrings(scope, "ignore", `${at}.scope`),
+        keep: readStrings(scope, "keep", `${at}.scope`),
+        site: readStrings(scope, "site", `${at}.scope`),
+      }),
     testScripts:
       testScripts &&
       compact<Section<"testScripts">>({

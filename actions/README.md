@@ -65,7 +65,7 @@ gate:
         needs: ${{ toJSON(needs) }}
 ```
 
-`skipped` passes (a release commit, a push with no pull request); `failure` and `cancelled` do not.
+`skipped` passes (a release commit, a documentation-only range, a push with no pull request); `failure` and `cancelled` do not.
 
 ## `notify-website`
 

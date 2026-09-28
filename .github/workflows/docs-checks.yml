@@ -1,0 +1,50 @@
+name: Docs checks
+
+# Reusable: the light job a documentation-only range runs in place of the
+# matrix. `check-scope` skips the build, tests and package checks when only
+# documentation changed, but formatting and the checks that read prose still
+# apply, so the caller names them here:
+#
+#   jobs:
+#     docs-checks:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.docs-only == 'true'
+#       uses: rxova/shared/.github/workflows/docs-checks.yml@main
+#       with:
+#         command: >-
+#           pnpm exec prettier --check . &&
+#           pnpm exec rxova-repo-config check-snippets
+#
+# Add `check-llms`, `check-banned` or `check-snippets` to the command when the
+# repository runs them: each reads Markdown and no build.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      command:
+        description: The checks to run from the repository root.
+        type: string
+        required: false
+        default: pnpm exec prettier --check .
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    name: docs checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: pnpm install --frozen-lockfile
+      - name: Check the documentation
+        run: ${{ inputs.command }}

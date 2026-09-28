@@ -108,6 +108,22 @@ export interface RepoConfig {
     peers?: Record<string, string>;
   };
   llms?: LlmsConfig;
+  scope?: {
+    /**
+     * Globs of paths that change no code: a range touching only these (and
+     * release bookkeeping) reports `code-changed=false` from `check-scope`.
+     * Default `**\/*.md`, `**\/*.mdx`.
+     */
+    ignore?: string[];
+    /**
+     * Globs that count as code even when `ignore` matches them: markdown a test
+     * reads or a package ships as content. Default `packages/*\/*\/**` (anything
+     * below a package's top level) and test and fixture folders.
+     */
+    keep?: string[];
+    /** Globs of the docs site's sources, reported as `docs-changed` (default `apps/docs/**`). */
+    site?: string[];
+  };
   testScripts?: {
     /** Directories (globs) that must have a `test` script when they hold a `vitest.config.*`. */
     globs?: string[];

@@ -1,9 +1,12 @@
 name: Commit messages
 
 # Reusable: the root job of a CI graph. Lints the branch commits on a pull
-# request or the pushed commit on a push, and decides whether the commit touched
-# the tree at all (`code-changed` is false only for a release commit: version
-# and changelog only). Every other job then gates on it:
+# request or the pushed commit on a push, and decides with `check-scope` what
+# the range touched. `code-changed` is false for a release commit (version and
+# changelog only) and for a documentation-only range (what the caller's
+# `repoConfig.scope` calls documentation: Markdown outside package internals by
+# default); `docs-only` is true for the latter, and `docs-changed` when the docs
+# site's sources moved. Every other job then gates on them:
 #
 #   jobs:
 #     commitlint:
@@ -11,6 +14,19 @@ name: Commit messages
 #     checks:
 #       needs: [commitlint]
 #       if: needs.commitlint.outputs.code-changed == 'true'
+#     docs-site:
+#       needs: [commitlint]
+#       if: >-
+#         needs.commitlint.outputs.code-changed == 'true' ||
+#         needs.commitlint.outputs.docs-changed == 'true'
+#     docs-checks:
+#       needs: [commitlint]
+#       if: needs.commitlint.outputs.docs-only == 'true'
+#       uses: rxova/shared/.github/workflows/docs-checks.yml@main
+#
+# The gate is a job output rather than `paths-ignore`: a workflow that
+# `paths-ignore` skips never reports, so a required check it feeds stays
+# pending, while a skipped job passes `require-jobs`.
 #
 # Run it on push as well as pull_request: a skipped job skips its dependents,
 # so gating it on pull_request alone would silently skip the whole graph on main.
@@ -31,14 +47,20 @@ on:
         required: false
         default: pnpm exec rxova-repo-config
       check-scope:
-        description: "`false` skips `check-scope` and always reports `code-changed: true`."
+        description: "`false` skips `check-scope` and always reports `code-changed: true`, `docs-only: false`."
         type: boolean
         required: false
         default: true
     outputs:
       code-changed:
-        description: "`true` unless the commit is a release commit (version and changelog only)."
+        description: "`true` unless the range is a release commit or documentation only."
         value: ${{ jobs.commitlint.outputs.code-changed }}
+      docs-only:
+        description: "`true` when the range changed documentation and nothing else but release bookkeeping."
+        value: ${{ jobs.commitlint.outputs.docs-only }}
+      docs-changed:
+        description: "`true` when the range touched the docs site (`repoConfig.scope.site`), or cannot tell."
+        value: ${{ jobs.commitlint.outputs.docs-changed }}
 
 permissions:
   contents: read
@@ -48,8 +70,12 @@ jobs:
     name: commit messages
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # The fallbacks are the answers of a bin that predates an output, or of a
+    # skipped `check-scope`: run everything, and nothing extra.
     outputs:
       code-changed: ${{ steps.scope.outputs.code-changed || 'true' }}
+      docs-only: ${{ steps.scope.outputs.docs-only || 'false' }}
+      docs-changed: ${{ steps.scope.outputs.docs-changed || 'true' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -59,7 +85,7 @@ jobs:
           node-version: ${{ inputs.node-version }}
       - run: pnpm install --frozen-lockfile
 
-      - name: Decide whether this commit touched the tree
+      - name: Decide what this range touched
         id: scope
         if: inputs.check-scope
         env:

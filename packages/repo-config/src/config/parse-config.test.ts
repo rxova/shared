@@ -46,6 +46,7 @@ describe("parseConfig", () => {
       packages: { marker: "rxova.slug" },
       postPublish: { importPattern: "^@rxova/react-", peers: { react: "^19" } },
       llms: { api: "props", rootIndex: true },
+      scope: { ignore: ["docs/**"], keep: ["docs/fixtures/**"], site: ["site/**"] },
       testScripts: { globs: ["packages/*"] },
       fileSize: { max: 400, extensions: ["ts"], ignore: ["pnpm-lock.yaml"], allow: ["big.ts"] },
     };
@@ -61,6 +62,7 @@ describe("parseConfig", () => {
       packages: {},
       postPublish: {},
       llms: {},
+      scope: {},
       testScripts: {},
       fileSize: {},
     };
@@ -89,6 +91,8 @@ describe("parseConfig", () => {
     [{ packages: { marker: "" } }, "repoConfig.packages.marker must be a non-empty string"],
     [{ postPublish: { importPattern: "[" } }, "repoConfig.postPublish.importPattern"],
     [{ llms: { api: "x" } }, "repoConfig.llms.api must be one of"],
+    [{ scope: { ignore: "**/*.md" } }, "repoConfig.scope.ignore must be an array"],
+    [{ scope: { skip: [] } }, 'unknown key "skip"'],
     [{ fileSize: { max: 0 } }, "repoConfig.fileSize.max must be a positive integer"],
   ])("rejects %j", (raw, message) => {
     expect(() => parseConfig(raw)).toThrow(message);
