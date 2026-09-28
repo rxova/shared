@@ -11,21 +11,22 @@ export const commands = (): Record<string, CommandEntry> => ({
   },
   install: {
     summary:
-      'install a profile (core, hackathon, full) [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]',
+      'install a profile (core, hackathon, dotnet, full) for Claude Code, OpenCode or both [--target claude|opencode|both] [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]',
     load: async () => {
       const { installCommand } = await import('@/install/install-command');
       return (argv) => installCommand(argv);
     },
   },
   uninstall: {
-    summary: 'remove everything the last install wrote [--project] [--dry-run]',
+    summary: 'remove everything the last install wrote [--target t] [--project] [--dry-run]',
     load: async () => {
       const { uninstallCommand } = await import('@/install/uninstall-command');
       return (argv) => uninstallCommand(argv);
     },
   },
   status: {
-    summary: 'show the installed profile and anything missing or changed [--project]',
+    summary:
+      'show each installed target’s profile and anything missing or changed [--target t] [--project]',
     load: async () => {
       const { statusCommand } = await import('@/install/status-command');
       return (argv) => statusCommand(argv);

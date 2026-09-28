@@ -14,10 +14,17 @@ export interface Manifest {
   createdSettings: boolean;
 }
 
-/** One file the install copies: from the package, to a path relative to the target. */
-export interface Copy {
-  from: string;
-  to: string;
+/** One file the install writes, to a path relative to the target: copied from the package, or generated. */
+export type Copy =
+  { to: string; from: string; text?: undefined } | { to: string; text: string; from?: undefined };
+
+/** The tools the kit installs into. */
+export type TargetKind = 'claude' | 'opencode';
+
+/** One install destination: which tool, and the directory its files go in. */
+export interface InstallTarget {
+  kind: TargetKind;
+  root: string;
 }
 
 export interface InstallPlan {
@@ -46,6 +53,8 @@ export type HookGroups = Partial<Record<HookEvent, HookGroup[]>>;
 export interface InstallEnv {
   home: string;
   cwd: string;
+  /** The XDG config directory (`$XDG_CONFIG_HOME`, or `~/.config`), where OpenCode keeps its global config. */
+  configHome: string;
   /** This package's root, holding `content/` and `dist/`. */
   packageDir: string;
   io: Io;
