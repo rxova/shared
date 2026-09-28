@@ -18,7 +18,7 @@ import { removeFiles } from '@/internal/install/remove-files';
 import { writeJson } from '@/internal/install/write-json';
 
 /**
- * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|full]
+ * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|react|qa|marketing|full]
  * [--add a,b] [--skip c] [--project] [--dry-run] [--force]`: writes the chosen agents, skills and
  * hooks for Claude Code, OpenCode or both, and records what it wrote in each. Running it again
  * updates in place, keeping each target's last selection unless told otherwise; with no

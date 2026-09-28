@@ -62,4 +62,19 @@ describe('the profiles over the real catalog', () => {
     expect(full).toEqual(names);
     expect(hackathon.length).toBeLessThan(full.length);
   });
+
+  it.each([
+    ['react', 'rx-fe-'],
+    ['qa', 'rx-qa-'],
+    ['marketing', 'rx-mkt-'],
+  ])('builds %s from core and every %s item, which hackathon leaves out', (profile, prefix) => {
+    const picked = profiles[profile]?.(names) ?? [];
+    const set = names.filter((name) => name.startsWith(prefix));
+    const core = profiles.core?.(names) ?? [];
+    expect(set.length).toBeGreaterThan(0);
+    expect(picked).toEqual(expect.arrayContaining([...core, ...set]));
+    expect(profiles.hackathon?.(names).some((name) => name.startsWith(prefix))).toBe(false);
+    // Only its own set: the other two stay out.
+    expect(picked.filter((name) => /^rx-(fe|qa|mkt)-/.test(name))).toEqual(set);
+  });
 });
