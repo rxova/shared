@@ -34,13 +34,6 @@
     "verify": "node --import tsx ./packages/repo-config/src/cli/cli.ts verify",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,mjs,cjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,jsonc,css,md,mdx,yaml,yml}": "prettier --write"
-  },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
