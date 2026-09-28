@@ -255,9 +255,33 @@ Datadog:
 
 ## GitHub Actions
 
-| Action                                    | Inputs                         | What it does                                                                    |
-| ----------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
-| `rxova/shared/actions/setup-pnpm`         | `node-version`, `registry-url` | pnpm from `packageManager` (install cached) and Node with the pnpm store cached |
-| `rxova/shared/actions/turbo-cache`        | `key`                          | Restores and saves `.turbo` per job; pass `key` per matrix leg                  |
-| `rxova/shared/actions/turbo-remote-cache` | —                              | A Turbo remote cache backed by the Actions cache, per task hash                 |
-| `rxova/shared/actions/setup-playwright`   | `browsers`                     | Installs Playwright browsers, cached by Playwright version                      |
+| Action                                    | Inputs                                                           | What it does                                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `rxova/shared/actions/setup-pnpm`         | `node-version`, `registry-url`                                   | pnpm from `packageManager` (install cached) and Node with the pnpm store cached                  |
+| `rxova/shared/actions/turbo-cache`        | `key`                                                            | Restores and saves `.turbo` per job; pass `key` per matrix leg                                   |
+| `rxova/shared/actions/turbo-remote-cache` | —                                                                | A Turbo remote cache backed by the Actions cache, per task hash                                  |
+| `rxova/shared/actions/setup-playwright`   | `browsers`, `working-directory`, `install-script`                | Installs Playwright browsers, cached by Playwright version (resolved from `working-directory`)   |
+| `rxova/shared/actions/pin-react`          | `react-version`, `types-version`, `types-dom-version`, `filters` | Pins one exact React at the workspace root and in `filters`, and fails if another still resolves |
+| `rxova/shared/actions/require-jobs`       | `needs`                                                          | Fails unless every job in `needs` passed or was skipped (the `all checks` gate)                  |
+| `rxova/shared/actions/notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.org to publish this run's `docs-dist` artifact        |
+
+## Reusable workflows
+
+Called at the job level as `uses: rxova/shared/.github/workflows/<file>@main`.
+
+| Workflow                    | Inputs                                                                                                                                                                        | Outputs                           | What it does                                                                          |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
+| `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`                    | Lints the branch or pushed commits and runs `check-scope`: the root job of a CI graph |
+| `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                 | Lints the PR title, read live from the API                                            |
+| `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                 | `check-changeset` on pull requests, with labels and title from the event              |
+| `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                 | Pins the oldest React at the root and in `filters`, then builds, tests and typechecks |
+| `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                 | Runs `pack-smoke` for each published package on the Node floor its `engines` promises |
+| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages` | The version pull request, then publishing with npm trusted publishing and provenance  |
+| `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                 | Publishes a snapshot prerelease under a dist-tag other than `latest`                  |
+
+## Renovate preset
+
+`github>rxova/shared//renovate/default.json5`: `config:recommended`, one weekly non-major group,
+a minimum release age, `chore(deps)` semantic commits, majors behind the dashboard, `pnpm dedupe`
+after updates, patch and minor automerge through GitHub, and the TypeScript `<7` ceiling. A
+repository's `.github/renovate.json5` extends it and keeps only its own `packageRules`.
