@@ -19,14 +19,14 @@ description: Every export, command and action this repository publishes.
 
 ## `@rxova/repo-config`
 
-| Command                                 | What it does                                                     |
-| --------------------------------------- | ---------------------------------------------------------------- |
-| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate, from `package.json#tooling.verify.steps` |
-| `rxova-repo-config check-changeset`     | Requires a changeset when a published package changed            |
-| `rxova-repo-config check-scope`         | Reports `code-changed=false` for a release commit                |
-| `rxova-repo-config node-floor`          | Reads the one `engines.node` floor the packages share            |
-| `rxova-repo-config pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball |
-| `rxova-repo-config check-llms [root]`   | Holds each `llms.txt` to the package exports                     |
+| Command                                 | What it does                                                        |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate, from `package.json#repoConfig.verify.steps` |
+| `rxova-repo-config check-changeset`     | Requires a changeset when a published package changed               |
+| `rxova-repo-config check-scope`         | Reports `code-changed=false` for a release commit                   |
+| `rxova-repo-config node-floor`          | Reads the one `engines.node` floor the packages share               |
+| `rxova-repo-config pack-smoke [dir]`    | Packs, installs, imports and requires a package from its tarball    |
+| `rxova-repo-config check-llms [root]`   | Holds each `llms.txt` to the package exports                        |
 
 Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
 `/tsconfig.base.json`.

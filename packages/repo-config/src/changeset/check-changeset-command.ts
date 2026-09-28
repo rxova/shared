@@ -17,7 +17,7 @@ import { readConfig } from '@/config/read-config';
  *
  * Run from the repository root with `BASE_SHA` and `HEAD_SHA` set. `PR_LABELS`
  * (comma-separated) and `PR_TITLE` carry the escape hatch. With
- * `tooling.changeset.singlePackage` set in the root `package.json`, each
+ * `repoConfig.changeset.singlePackage` set in the root `package.json`, each
  * changeset must also name exactly one package, so every changelog entry
  * belongs to the package it describes. Returns the process exit code.
  */

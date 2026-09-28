@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { readConfig } from '@/config/read-config';
 
 describe('readConfig', () => {
-  it('reads the tooling field of the root manifest', () => {
-    const read = () => JSON.stringify({ tooling: { changeset: { singlePackage: true } } });
+  it('reads the repoConfig field of the root manifest', () => {
+    const read = () => JSON.stringify({ repoConfig: { changeset: { singlePackage: true } } });
     expect(readConfig('/repo', read)).toEqual({ changeset: { singlePackage: true } });
   });
 

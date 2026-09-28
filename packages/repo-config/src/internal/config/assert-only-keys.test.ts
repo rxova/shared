@@ -4,16 +4,16 @@ import { assertOnlyKeys } from '@/internal/config/assert-only-keys';
 describe('assertOnlyKeys', () => {
   it('accepts the allowed keys, in any subset', () => {
     expect(() => {
-      assertOnlyKeys({ verify: {} }, 'tooling', ['verify', 'changeset']);
-      assertOnlyKeys({}, 'tooling', ['verify']);
+      assertOnlyKeys({ verify: {} }, 'repoConfig', ['verify', 'changeset']);
+      assertOnlyKeys({}, 'repoConfig', ['verify']);
     }).not.toThrow();
   });
 
   it('names an unknown key and the keys it could have been', () => {
     expect(() => {
-      assertOnlyKeys({ verfy: {} }, 'tooling', ['verify', 'changeset']);
+      assertOnlyKeys({ verfy: {} }, 'repoConfig', ['verify', 'changeset']);
     }).toThrow(
-      'package.json#tooling has an unknown key "verfy"; expected one of verify, changeset',
+      'package.json#repoConfig has an unknown key "verfy"; expected one of verify, changeset',
     );
   });
 });

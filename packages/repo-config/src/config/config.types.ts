@@ -4,8 +4,8 @@ export interface Step {
   command: string;
 }
 
-/** The `tooling` field of the root `package.json`. Every key is optional. */
-export interface ToolingConfig {
+/** The `repoConfig` field of the root `package.json`. Every key is optional. */
+export interface RepoConfig {
   verify?: {
     /** The ordered gate. Replaces the default list entirely. */
     steps?: Step[];

@@ -19,9 +19,9 @@ describe('verifyCommand', () => {
     expect(ran).toEqual(defaultSteps().map(({ command }) => command));
   });
 
-  it('runs the list from package.json#tooling.verify.steps', () => {
+  it('runs the list from package.json#repoConfig.verify.steps', () => {
     const ran: string[] = [];
-    const read = () => JSON.stringify({ tooling: { verify: { steps: [step('only', 'x')] } } });
+    const read = () => JSON.stringify({ repoConfig: { verify: { steps: [step('only', 'x')] } } });
     expect(verifyCommand([], { read, run: (command) => void ran.push(command) })).toBe(0);
     expect(ran).toEqual(['x']);
   });
@@ -34,8 +34,12 @@ describe('verifyCommand', () => {
   });
 
   it('fails with the reason when the config or the flags are wrong', () => {
-    expect(verifyCommand([], { read: () => '{"tooling":{"verify":[]}}', run: () => {} })).toBe(1);
-    expect(err).toHaveBeenCalledWith(expect.stringContaining('tooling.verify must be an object'));
+    expect(verifyCommand([], { read: () => '{"repoConfig":{"verify":[]}}', run: () => {} })).toBe(
+      1,
+    );
+    expect(err).toHaveBeenCalledWith(
+      expect.stringContaining('repoConfig.verify must be an object'),
+    );
     expect(verifyCommand(['--only', 'nope'], { read: () => undefined, run: () => {} })).toBe(1);
   });
 

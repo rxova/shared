@@ -1,4 +1,4 @@
-export type { Step, ToolingConfig } from '@/config/config.types';
+export type { Step, RepoConfig } from '@/config/config.types';
 export { isEntry } from '@/entry/is-entry';
 export { parseConfig } from '@/config/parse-config';
 export { readConfig } from '@/config/read-config';

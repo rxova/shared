@@ -17,7 +17,7 @@ Run each command from the repository root, except `pack-smoke`, which runs from 
 
 | Command                                 | What it does                                                                                                                                                                                       |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate in order and stops at the first failure. The steps come from `package.json#tooling.verify.steps`, or a default pnpm and Turborepo list.                                     |
+| `rxova-repo-config verify [--only a,b]` | Runs the pre-push gate in order and stops at the first failure. The steps come from `package.json#repoConfig.verify.steps`, or a default pnpm and Turborepo list.                                  |
 | `rxova-repo-config check-changeset`     | Fails when a published package changed and no changeset was added. Reads `BASE_SHA` and `HEAD_SHA`. `PR_LABELS` or `PR_TITLE` can carry `skip-changeset`.                                          |
 | `rxova-repo-config check-scope`         | Writes `code-changed=false` to `GITHUB_OUTPUT` for a release commit, which contains only version and changelog edits.                                                                              |
 | `rxova-repo-config node-floor`          | Writes to `GITHUB_OUTPUT` the single `engines.node` floor that all published packages share.                                                                                                       |
@@ -33,7 +33,7 @@ Everything is optional. Settings go in the root `package.json`:
 
 ```json
 {
-  "tooling": {
+  "repoConfig": {
     "verify": {
       "steps": [
         { "name": "lint", "command": "pnpm lint" },
