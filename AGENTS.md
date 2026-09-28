@@ -9,7 +9,7 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   changeset gate, release-commit scope, Node floor, pack smoke, llms.txt check) and the
   shared tsdown, vitest, eslint, commitlint and prettier presets. Coverage thresholds live in its
   vitest preset only. This repository runs the scripts from source with `tsx`.
-- `packages/toolbox` — `@rxova/toolbox`: small dependency-free runtime helpers, plus a `/react`
+- `packages/ts-utils` — `@rxova/ts-utils`: small dependency-free runtime helpers, plus a `/react`
   entry. Neutral platform, es2020, no side effects: consumers inline it at build time.
 - `packages/ai` — `@rxova/ai`: the `rxova-ai` bin that installs Claude Code agents, skills and
   hooks into `.claude`, in profiles. Agents and skills are Markdown under `content/`; every
@@ -39,14 +39,14 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
   exactly `functionName` (kebab-case file, camelCase export), `<function-name>.test.ts` beside it
   holds its tests, `<name>.types.ts` holds types only, `<name>.fixtures.ts` the fakes several
   suites share. Files sit in topic folders (`scope/`, `changeset/`, `pack-smoke/`, …), never loose
-  under `src/`; only `index.ts` (and toolbox's `react.ts`) live at the root, and they re-export
+  under `src/`; only `index.ts` (and ts-utils's `react.ts`) live at the root, and they re-export
   only. Barrels, types and fixtures are excluded from coverage, so logic there is logic nobody
   measures.
 - No relative imports in source. A package names its own files as `@/<topic>/<file>`; each
   package's `tsconfig.json` declares `@/*` in `paths`, the vitest preset maps it for tests, tsdown
   reads it for the build, and the root `tsconfig.json` carries tooling's for `tsx` runs from the
   repository root. The eslint preset rejects `./` and `../` imports.
-- `@rxova/tooling` and `@rxova/toolbox` hold only their public functions: what `index.ts`, a
+- `@rxova/tooling` and `@rxova/ts-utils` hold only their public functions: what `index.ts`, a
   subpath export or the `rxova-tooling` bin reaches. Anything else — a private helper, an io
   adapter, a constant, a shared test fixture — goes in the package's `src/internal/<topic>/`,
   which `index.ts` never re-exports. A published package never has a module-level
@@ -56,5 +56,5 @@ pnpm + Turborepo monorepo. Node >= 22.13. TypeScript everywhere, ESM only.
 - ESLint runs `strictTypeChecked`. Fix the finding rather than disabling the rule; if a disable is
   truly needed, scope it to one line and say why.
 - Conventional Commits; subject line only. Never `--no-verify`.
-- No new runtime dependency in a published package without saying why. `@rxova/toolbox` takes none
+- No new runtime dependency in a published package without saying why. `@rxova/ts-utils` takes none
   at all, and `@rxova/tooling` keeps its tools as optional peer dependencies.

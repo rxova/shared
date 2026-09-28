@@ -1,21 +1,21 @@
-# @rxova/toolbox
+# @rxova/ts-utils
 
 Small runtime helpers with no dependencies, shared by the rxova packages. They work in browsers and
 in Node, have no side effects, and are built to es2020, so a bundler can inline the few you use.
 
 ```sh
-pnpm add -D @rxova/toolbox
+pnpm add -D @rxova/ts-utils
 ```
 
 Add it as a **dev** dependency of a published package and let the build inline it. That way the
 package keeps its zero-dependency promise and its size budget.
 
 ```ts
-import { errorMessage, isRecord } from '@rxova/toolbox';
-import { useIsomorphicLayoutEffect } from '@rxova/toolbox/react';
+import { errorMessage, isRecord } from '@rxova/ts-utils';
+import { useIsomorphicLayoutEffect } from '@rxova/ts-utils/react';
 ```
 
-## `@rxova/toolbox`
+## `@rxova/ts-utils`
 
 | Export                                  | What it answers                                                                          |
 | --------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -39,7 +39,7 @@ import { useIsomorphicLayoutEffect } from '@rxova/toolbox/react';
 | `deepFreeze(value)`                     | Freezes the value and everything reachable from it. Skips typed arrays, survives cycles. |
 | `clamp(value, min, max)`                | `value` kept within `[min, max]`. NaN stays NaN; a reversed range throws.                |
 
-## `@rxova/toolbox/react`
+## `@rxova/ts-utils/react`
 
 | Export                      | What it is                                                             |
 | --------------------------- | ---------------------------------------------------------------------- |
