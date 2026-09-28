@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { configDefaults } from 'vitest/config';
 import { baseVitestConfig } from '@/vitest/base-vitest-config';
 
 describe('baseVitestConfig', () => {
@@ -40,6 +41,25 @@ describe('baseVitestConfig', () => {
     expect(test?.environment).toBe('jsdom');
     expect(test?.include).toEqual(['test/**/*.ts']);
     expect(test?.coverage).toMatchObject({ reporter: ['json-summary'] });
+  });
+
+  it('lets a package set its own thresholds, one axis at a time', () => {
+    const coverage = baseVitestConfig({ thresholds: { branches: 88, functions: 100 } }).test
+      ?.coverage;
+    expect(coverage).toMatchObject({
+      thresholds: { perFile: true, statements: 95, branches: 88, functions: 100, lines: 95 },
+    });
+  });
+
+  it('measures the files a package names, and keeps others out of discovery', () => {
+    const { test } = baseVitestConfig({
+      coverageInclude: ['src/**/*.ts'],
+      testExclude: ['src/**/*.browser.test.tsx'],
+    });
+    expect(test?.coverage).toMatchObject({ include: ['src/**/*.ts'] });
+    expect(test?.exclude).toEqual([...configDefaults.exclude, 'src/**/*.browser.test.tsx']);
+    expect(baseVitestConfig().test?.exclude).toEqual([...configDefaults.exclude]);
+    expect(baseVitestConfig().test?.coverage).toMatchObject({ include: ['src/**/*.{ts,tsx}'] });
   });
 
   it('maps @/ to the package src, from root', () => {

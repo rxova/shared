@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { defineConfig, type ViteUserConfig } from 'vitest/config';
+import { configDefaults, defineConfig, type ViteUserConfig } from 'vitest/config';
 import type { BaseVitestOptions } from '@/vitest/vitest.types';
 
 /**
@@ -7,8 +7,10 @@ import type { BaseVitestOptions } from '@/vitest/vitest.types';
  * is a one-liner over this, so raising the bar is a single-file change rather
  * than a sweep that misses a package.
  *
- * Coverage is per file, 95% on every axis, over every source file under `src/`
- * whether or not a test imports it. Barrels, `.types.ts` files, tests and
+ * Coverage is per file, 95% on every axis by default, over every source file
+ * under `src/` whether or not a test imports it. A package can set its own
+ * `thresholds` (only the axes it names change), measure other files with
+ * `coverageInclude`, and keep files out of discovery with `testExclude`. Barrels, `.types.ts` files, tests and
  * fixtures are left out: none has executable lines worth a threshold, so logic
  * that lands in one is logic nobody measures.
  *
@@ -22,7 +24,10 @@ export const baseVitestConfig = ({
   root = process.cwd(),
   environment = 'node',
   include = ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+  testExclude = [],
+  coverageInclude = ['src/**/*.{ts,tsx}'],
   exclude = [],
+  thresholds = {},
   reporter = ['text', 'lcov'],
 }: BaseVitestOptions = {}): ViteUserConfig =>
   defineConfig({
@@ -32,10 +37,11 @@ export const baseVitestConfig = ({
     test: {
       environment,
       include: [...include],
+      exclude: [...configDefaults.exclude, ...testExclude],
       coverage: {
         provider: 'v8',
         reporter: [...reporter],
-        include: ['src/**/*.{ts,tsx}'],
+        include: [...coverageInclude],
         exclude: [
           'src/**/*.test.{ts,tsx}',
           'src/**/*.fixtures.{ts,tsx}',
@@ -43,7 +49,14 @@ export const baseVitestConfig = ({
           'src/index.ts',
           ...exclude,
         ],
-        thresholds: { perFile: true, statements: 95, branches: 95, functions: 95, lines: 95 },
+        thresholds: {
+          perFile: true,
+          statements: 95,
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          ...thresholds,
+        },
       },
     },
   });
