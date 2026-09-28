@@ -1,0 +1,49 @@
+name: Notify rxova.org
+description: Tell the rxova/rxova-website aggregator that this run built a docs dist it should publish.
+
+# The sender half of the contract in rxova/rxova-website docs/INPUTS-CONTRACT.md
+# (gate 1): a `docs` repository_dispatch naming this run, whose `docs-dist`
+# artifact the aggregator downloads, validates and republishes. One
+# implementation, so the payload shape changes in one place.
+#
+# Call it in the job that uploaded the artifact, after the upload, on main only.
+
+inputs:
+  project:
+    description: The project slug on rxova.org, such as `overlock` or `storybook-react-inputs`.
+    required: true
+  base:
+    description: The path the dist is served under. Defaults to `/packages/<project>/`.
+    required: false
+    default: ''
+  framework:
+    description: What built the dist (`astro`, `storybook`).
+    required: false
+    default: astro
+  token:
+    description: >-
+      A token that may dispatch to the aggregator repository — a fine-grained PAT
+      with Contents: write on rxova/rxova-website (AGGREGATOR_DISPATCH_TOKEN).
+    required: true
+  repository:
+    description: The aggregator repository.
+    required: false
+    default: rxova/rxova-website
+  dry-run:
+    description: '`true` prints the request instead of sending it.'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Dispatch the docs event
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        PROJECT: ${{ inputs.project }}
+        BASE: ${{ inputs.base }}
+        FRAMEWORK: ${{ inputs.framework }}
+        REPOSITORY: ${{ inputs.repository }}
+        DRY_RUN: ${{ inputs.dry-run }}
+      run: bash "$GITHUB_ACTION_PATH/notify.sh"
