@@ -33,14 +33,16 @@ Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettie
 
 ## `@rxova/ai`
 
-| Command                                              | What it does                                                |
-| ---------------------------------------------------- | ----------------------------------------------------------- |
-| `rxova-ai install [--project] [--dry-run] [--force]` | Installs the agents, skills and guard hooks into `.claude`  |
-| `rxova-ai uninstall [--project] [--dry-run]`         | Removes exactly what the last install wrote                 |
-| `rxova-ai status [--project]`                        | Shows the installed version and any missing or changed file |
+| Command                                                                                   | What it does                                                        |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `rxova-ai list [--profile p]`                                                             | Lists every agent, skill and hook, and the profiles that include it |
+| `rxova-ai install [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile (`core`, `hackathon`, `full`) into `.claude`     |
+| `rxova-ai uninstall [--project] [--dry-run]`                                              | Removes exactly what the last install wrote                         |
+| `rxova-ai status [--project]`                                                             | Shows the installed profile and any missing or changed file         |
 
-Guards: `no-bypass`, `no-attribution`, `config-lock`. Skills: `rx-verify`, `rx-handoff`,
-`rx-slice`, `rx-theme-audit`. Agents: `rx-planner`, `rx-reviewer`, `rx-scout`.
+Hooks: `no-bypass`, `no-attribution`, `danger-zone`, `dev-server`, `config-lock`, `secret-guard`,
+`quick-check`, `memory-snapshot`, `handoff-reminder`, `context-nudge`. 26 skills and 15 agents;
+`rxova-ai list` shows them all.
 
 ## GitHub Actions
 

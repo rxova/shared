@@ -2,8 +2,8 @@
 '@rxova/ai': minor
 ---
 
-Add `@rxova/ai`, a small Claude Code kit installed by the `rxova-ai` bin (`install`, `uninstall`, `status`):
+Add `@rxova/ai`, a Claude Code kit installed in profiles (`core`, `hackathon`, `full`) by the `rxova-ai` bin (`list`, `install`, `uninstall`, `status`):
 
-- guard hooks: `no-bypass`, `no-attribution` and `config-lock`;
-- skills: `rx-verify`, `rx-handoff`, `rx-slice` and `rx-theme-audit`;
-- agents: `rx-planner`, `rx-reviewer` and `rx-scout`.
+- hooks: the guards `no-bypass`, `no-attribution`, `danger-zone`, `dev-server`, `config-lock` and `secret-guard`, and the helpers `quick-check`, `memory-snapshot`, `handoff-reminder` and `context-nudge`;
+- 26 skills for the workflow from kickoff to demo, for React, Node, Python, Expo, the Claude API, UI and auth, and for Supabase, Postgres, Vercel, Cloudflare, containers and AWS;
+- 15 agents, each with the fewest tools and the cheapest model its job needs.
