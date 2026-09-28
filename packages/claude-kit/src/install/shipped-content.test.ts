@@ -10,6 +10,10 @@ import { readFrontmatter } from '@/internal/install/read-frontmatter';
 const root = packageRoot(import.meta.url);
 const content = join(root, 'content');
 
+/** Values a strict YAML parser would reject or misread when left unquoted. */
+const unsafeYaml = (value: string | undefined) =>
+  value === undefined || /: |\s#/.test(value) || /^[\s'"&*!|>%@`{[\]-]/.test(value);
+
 describe('the shipped agents', () => {
   it.each(readdirSync(join(content, 'agents')))(
     '%s names itself, says when to use it, and limits its tools and model',
@@ -18,7 +22,10 @@ describe('the shipped agents', () => {
       expect(meta.name).toBe(file.replace(/\.md$/, ''));
       expect(meta.name).toMatch(/^rx-[a-z0-9-]+$/);
       expect(meta.description?.length).toBeGreaterThan(40);
-      expect(meta.tools).toMatch(/^[A-Z]\w+(, [A-Z]\w+)*$/);
+      expect(unsafeYaml(meta.description)).toBe(false);
+      // An agent without a tools line inherits every tool, MCP servers included; only then allowed.
+      if (meta.tools === undefined) expect(file).toBe('rx-observability.md');
+      else expect(meta.tools).toMatch(/^[A-Z]\w+(, [A-Z]\w+)*$/);
       expect(['haiku', 'sonnet', 'opus']).toContain(meta.model);
     },
   );
