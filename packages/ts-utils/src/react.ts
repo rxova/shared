@@ -1,1 +1,1 @@
-export { useIsomorphicLayoutEffect } from '@/react/use-isomorphic-layout-effect';
+export { useIsomorphicLayoutEffect } from "@/react/use-isomorphic-layout-effect";

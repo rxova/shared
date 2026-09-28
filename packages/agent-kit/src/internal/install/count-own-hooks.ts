@@ -1,5 +1,5 @@
-import { isOwnHook } from '@/internal/install/is-own-hook';
-import { isRecord } from '@/internal/install/is-record';
+import { isOwnHook } from "@/internal/install/is-own-hook";
+import { isRecord } from "@/internal/install/is-record";
 
 /** How many hook commands in a settings object run this kit's runner. */
 export const countOwnHooks = (settings: Record<string, unknown>): number => {

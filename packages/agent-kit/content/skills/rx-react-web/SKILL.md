@@ -53,36 +53,36 @@ Mixing three fetching styles is how hackathon apps break at 3am.
 
 ```ts
 // lib/schemas.ts (shared)
-import { z } from 'zod';
-export const todoSchema = z.object({ title: z.string().min(1, 'Required').max(120) });
+import { z } from "zod";
+export const todoSchema = z.object({ title: z.string().min(1, "Required").max(120) });
 export type TodoInput = z.infer<typeof todoSchema>;
 ```
 
 ```tsx
 // components/todo-form.tsx
-'use client';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { todoSchema, type TodoInput } from '@/lib/schemas';
+"use client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { todoSchema, type TodoInput } from "@/lib/schemas";
 
 export function TodoForm() {
   const qc = useQueryClient();
   const form = useForm<TodoInput>({ resolver: zodResolver(todoSchema) });
   const create = useMutation({
     mutationFn: async (data: TodoInput) => {
-      const res = await fetch('/api/todos', { method: 'POST', body: JSON.stringify(data) });
+      const res = await fetch("/api/todos", { method: "POST", body: JSON.stringify(data) });
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
     onSuccess: () => {
       form.reset();
-      qc.invalidateQueries({ queryKey: ['todos'] });
+      qc.invalidateQueries({ queryKey: ["todos"] });
     },
   });
   return (
     <form onSubmit={form.handleSubmit((d) => create.mutate(d))}>
-      <input {...form.register('title')} aria-invalid={!!form.formState.errors.title} />
+      <input {...form.register("title")} aria-invalid={!!form.formState.errors.title} />
       {form.formState.errors.title && <p role="alert">{form.formState.errors.title.message}</p>}
       <button disabled={create.isPending}>Add</button>
     </form>
@@ -92,7 +92,7 @@ export function TodoForm() {
 
 ```ts
 // app/api/todos/route.ts
-import { todoSchema } from '@/lib/schemas';
+import { todoSchema } from "@/lib/schemas";
 export async function POST(req: Request) {
   const parsed = todoSchema.safeParse(await req.json());
   if (!parsed.success) return Response.json({ issues: parsed.error.issues }, { status: 400 });

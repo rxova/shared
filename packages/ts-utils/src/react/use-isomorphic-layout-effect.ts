@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from "react";
 
 /**
  * `useLayoutEffect` where there is a document, `useEffect` where there is not.
@@ -10,4 +10,4 @@ import { useEffect, useLayoutEffect } from 'react';
  * must be the same function on every render.
  */
 export const useIsomorphicLayoutEffect =
-  typeof document === 'undefined' ? useEffect : useLayoutEffect;
+  typeof document === "undefined" ? useEffect : useLayoutEffect;

@@ -1,5 +1,5 @@
-import { realpathOrSelf } from '@/internal/entry/realpath-or-self';
-import { pathToFileURL } from 'node:url';
+import { realpathOrSelf } from "@/internal/entry/realpath-or-self";
+import { pathToFileURL } from "node:url";
 
 /**
  * Whether this module is the file Node was asked to run.
@@ -11,4 +11,4 @@ import { pathToFileURL } from 'node:url';
  * script path resolved through the symlink a bin is run through.
  */
 export const isEntry = (moduleUrl: string, argv1: string | undefined = process.argv[1]): boolean =>
-  argv1 !== undefined && argv1 !== '' && pathToFileURL(realpathOrSelf(argv1)).href === moduleUrl;
+  argv1 !== undefined && argv1 !== "" && pathToFileURL(realpathOrSelf(argv1)).href === moduleUrl;

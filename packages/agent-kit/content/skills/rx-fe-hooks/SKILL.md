@@ -73,14 +73,14 @@ handlers, and keep effects for synchronising with something outside React.
 
 ```ts
 // use-online.ts
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from "react";
 
 const subscribe = (onChange: () => void) => {
-  window.addEventListener('online', onChange);
-  window.addEventListener('offline', onChange);
+  window.addEventListener("online", onChange);
+  window.addEventListener("offline", onChange);
   return () => {
-    window.removeEventListener('online', onChange);
-    window.removeEventListener('offline', onChange);
+    window.removeEventListener("online", onChange);
+    window.removeEventListener("offline", onChange);
   };
 };
 
@@ -95,16 +95,16 @@ export function useOnline() {
 
 ```ts
 // use-online.test.ts
-import { act, renderHook } from '@testing-library/react';
-import { expect, it, vi } from 'vitest';
-import { useOnline } from './use-online';
+import { act, renderHook } from "@testing-library/react";
+import { expect, it, vi } from "vitest";
+import { useOnline } from "./use-online";
 
-it('reports going offline', () => {
+it("reports going offline", () => {
   const { result } = renderHook(() => useOnline());
   expect(result.current).toBe(true);
   act(() => {
-    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
-    window.dispatchEvent(new Event('offline'));
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    window.dispatchEvent(new Event("offline"));
   });
   expect(result.current).toBe(false);
 });

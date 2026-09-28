@@ -58,8 +58,8 @@ login page), or a "Try the demo" button that signs into it.
 
 ```ts
 // Next.js route handler with Supabase Auth (server-side check)
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function GET() {
   const store = await cookies();
@@ -76,15 +76,15 @@ export async function GET() {
   const {
     data: { user },
   } = await supabase.auth.getUser(); // verifies with the auth server
-  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data } = await supabase.from('notes').select('*'); // RLS limits rows to this user
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const { data } = await supabase.from("notes").select("*"); // RLS limits rows to this user
   return Response.json(data);
 }
 ```
 
 ```ts
 // scripts/seed-demo-user.ts (server-only secret key; run once per environment)
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 const admin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!);
 await admin.auth.admin.createUser({
   email: process.env.DEMO_EMAIL!,

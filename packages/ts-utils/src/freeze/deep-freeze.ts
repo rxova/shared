@@ -8,7 +8,7 @@
  * check instead of looping.
  */
 export const deepFreeze = <T>(value: T): T => {
-  if (typeof value !== 'object' || value === null || Object.isFrozen(value)) return value;
+  if (typeof value !== "object" || value === null || Object.isFrozen(value)) return value;
   if (ArrayBuffer.isView(value)) return value;
 
   Object.freeze(value);

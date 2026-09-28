@@ -25,19 +25,19 @@ export const shellSegments = (command: string): string[][] => {
   const skipHeredocBodies = () => {
     for (const { delimiter, strip } of heredocs.splice(0)) {
       for (;;) {
-        const end = command.indexOf('\n', i);
+        const end = command.indexOf("\n", i);
         const line = command.slice(i, end === -1 ? command.length : end);
         i = end === -1 ? command.length : end + 1;
-        if ((strip ? line.replace(/^\t+/, '') : line) === delimiter || end === -1) break;
+        if ((strip ? line.replace(/^\t+/, "") : line) === delimiter || end === -1) break;
       }
     }
   };
   const readDelimiter = (): string => {
-    while (command[i] === ' ' || command[i] === '\t') i += 1;
-    let delimiter = '';
+    while (command[i] === " " || command[i] === "\t") i += 1;
+    let delimiter = "";
     while (i < command.length && !/[\s;&|<>()]/.test(command.charAt(i))) {
       const char = command.charAt(i);
-      if (char !== "'" && char !== '"' && char !== '\\') delimiter += char;
+      if (char !== "'" && char !== '"' && char !== "\\") delimiter += char;
       i += 1;
     }
     return delimiter;
@@ -48,41 +48,41 @@ export const shellSegments = (command: string): string[][] => {
     if (char === "'") {
       const end = command.indexOf("'", i + 1);
       const stop = end === -1 ? command.length : end;
-      word = (word ?? '') + command.slice(i + 1, stop);
+      word = (word ?? "") + command.slice(i + 1, stop);
       i = stop + 1;
     } else if (char === '"') {
-      word ??= '';
+      word ??= "";
       i += 1;
       while (i < command.length && command[i] !== '"') {
-        if (command[i] === '\\' && '"\\$`'.includes(command.charAt(i + 1))) i += 1;
+        if (command[i] === "\\" && '"\\$`'.includes(command.charAt(i + 1))) i += 1;
         word += command.charAt(i);
         i += 1;
       }
       i += 1;
-    } else if (char === '\\') {
-      if (command[i + 1] !== '\n') word = (word ?? '') + command.charAt(i + 1);
+    } else if (char === "\\") {
+      if (command[i + 1] !== "\n") word = (word ?? "") + command.charAt(i + 1);
       i += 2;
-    } else if (command.startsWith('<<<', i)) {
-      word = (word ?? '') + '<<<';
+    } else if (command.startsWith("<<<", i)) {
+      word = (word ?? "") + "<<<";
       i += 3;
-    } else if (char === '<' && command[i + 1] === '<') {
+    } else if (char === "<" && command[i + 1] === "<") {
       endWord();
       i += 2;
-      const strip = command[i] === '-';
+      const strip = command[i] === "-";
       if (strip) i += 1;
       heredocs.push({ delimiter: readDelimiter(), strip });
-    } else if (char === '\n') {
+    } else if (char === "\n") {
       endSegment();
       i += 1;
       skipHeredocBodies();
-    } else if (char === ';' || char === '&' || char === '|') {
+    } else if (char === ";" || char === "&" || char === "|") {
       endSegment();
       i += 1;
-    } else if (char === ' ' || char === '\t') {
+    } else if (char === " " || char === "\t") {
       endWord();
       i += 1;
     } else {
-      word = (word ?? '') + char;
+      word = (word ?? "") + char;
       i += 1;
     }
   }

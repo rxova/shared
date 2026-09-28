@@ -1,4 +1,4 @@
-import type { Guard, HookInput, HookContext, HookOutcome } from '@/hooks/hook.types';
+import type { Guard, HookInput, HookContext, HookOutcome } from "@/hooks/hook.types";
 
 /** A guard as a hook's work: exit 2 with the reason when it blocks, 0 otherwise. */
 export const asHook =

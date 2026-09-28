@@ -10,7 +10,7 @@ pnpm add -D @rxova/ts-utils
 ```
 
 ```ts
-import { errorMessage, isRecord } from '@rxova/ts-utils';
+import { errorMessage, isRecord } from "@rxova/ts-utils";
 ```
 
 Add it as a dev dependency of a published package so its build inlines the helpers. The package
@@ -32,7 +32,7 @@ pnpm add -D @rxova/repo-config
 
 ```js
 // eslint.config.js
-import { baseEslintConfig } from '@rxova/repo-config/eslint';
+import { baseEslintConfig } from "@rxova/repo-config/eslint";
 export default baseEslintConfig({ tsconfigRootDir: import.meta.dirname });
 ```
 

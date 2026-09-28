@@ -47,69 +47,69 @@ app in memory. Hono is the default because the same code runs on Node, Bun and W
 
 ```ts
 // src/app.ts
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
-import { HTTPException } from 'hono/http-exception';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import { HTTPException } from "hono/http-exception";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 
 type Env = { Variables: { userId: string } };
 export const app = new Hono<Env>();
 
-app.use('*', logger());
-app.use('*', cors({ origin: (process.env.CORS_ORIGINS ?? '').split(','), credentials: true }));
+app.use("*", logger());
+app.use("*", cors({ origin: (process.env.CORS_ORIGINS ?? "").split(","), credentials: true }));
 
-app.get('/health', (c) => c.json({ ok: true }));
+app.get("/health", (c) => c.json({ ok: true }));
 
-app.use('/api/*', async (c, next) => {
-  const token = c.req.header('authorization')?.replace(/^Bearer /, '');
-  if (!token) throw new HTTPException(401, { message: 'Missing token' });
-  c.set('userId', await verifyToken(token)); // your provider's verify call
+app.use("/api/*", async (c, next) => {
+  const token = c.req.header("authorization")?.replace(/^Bearer /, "");
+  if (!token) throw new HTTPException(401, { message: "Missing token" });
+  c.set("userId", await verifyToken(token)); // your provider's verify call
   await next();
 });
 
 const NoteIn = z.object({ text: z.string().min(1).max(500) });
-app.post('/api/notes', zValidator('json', NoteIn), (c) => {
-  const { text } = c.req.valid('json');
-  return c.json({ id: crypto.randomUUID(), text, owner: c.get('userId') }, 201);
+app.post("/api/notes", zValidator("json", NoteIn), (c) => {
+  const { text } = c.req.valid("json");
+  return c.json({ id: crypto.randomUUID(), text, owner: c.get("userId") }, 201);
 });
 
 app.onError((err, c) => {
   const status = err instanceof HTTPException ? err.status : 500;
   if (status === 500) console.error(err);
   return c.json(
-    { type: 'about:blank', title: status === 500 ? 'Internal error' : err.message, status },
+    { type: "about:blank", title: status === 500 ? "Internal error" : err.message, status },
     status,
-    { 'content-type': 'application/problem+json' },
+    { "content-type": "application/problem+json" },
   );
 });
 
 async function verifyToken(token: string): Promise<string> {
-  if (token !== process.env.DEV_TOKEN) throw new HTTPException(401, { message: 'Bad token' });
-  return 'demo-user';
+  if (token !== process.env.DEV_TOKEN) throw new HTTPException(401, { message: "Bad token" });
+  return "demo-user";
 }
 ```
 
 ```ts
 // src/index.ts (Node)
-import { serve } from '@hono/node-server';
-import { app } from './app';
+import { serve } from "@hono/node-server";
+import { app } from "./app";
 serve({ fetch: app.fetch, port: Number(process.env.PORT ?? 3000) });
 ```
 
 ```ts
 // src/app.test.ts (vitest)
-import { expect, test } from 'vitest';
-import { app } from './app';
-test('rejects empty note', async () => {
-  const res = await app.request('/api/notes', {
-    method: 'POST',
+import { expect, test } from "vitest";
+import { app } from "./app";
+test("rejects empty note", async () => {
+  const res = await app.request("/api/notes", {
+    method: "POST",
     headers: {
       authorization: `Bearer ${process.env.DEV_TOKEN}`,
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
-    body: JSON.stringify({ text: '' }),
+    body: JSON.stringify({ text: "" }),
   });
   expect(res.status).toBe(400);
 });

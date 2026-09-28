@@ -1,5 +1,5 @@
-import type { Io } from '@/cli/cli.types';
-import type { HookEvent } from '@/hooks/hook.types';
+import type { Io } from "@/cli/cli.types";
+import type { HookEvent } from "@/hooks/hook.types";
 
 /** What an install wrote, kept in `<target>/rx-ai/manifest.json` so uninstall removes exactly that. */
 export interface Manifest {
@@ -19,7 +19,7 @@ export type Copy =
   { to: string; from: string; text?: undefined } | { to: string; text: string; from?: undefined };
 
 /** The tools the kit installs into. */
-export type TargetKind = 'claude' | 'opencode';
+export type TargetKind = "claude" | "opencode";
 
 /** One install destination: which tool, and the directory its files go in. */
 export interface InstallTarget {
@@ -36,14 +36,14 @@ export interface InstallPlan {
 /** Something the kit can install. */
 export interface CatalogItem {
   name: string;
-  kind: 'agent' | 'skill' | 'hook';
+  kind: "agent" | "skill" | "hook";
   summary: string;
 }
 
 /** One `hooks[event][]` entry of a Claude Code settings file. */
 export interface HookGroup {
   matcher?: string;
-  hooks: { type: 'command'; command: string; timeout: number }[];
+  hooks: { type: "command"; command: string; timeout: number }[];
 }
 
 /** The kit's hook entries, by event. */

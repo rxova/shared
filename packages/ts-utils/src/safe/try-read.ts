@@ -1,4 +1,4 @@
-import type { ReadResult } from '@/safe/try-read.types';
+import type { ReadResult } from "@/safe/try-read.types";
 
 /**
  * Reads a property, reporting whether the read itself succeeded. Code that

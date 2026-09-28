@@ -1,5 +1,5 @@
-import type { InstallPlan, InstallTarget, Manifest } from '@/install/install.types';
-import { installCopies } from '@/install/install-copies';
+import type { InstallPlan, InstallTarget, Manifest } from "@/install/install.types";
+import { installCopies } from "@/install/install-copies";
 
 /**
  * What an install writes into one target, and which destinations belong to someone else: a file

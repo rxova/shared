@@ -1,8 +1,8 @@
-import { workspaceFiles } from '@/internal/node-floor/workspace-files';
-import type { WorkspaceFiles } from '@/node-floor/node-floor.types';
-import { appendFileSync } from 'node:fs';
-import { decideFloor } from '@/node-floor/decide-floor';
-import { readPublished } from '@/node-floor/read-published';
+import { workspaceFiles } from "@/internal/node-floor/workspace-files";
+import type { WorkspaceFiles } from "@/node-floor/node-floor.types";
+import { appendFileSync } from "node:fs";
+import { decideFloor } from "@/node-floor/decide-floor";
+import { readPublished } from "@/node-floor/read-published";
 
 /**
  * `rxova-repo-config node-floor`: the oldest Node the published packages promise to
@@ -23,13 +23,13 @@ export const nodeFloorCommand = (
 
     console.log(
       floor === undefined
-        ? 'node-floor: no published package, nothing to test'
-        : `node-floor: ${floor} for ${published.map((pkg) => pkg.name).join(', ')}`,
+        ? "node-floor: no published package, nothing to test"
+        : `node-floor: ${floor} for ${published.map((pkg) => pkg.name).join(", ")}`,
     );
 
     if (env.GITHUB_OUTPUT) {
-      const dirs = published.map((pkg) => pkg.dir).join(' ');
-      appendFileSync(env.GITHUB_OUTPUT, `version=${floor ?? ''}\npackages=${dirs}\n`);
+      const dirs = published.map((pkg) => pkg.dir).join(" ");
+      appendFileSync(env.GITHUB_OUTPUT, `version=${floor ?? ""}\npackages=${dirs}\n`);
     }
     return 0;
   } catch (failure) {

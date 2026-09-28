@@ -27,11 +27,11 @@ where state belongs; come here once the answer is "a global store".
 
    ```ts
    // app/store.ts
-   import { combineSlices, configureStore } from '@reduxjs/toolkit';
-   import { setupListeners } from '@reduxjs/toolkit/query';
-   import { api } from '@/app/api';
-   import { cartSlice } from '@/features/cart/cart-slice';
-   import { listener } from '@/app/listener';
+   import { combineSlices, configureStore } from "@reduxjs/toolkit";
+   import { setupListeners } from "@reduxjs/toolkit/query";
+   import { api } from "@/app/api";
+   import { cartSlice } from "@/features/cart/cart-slice";
+   import { listener } from "@/app/listener";
 
    const rootReducer = combineSlices(cartSlice, api);
    export type RootState = ReturnType<typeof rootReducer>;
@@ -46,7 +46,7 @@ where state belongs; come here once the answer is "a global store".
      return store;
    };
    export type AppStore = ReturnType<typeof makeStore>;
-   export type AppDispatch = AppStore['dispatch'];
+   export type AppDispatch = AppStore["dispatch"];
    ```
 
 3. **Typed hooks, once:** `export const useAppSelector = useSelector.withTypes<RootState>()`

@@ -1,9 +1,9 @@
-import { join } from 'node:path';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { directivesOf } from '@/internal/pack-smoke/directives-of';
-import { exportTargets } from '@/internal/pack-smoke/export-targets';
-import { readIfPresent } from '@/internal/pack-smoke/read-if-present';
-import { sourceCandidates } from '@/internal/pack-smoke/source-candidates';
+import { join } from "node:path";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { directivesOf } from "@/internal/pack-smoke/directives-of";
+import { exportTargets } from "@/internal/pack-smoke/export-targets";
+import { readIfPresent } from "@/internal/pack-smoke/read-if-present";
+import { sourceCandidates } from "@/internal/pack-smoke/source-candidates";
 
 /**
  * The built entries whose source opens with a `'use client'` directive but
@@ -24,9 +24,9 @@ export const lostClientDirectives = (
     for (const source of sourceCandidates(target)) {
       const text = readIfPresent(read, join(pkgDir, source));
       if (text === undefined) continue;
-      if (!directivesOf(text).includes('use client')) return [];
+      if (!directivesOf(text).includes("use client")) return [];
       const built = readIfPresent(read, join(installedDir, target));
-      return built !== undefined && directivesOf(built).includes('use client')
+      return built !== undefined && directivesOf(built).includes("use client")
         ? []
         : [`${target} (from ${source})`];
     }

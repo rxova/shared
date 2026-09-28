@@ -1,6 +1,6 @@
-import type { HookGroups } from '@/install/install.types';
-import { isRecord } from '@/internal/install/is-record';
-import { withoutOwnHooks } from '@/install/without-own-hooks';
+import type { HookGroups } from "@/install/install.types";
+import { isRecord } from "@/internal/install/is-record";
+import { withoutOwnHooks } from "@/install/without-own-hooks";
 
 /** A settings object with this kit's hook groups in place of any it had before. */
 export const withOwnHooks = (

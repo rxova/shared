@@ -6,7 +6,7 @@
  */
 export const revisionRange = (base: string, head: string): string => {
   for (const revision of [base, head]) {
-    if (revision.startsWith('-')) {
+    if (revision.startsWith("-")) {
       throw new Error(`revision "${revision}" starts with a dash, which git reads as an option`);
     }
   }

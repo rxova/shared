@@ -28,9 +28,9 @@ only kind worth keeping.
 3. **Query by role first**, then label, then text; `getByTestId` is the last resort:
 
    ```ts
-   screen.getByRole('button', { name: /save/i });
-   screen.getByRole('textbox', { name: /email/i });
-   screen.getByRole('heading', { level: 2, name: /orders/i });
+   screen.getByRole("button", { name: /save/i });
+   screen.getByRole("textbox", { name: /email/i });
+   screen.getByRole("heading", { level: 2, name: /orders/i });
    ```
 
    If an element has no accessible role or name, that is an accessibility bug to fix, not a
@@ -68,32 +68,32 @@ only kind worth keeping.
 ## Example
 
 ```tsx
-import { http, HttpResponse } from 'msw';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { expect, it } from 'vitest';
-import { server } from '@/test/server';
-import { renderWithProviders } from '@/test/render';
-import { TodoPage } from './todo-page';
+import { http, HttpResponse } from "msw";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { expect, it } from "vitest";
+import { server } from "@/test/server";
+import { renderWithProviders } from "@/test/render";
+import { TodoPage } from "./todo-page";
 
-it('adds a todo and shows it in the list', async () => {
+it("adds a todo and shows it in the list", async () => {
   const user = userEvent.setup();
   renderWithProviders(<TodoPage />);
 
-  await user.type(await screen.findByRole('textbox', { name: /title/i }), 'Buy milk');
-  await user.click(screen.getByRole('button', { name: /add/i }));
+  await user.type(await screen.findByRole("textbox", { name: /title/i }), "Buy milk");
+  await user.click(screen.getByRole("button", { name: /add/i }));
 
-  expect(await screen.findByText('Buy milk')).toBeInTheDocument();
+  expect(await screen.findByText("Buy milk")).toBeInTheDocument();
 });
 
-it('shows an error when saving fails', async () => {
-  server.use(http.post('/api/todos', () => HttpResponse.json({}, { status: 500 })));
+it("shows an error when saving fails", async () => {
+  server.use(http.post("/api/todos", () => HttpResponse.json({}, { status: 500 })));
   const user = userEvent.setup();
   renderWithProviders(<TodoPage />);
 
-  await user.type(await screen.findByRole('textbox', { name: /title/i }), 'Buy milk');
-  await user.click(screen.getByRole('button', { name: /add/i }));
+  await user.type(await screen.findByRole("textbox", { name: /title/i }), "Buy milk");
+  await user.click(screen.getByRole("button", { name: /add/i }));
 
-  expect(await screen.findByRole('alert')).toHaveTextContent(/could not save/i);
+  expect(await screen.findByRole("alert")).toHaveTextContent(/could not save/i);
 });
 ```

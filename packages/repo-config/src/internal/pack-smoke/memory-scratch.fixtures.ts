@@ -1,16 +1,16 @@
-import { join } from 'node:path';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
+import { join } from "node:path";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
 
-export const SCRATCH = '/scratch';
+export const SCRATCH = "/scratch";
 /** Where the workspace packages sit beside `/pkg`, spelled the way `join` spells it here. */
-export const PARENT = join('/pkg', '..');
+export const PARENT = join("/pkg", "..");
 /** What a healthy tarball holds, as `tar -tzf` lists it. */
 export const HEALTHY_TARBALL = [
-  'package/LICENSE',
-  'package/README.md',
-  'package/package.json',
-  'package/dist/index.js',
+  "package/LICENSE",
+  "package/README.md",
+  "package/package.json",
+  "package/dist/index.js",
 ];
 
 /**
@@ -23,13 +23,13 @@ export const memoryScratch = (
   { tarball = true, extra = {} }: { tarball?: boolean; extra?: Record<string, string> } = {},
 ) => {
   const files = new Map<string, string>([
-    [join('/pkg', 'package.json'), JSON.stringify(manifest)],
+    [join("/pkg", "package.json"), JSON.stringify(manifest)],
     ...Object.entries(extra),
   ]);
   const removed: string[] = [];
   const fs: ScratchFiles = {
     make: () => SCRATCH,
-    list: (dir) => (dir === SCRATCH && tarball ? ['scope-example-0.1.0.tgz'] : []),
+    list: (dir) => (dir === SCRATCH && tarball ? ["scope-example-0.1.0.tgz"] : []),
     read: (file) => {
       const contents = files.get(file);
       if (contents === undefined) throw new Error(`ENOENT: ${file}`);
@@ -45,10 +45,10 @@ export const memoryScratch = (
 export const fakeNpm =
   (overrides: { version?: string; probe?: string; contents?: readonly string[] } = {}): Shell =>
   (command, args) => {
-    if (command === 'npx') return `${overrides.version ?? '1.2.3'}\n`;
-    if (command === 'node') return `${overrides.probe ?? 'ok'}\n`;
-    if (command === 'tar' && args[0] === '-tzf') {
-      return `${(overrides.contents ?? HEALTHY_TARBALL).join('\n')}\n`;
+    if (command === "npx") return `${overrides.version ?? "1.2.3"}\n`;
+    if (command === "node") return `${overrides.probe ?? "ok"}\n`;
+    if (command === "tar" && args[0] === "-tzf") {
+      return `${(overrides.contents ?? HEALTHY_TARBALL).join("\n")}\n`;
     }
-    return args.join(' ');
+    return args.join(" ");
   };

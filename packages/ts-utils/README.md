@@ -11,8 +11,8 @@ Add it as a **dev** dependency of a published package and let the build inline i
 package keeps its zero-dependency promise and its size budget.
 
 ```ts
-import { errorMessage, isRecord } from '@rxova/ts-utils';
-import { useIsomorphicLayoutEffect } from '@rxova/ts-utils/react';
+import { errorMessage, isRecord } from "@rxova/ts-utils";
+import { useIsomorphicLayoutEffect } from "@rxova/ts-utils/react";
 ```
 
 ## `@rxova/ts-utils`

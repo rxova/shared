@@ -9,7 +9,7 @@
  */
 export const shallowEqual = (a: unknown, b: unknown): boolean => {
   if (Object.is(a, b)) return true;
-  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
+  if (typeof a !== "object" || a === null || typeof b !== "object" || b === null) return false;
   if (Array.isArray(a) !== Array.isArray(b)) return false;
 
   const left = a as Record<string, unknown>;

@@ -7,4 +7,4 @@ export const probeSource = (name: string): string =>
     'if (Object.keys(esm).length === 0) throw new Error("the import entry exports nothing");',
     'if (Object.keys(cjs).length === 0) throw new Error("the require entry exports nothing");',
     "console.log('ok');",
-  ].join('\n');
+  ].join("\n");

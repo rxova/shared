@@ -1,4 +1,4 @@
-import type { DevGlobal } from '@/env/is-development.types';
+import type { DevGlobal } from "@/env/is-development.types";
 
 // Typed here so the package needs no Node types: it runs in browsers too.
 declare const process: { env: { NODE_ENV?: string } };
@@ -19,9 +19,9 @@ declare const process: { env: { NODE_ENV?: string } };
  */
 export const isDevelopment = (): boolean => {
   const flag = (globalThis as DevGlobal).__DEV__;
-  if (typeof flag === 'boolean') return flag;
+  if (typeof flag === "boolean") return flag;
   try {
-    return process.env.NODE_ENV !== 'production';
+    return process.env.NODE_ENV !== "production";
   } catch {
     return false;
   }

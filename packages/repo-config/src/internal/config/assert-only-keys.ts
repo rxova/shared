@@ -7,7 +7,7 @@ export const assertOnlyKeys = (
   for (const key of Object.keys(value)) {
     if (!allowed.includes(key)) {
       throw new Error(
-        `package.json#${path} has an unknown key "${key}"; expected one of ${allowed.join(', ')}`,
+        `package.json#${path} has an unknown key "${key}"; expected one of ${allowed.join(", ")}`,
       );
     }
   }

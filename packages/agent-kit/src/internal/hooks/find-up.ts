@@ -1,4 +1,4 @@
-import { dirname, join } from 'node:path';
+import { dirname, join } from "node:path";
 
 /** The nearest directory from `start` upwards that holds one of `markers`, or undefined. */
 export const findUp = (

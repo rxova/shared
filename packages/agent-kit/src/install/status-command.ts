@@ -1,15 +1,15 @@
-import { existsSync, readFileSync } from 'node:fs';
-import type { InstallEnv } from '@/install/install.types';
-import { hookGroups } from '@/install/hook-groups';
-import { installCopies } from '@/install/install-copies';
-import { installedTargets } from '@/install/installed-targets';
-import { countOwnHooks } from '@/internal/install/count-own-hooks';
-import { defaultEnv } from '@/internal/install/default-env';
-import { fromTarget } from '@/internal/install/from-target';
-import { packageVersionAt } from '@/internal/install/package-version-at';
-import { parseOptions } from '@/internal/install/parse-options';
-import { readManifest } from '@/internal/install/read-manifest';
-import { readSettings } from '@/internal/install/read-settings';
+import { existsSync, readFileSync } from "node:fs";
+import type { InstallEnv } from "@/install/install.types";
+import { hookGroups } from "@/install/hook-groups";
+import { installCopies } from "@/install/install-copies";
+import { installedTargets } from "@/install/installed-targets";
+import { countOwnHooks } from "@/internal/install/count-own-hooks";
+import { defaultEnv } from "@/internal/install/default-env";
+import { fromTarget } from "@/internal/install/from-target";
+import { packageVersionAt } from "@/internal/install/package-version-at";
+import { parseOptions } from "@/internal/install/parse-options";
+import { readManifest } from "@/internal/install/read-manifest";
+import { readSettings } from "@/internal/install/read-settings";
 
 /**
  * `rxova-agent-kit status [--target claude|opencode|both] [--project]`: for each installed
@@ -20,10 +20,10 @@ import { readSettings } from '@/internal/install/read-settings';
 export const statusCommand = (argv: readonly string[], env: InstallEnv = defaultEnv()): number => {
   const { io } = env;
   try {
-    const options = parseOptions(argv, ['project', 'target']);
+    const options = parseOptions(argv, ["project", "target"]);
     const targets = installedTargets(options.target, options.project === true, env, null);
     if (targets.length === 0) {
-      io.out('rx-ai is not installed here.');
+      io.out("rx-ai is not installed here.");
       return 1;
     }
     const version = packageVersionAt(env.packageDir);
@@ -36,7 +36,7 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
         continue;
       }
       const withSkills = !(
-        target.kind === 'opencode' && !manifest.files.some((file) => file.startsWith('skills/'))
+        target.kind === "opencode" && !manifest.files.some((file) => file.startsWith("skills/"))
       );
       const sources = new Map(
         installCopies(env.packageDir, manifest.items, target, { withSkills }).map((copy) => [
@@ -60,10 +60,10 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
         else if (expected !== undefined && !readFileSync(path).equals(expected))
           problems.push(`  changed  ${file}`);
       }
-      let hooks = '';
-      if (target.kind === 'claude') {
+      let hooks = "";
+      if (target.kind === "claude") {
         const registered = countOwnHooks(readSettings(target.root));
-        const expected = Object.values(hookGroups('rx-ai/hooks.js', manifest.items)).flatMap(
+        const expected = Object.values(hookGroups("rx-ai/hooks.js", manifest.items)).flatMap(
           (groups) => groups.flatMap((group) => group.hooks),
         ).length;
         hooks = `, ${String(registered)} hooks registered`;
@@ -73,7 +73,7 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
           );
       }
       io.out(
-        `rx-ai ${manifest.version} (${manifest.profile}) for ${target.kind === 'claude' ? 'Claude Code' : 'OpenCode'} in ${target.root} (this package is ${version})`,
+        `rx-ai ${manifest.version} (${manifest.profile}) for ${target.kind === "claude" ? "Claude Code" : "OpenCode"} in ${target.root} (this package is ${version})`,
       );
       io.out(
         `  ${String(manifest.items.length)} items, ${String(manifest.files.length)} files${hooks}`,

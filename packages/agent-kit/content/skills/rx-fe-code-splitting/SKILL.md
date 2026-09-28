@@ -31,9 +31,9 @@ and measure the result. Splitting blind moves bytes around without making anythi
 3. **Split heavy features inside a route** with `lazy` or `next/dynamic`:
 
    ```tsx
-   const Chart = lazy(() => import('@/features/report/chart'));
+   const Chart = lazy(() => import("@/features/report/chart"));
    // Next.js, client-only widget
-   const Map = dynamic(() => import('@/features/map/map'), {
+   const Map = dynamic(() => import("@/features/map/map"), {
      ssr: false,
      loading: () => <MapSkeleton />,
    });
@@ -49,7 +49,7 @@ and measure the result. Splitting blind moves bytes around without making anythi
    and call it on hover, focus or when the route is likely next:
 
    ```tsx
-   const loadSettings = () => import('@/pages/settings');
+   const loadSettings = () => import("@/pages/settings");
    const Settings = lazy(loadSettings);
    <Link to="/settings" onMouseEnter={loadSettings} onFocus={loadSettings}>
      Settings
@@ -67,10 +67,10 @@ and measure the result. Splitting blind moves bytes around without making anythi
    listen for the preload error once:
 
    ```ts
-   window.addEventListener('vite:preloadError', (e) => {
-     if (sessionStorage.getItem('reloaded-for-chunk')) return;
+   window.addEventListener("vite:preloadError", (e) => {
+     if (sessionStorage.getItem("reloaded-for-chunk")) return;
      e.preventDefault();
-     sessionStorage.setItem('reloaded-for-chunk', '1');
+     sessionStorage.setItem("reloaded-for-chunk", "1");
      window.location.reload();
    });
    ```

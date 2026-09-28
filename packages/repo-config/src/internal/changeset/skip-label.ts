@@ -7,4 +7,4 @@
  * label to every pull request it opens. `[skip-changeset]` in the title does
  * the same for a pull request whose author cannot set labels.
  */
-export const SKIP_LABEL = 'skip-changeset';
+export const SKIP_LABEL = "skip-changeset";

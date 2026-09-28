@@ -48,35 +48,35 @@ environment, and a seed script so the demo never starts empty.
 
 ```ts
 // src/db/schema.ts
-import { pgTable, uuid, text, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
 export const notes = pgTable(
-  'notes',
+  "notes",
   {
-    id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
-    body: text('body').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index('notes_user_created_idx').on(t.userId, t.createdAt)],
+  (t) => [index("notes_user_created_idx").on(t.userId, t.createdAt)],
 );
 ```
 
 ```ts
 // drizzle.config.ts
-import { defineConfig } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
 export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './drizzle',
-  dialect: 'postgresql',
+  schema: "./src/db/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
   dbCredentials: { url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL! },
 });
 ```
 
 ```ts
 // src/db/index.ts
-import postgres from 'postgres';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import * as schema from './schema';
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import * as schema from "./schema";
 // prepare: false is required behind transaction-mode poolers (Supabase, PgBouncer)
 const client = postgres(process.env.DATABASE_URL!, { prepare: false, max: 5 });
 export const db = drizzle(client, { schema });

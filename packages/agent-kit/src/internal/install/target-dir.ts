@@ -1,4 +1,4 @@
-import { isAbsolute, join } from 'node:path';
+import { isAbsolute, join } from "node:path";
 
 /**
  * The `.claude` directory to install into: the user's, or the project's with `--project`. Throws
@@ -14,7 +14,7 @@ export const targetDir = (
     throw new Error(
       project
         ? `the working directory "${base}" is not an absolute path`
-        : 'no home directory (HOME is empty); set HOME or pass --project',
+        : "no home directory (HOME is empty); set HOME or pass --project",
     );
-  return join(base, '.claude');
+  return join(base, ".claude");
 };

@@ -64,21 +64,21 @@ Do not test first:
 Splitting a bill in integer cents, test first:
 
 ```ts
-import { describe, it, expect } from 'vitest';
-import { splitCents } from './split';
+import { describe, it, expect } from "vitest";
+import { splitCents } from "./split";
 
-describe('splitCents', () => {
-  it('splits evenly when it divides', () => {
+describe("splitCents", () => {
+  it("splits evenly when it divides", () => {
     expect(splitCents(900, 3)).toEqual([300, 300, 300]);
   });
 
-  it('gives remainder cents to the first people, never loses a cent', () => {
+  it("gives remainder cents to the first people, never loses a cent", () => {
     const parts = splitCents(1000, 3);
     expect(parts).toEqual([334, 333, 333]);
     expect(parts.reduce((a, b) => a + b, 0)).toBe(1000);
   });
 
-  it('rejects zero people', () => {
+  it("rejects zero people", () => {
     expect(() => splitCents(1000, 0)).toThrow(/at least one/);
   });
 });

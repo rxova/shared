@@ -6,6 +6,6 @@ export const hasServiceRoleJwt = (text: string): boolean =>
   [...text.matchAll(/eyJ[A-Za-z0-9_-]{8,}\.(eyJ[A-Za-z0-9_-]{8,})\.[A-Za-z0-9_-]{8,}/g)].some(
     (match) =>
       /"role"\s*:\s*"service_role"/.test(
-        Buffer.from(String(match[1]), 'base64url').toString('utf8'),
+        Buffer.from(String(match[1]), "base64url").toString("utf8"),
       ),
   );

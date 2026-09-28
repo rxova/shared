@@ -1,4 +1,4 @@
-import { CORE_ITEMS } from '@/internal/install/profile-items';
+import { CORE_ITEMS } from "@/internal/install/profile-items";
 
 /** A profile of core, plus a list of general items, plus every item `claims` accepts. */
 export const coreWith =

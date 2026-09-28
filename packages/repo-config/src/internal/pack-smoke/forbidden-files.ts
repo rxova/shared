@@ -1,5 +1,5 @@
-import { FORBIDDEN_PATTERNS } from '@/internal/pack-smoke/forbidden-patterns';
-import { matchesFilesEntry } from '@/internal/pack-smoke/matches-files-entry';
+import { FORBIDDEN_PATTERNS } from "@/internal/pack-smoke/forbidden-patterns";
+import { matchesFilesEntry } from "@/internal/pack-smoke/matches-files-entry";
 
 /**
  * The files in `contents` that look like source or tests (see
@@ -14,7 +14,7 @@ export const forbiddenFiles = (contents: readonly string[], files: readonly stri
       (pattern) =>
         pattern.test(path) &&
         !files.some(
-          (entry) => pattern.test(entry.replace(/^\.?\/+/, '')) && matchesFilesEntry(entry, path),
+          (entry) => pattern.test(entry.replace(/^\.?\/+/, "")) && matchesFilesEntry(entry, path),
         ),
     ),
   );

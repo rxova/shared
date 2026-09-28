@@ -1,6 +1,6 @@
-import { join } from 'node:path';
-import { configDefaults, defineConfig, type ViteUserConfig } from 'vitest/config';
-import type { BaseVitestOptions } from '@/vitest/vitest.types';
+import { join } from "node:path";
+import { configDefaults, defineConfig, type ViteUserConfig } from "vitest/config";
+import type { BaseVitestOptions } from "@/vitest/vitest.types";
 
 /**
  * A package's Vitest config, from the shared preset. Every `vitest.config.ts`
@@ -22,31 +22,31 @@ import type { BaseVitestOptions } from '@/vitest/vitest.types';
  */
 export const baseVitestConfig = ({
   root = process.cwd(),
-  environment = 'node',
-  include = ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+  environment = "node",
+  include = ["src/**/*.test.ts", "src/**/*.test.tsx"],
   testExclude = [],
-  coverageInclude = ['src/**/*.{ts,tsx}'],
+  coverageInclude = ["src/**/*.{ts,tsx}"],
   exclude = [],
   thresholds = {},
-  reporter = ['text', 'lcov'],
+  reporter = ["text", "lcov"],
 }: BaseVitestOptions = {}): ViteUserConfig =>
   defineConfig({
     resolve: {
-      alias: [{ find: /^@\//, replacement: `${join(root, 'src')}/` }],
+      alias: [{ find: /^@\//, replacement: `${join(root, "src")}/` }],
     },
     test: {
       environment,
       include: [...include],
       exclude: [...configDefaults.exclude, ...testExclude],
       coverage: {
-        provider: 'v8',
+        provider: "v8",
         reporter: [...reporter],
         include: [...coverageInclude],
         exclude: [
-          'src/**/*.test.{ts,tsx}',
-          'src/**/*.fixtures.{ts,tsx}',
-          'src/**/*.types.ts',
-          'src/index.ts',
+          "src/**/*.test.{ts,tsx}",
+          "src/**/*.fixtures.{ts,tsx}",
+          "src/**/*.types.ts",
+          "src/index.ts",
           ...exclude,
         ],
         thresholds: {

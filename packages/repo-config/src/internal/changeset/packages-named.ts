@@ -8,9 +8,9 @@
  * reads files a pull request can put anything in.
  */
 export const packagesNamed = (markdown: string): number => {
-  const lines = markdown.split('\n').map((line) => line.trim());
-  if (lines[0] !== '---') return 0;
-  const end = lines.indexOf('---', 1);
+  const lines = markdown.split("\n").map((line) => line.trim());
+  if (lines[0] !== "---") return 0;
+  const end = lines.indexOf("---", 1);
   if (end === -1) return 0;
   return lines
     .slice(1, end)

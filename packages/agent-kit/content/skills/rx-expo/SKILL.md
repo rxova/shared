@@ -56,8 +56,8 @@ use a development build or upgrade the SDK.
 
 ```ts
 // lib/supabase.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient } from '@supabase/supabase-js';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createClient } from "@supabase/supabase-js";
 
 export const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_URL!,
@@ -75,7 +75,7 @@ export const supabase = createClient(
 
 ```ts
 // lib/api.ts
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 const base = process.env.EXPO_PUBLIC_API_URL;
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
@@ -83,7 +83,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${base}${path}`, {
     ...init,
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
       ...(data.session && { authorization: `Bearer ${data.session.access_token}` }),
       ...init?.headers,
     },

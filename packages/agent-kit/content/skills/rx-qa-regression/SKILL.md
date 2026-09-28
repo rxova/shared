@@ -32,7 +32,7 @@ point.
    Tag it so it can run alone:
 
    ```ts
-   test('log in and see the dashboard', { tag: '@smoke' }, async ({ page }) => {
+   test("log in and see the dashboard", { tag: "@smoke" }, async ({ page }) => {
      /* … */
    });
    ```

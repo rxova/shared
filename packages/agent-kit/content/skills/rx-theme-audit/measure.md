@@ -59,7 +59,7 @@ async () => {
     return opacity;
   };
   const hex = ({ r, g, b }) =>
-    `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
+    `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
 
   const fails = [];
   const seen = new Set();
@@ -72,7 +72,7 @@ async () => {
     const box = element.getBoundingClientRect();
     const opacity = opacityOf(element);
     const colour = parse(style.color);
-    if (!colour || box.width === 0 || style.visibility === 'hidden' || opacity < 0.05) continue;
+    if (!colour || box.width === 0 || style.visibility === "hidden" || opacity < 0.05) continue;
     const background = backgroundOf(element);
     const text = over({ ...colour, a: colour.a * opacity }, background);
     const [light, dark] = [luminance(text), luminance(background)].sort((x, y) => y - x);
@@ -83,7 +83,7 @@ async () => {
     if (ratio < target)
       fails.push({
         text: walker.currentNode.textContent.trim().slice(0, 40),
-        element: `${element.tagName.toLowerCase()}.${[...element.classList].join('.')}`,
+        element: `${element.tagName.toLowerCase()}.${[...element.classList].join(".")}`,
         colour: hex(text),
         background: hex(background),
         ratio: Number(ratio.toFixed(2)),
@@ -91,7 +91,7 @@ async () => {
       });
   }
 
-  const lightSurfaces = [...document.querySelectorAll('body *')]
+  const lightSurfaces = [...document.querySelectorAll("body *")]
     .filter((element) => {
       const colour = parse(getComputedStyle(element).backgroundColor);
       const box = element.getBoundingClientRect();
@@ -100,17 +100,17 @@ async () => {
       );
     })
     .slice(0, 20)
-    .map((element) => `${element.tagName.toLowerCase()}.${[...element.classList].join('.')}`);
+    .map((element) => `${element.tagName.toLowerCase()}.${[...element.classList].join(".")}`);
 
   const brightImages = [];
   for (const image of document.images) {
-    image.loading = 'eager';
+    image.loading = "eager";
     await image.decode().catch(() => undefined);
     if (!image.naturalWidth) continue;
-    let brightness = 'unreadable';
+    let brightness = "unreadable";
     try {
-      const canvas = Object.assign(document.createElement('canvas'), { width: 32, height: 32 });
-      const context = canvas.getContext('2d');
+      const canvas = Object.assign(document.createElement("canvas"), { width: 32, height: 32 });
+      const context = canvas.getContext("2d");
       context.drawImage(image, 0, 0, 32, 32);
       const { data } = context.getImageData(0, 0, 32, 32);
       let sum = 0;
@@ -124,9 +124,9 @@ async () => {
     } catch {
       // A cross-origin image cannot be read back from the canvas.
     }
-    if (brightness === 'unreadable' || brightness > 200)
+    if (brightness === "unreadable" || brightness > 200)
       brightImages.push({
-        src: image.currentSrc.split('/').pop(),
+        src: image.currentSrc.split("/").pop(),
         alt: image.alt.slice(0, 40),
         brightness,
       });

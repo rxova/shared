@@ -1,4 +1,4 @@
-import { matchesFilesEntry } from '@/internal/pack-smoke/matches-files-entry';
+import { matchesFilesEntry } from "@/internal/pack-smoke/matches-files-entry";
 
 /**
  * The `wanted` entries — file names, directories or globs, as `files` spells
@@ -7,5 +7,5 @@ import { matchesFilesEntry } from '@/internal/pack-smoke/matches-files-entry';
  */
 export const missingFiles = (wanted: readonly string[], contents: readonly string[]): string[] =>
   wanted.filter(
-    (entry) => !entry.startsWith('!') && !contents.some((path) => matchesFilesEntry(entry, path)),
+    (entry) => !entry.startsWith("!") && !contents.some((path) => matchesFilesEntry(entry, path)),
   );

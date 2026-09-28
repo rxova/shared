@@ -1,9 +1,9 @@
-import { join } from 'node:path';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { packInto } from '@/internal/pack-smoke/pack-into';
-import { publishedRange } from '@/internal/pack-smoke/published-range';
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
-import { workspaceDir } from '@/internal/pack-smoke/workspace-dir';
+import { join } from "node:path";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { packInto } from "@/internal/pack-smoke/pack-into";
+import { publishedRange } from "@/internal/pack-smoke/published-range";
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
+import { workspaceDir } from "@/internal/pack-smoke/workspace-dir";
 
 /**
  * `npm pack` keeps a `workspace:` spec as written, which no npm install
@@ -28,22 +28,22 @@ export const resolveWorkspaceDeps = (
   scratch: string,
   { sh, fs }: { sh: Shell; fs: ScratchFiles },
 ): string[] => {
-  const fields = ['dependencies', 'optionalDependencies', 'peerDependencies'] as const;
+  const fields = ["dependencies", "optionalDependencies", "peerDependencies"] as const;
   const names = new Set(
     fields.flatMap((field) =>
       Object.entries(manifest[field] ?? {})
-        .filter(([, spec]) => spec.startsWith('workspace:'))
+        .filter(([, spec]) => spec.startsWith("workspace:"))
         .map(([name]) => name),
     ),
   );
   if (names.size === 0) return [];
-  sh('tar', ['-xzf', tarball, '-C', scratch], scratch);
-  const unpacked = join(scratch, 'package');
-  const packed = JSON.parse(fs.read(join(unpacked, 'package.json'))) as PackageManifest;
+  sh("tar", ["-xzf", tarball, "-C", scratch], scratch);
+  const unpacked = join(scratch, "package");
+  const packed = JSON.parse(fs.read(join(unpacked, "package.json"))) as PackageManifest;
   const local = new Map(
     [...names].map((name) => {
       const dir = workspaceDir(pkgDir, name, fs);
-      const { version } = JSON.parse(fs.read(join(dir, 'package.json'))) as PackageManifest;
+      const { version } = JSON.parse(fs.read(join(dir, "package.json"))) as PackageManifest;
       return [name, { tarball: packInto(dir, scratch, sh), version }] as const;
     }),
   );
@@ -58,7 +58,7 @@ export const resolveWorkspaceDeps = (
     specs &&
     Object.fromEntries(
       Object.entries(specs).map(([name, spec]) => {
-        const found = spec.startsWith('workspace:') ? local.get(name) : undefined;
+        const found = spec.startsWith("workspace:") ? local.get(name) : undefined;
         return [name, found ? to(spec, found) : spec];
       }),
     );
@@ -72,12 +72,12 @@ export const resolveWorkspaceDeps = (
       publishedRange(spec, version),
     ),
   };
-  fs.write(join(unpacked, 'package.json'), JSON.stringify(resolved, null, 2));
-  sh('npm', ['pack', '--ignore-scripts', '--pack-destination', scratch], unpacked);
+  fs.write(join(unpacked, "package.json"), JSON.stringify(resolved, null, 2));
+  sh("npm", ["pack", "--ignore-scripts", "--pack-destination", scratch], unpacked);
   const peers = Object.entries(manifest.peerDependencies ?? {});
   return [...local]
     .filter(([name]) =>
-      peers.some(([peer, spec]) => peer === name && spec.startsWith('workspace:')),
+      peers.some(([peer, spec]) => peer === name && spec.startsWith("workspace:")),
     )
     .map(([, { tarball: file }]) => file);
 };

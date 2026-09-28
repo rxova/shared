@@ -1,4 +1,4 @@
-import type { UserConfig } from 'tsdown';
+import type { UserConfig } from "tsdown";
 
 /**
  * The shared build defaults, so raising the floor is a single-file change
@@ -19,10 +19,10 @@ import type { UserConfig } from 'tsdown';
  * inference silently renames the files the exports map points at.
  */
 export const baseBuildConfig = (overrides: UserConfig = {}): UserConfig => ({
-  entry: { index: 'src/index.ts' },
-  format: ['esm'],
-  platform: 'node',
-  target: 'node22',
+  entry: { index: "src/index.ts" },
+  format: ["esm"],
+  platform: "node",
+  target: "node22",
   fixedExtension: false,
   dts: true,
   clean: true,

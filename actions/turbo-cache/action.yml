@@ -8,7 +8,7 @@ inputs:
       leg of a matrix — pass a distinct value per leg so one Node version cannot
       replay a result computed under another.
     required: false
-    default: ''
+    default: ""
 
 runs:
   using: composite

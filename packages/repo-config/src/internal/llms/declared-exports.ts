@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import ts from 'typescript';
+import { readFileSync } from "node:fs";
+import ts from "typescript";
 
 /**
  * Every name an entry file exports, types included: an agent importing a type
@@ -9,7 +9,7 @@ import ts from 'typescript';
  */
 export const declaredExports = (entry: string): Set<string> => {
   const names = new Set<string>();
-  const source = ts.createSourceFile(entry, readFileSync(entry, 'utf8'), ts.ScriptTarget.Latest);
+  const source = ts.createSourceFile(entry, readFileSync(entry, "utf8"), ts.ScriptTarget.Latest);
 
   for (const statement of source.statements) {
     if (ts.isExportDeclaration(statement)) {

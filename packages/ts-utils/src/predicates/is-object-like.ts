@@ -4,4 +4,4 @@
  * Safe to read a property off, nothing more.
  */
 export const isObjectLike = (value: unknown): value is object =>
-  typeof value === 'object' && value !== null;
+  typeof value === "object" && value !== null;

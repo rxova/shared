@@ -1,4 +1,4 @@
-import type { OpencodeHooks } from '@/install/opencode-hooks';
+import type { OpencodeHooks } from "@/install/opencode-hooks";
 
 /**
  * The OpenCode plugin the installer writes to `plugins/rx-kit.js`: plain ES module JavaScript that

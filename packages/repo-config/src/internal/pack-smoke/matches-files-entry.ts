@@ -1,4 +1,4 @@
-import { globRegExp } from '@/internal/pack-smoke/glob-regexp';
+import { globRegExp } from "@/internal/pack-smoke/glob-regexp";
 
 /**
  * Whether npm ships `path` because of the `files` entry `entry`: the entry
@@ -7,6 +7,6 @@ import { globRegExp } from '@/internal/pack-smoke/glob-regexp';
  */
 export const matchesFilesEntry = (entry: string, path: string): boolean => {
   const pattern = globRegExp(entry);
-  const segments = path.split('/');
-  return segments.some((_, index) => pattern.test(segments.slice(0, index + 1).join('/')));
+  const segments = path.split("/");
+  return segments.some((_, index) => pattern.test(segments.slice(0, index + 1).join("/")));
 };

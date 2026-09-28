@@ -7,7 +7,7 @@ inputs:
       Space-separated browser list, such as "chromium" for a job that only drives
       Vitest browser mode. Leave empty to install every browser Playwright ships.
     required: false
-    default: ''
+    default: ""
 
 runs:
   using: composite

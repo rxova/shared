@@ -1,5 +1,5 @@
-import { hooks } from '@/hooks/hooks-table';
-import type { HookGroup, HookGroups } from '@/install/install.types';
+import { hooks } from "@/hooks/hooks-table";
+import type { HookGroup, HookGroups } from "@/install/install.types";
 
 /**
  * The settings entries that run the chosen hooks through the installed runner: one group per
@@ -17,10 +17,10 @@ export const hookGroups = (runner: string, names: readonly string[]): HookGroups
         list.push(group);
       }
       group.hooks.push({
-        type: 'command',
+        type: "command",
         command: `node "${runner}" ${name}`,
         timeout: spec.timeout,
-      } satisfies HookGroup['hooks'][number]);
+      } satisfies HookGroup["hooks"][number]);
     }
   }
   return groups;

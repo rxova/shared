@@ -1,4 +1,4 @@
-import { isObjectLike } from '@/predicates/is-object-like';
+import { isObjectLike } from "@/predicates/is-object-like";
 
 /**
  * A non-null, non-array object, indexable by string key. Class instances pass;

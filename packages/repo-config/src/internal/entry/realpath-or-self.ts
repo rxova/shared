@@ -1,4 +1,4 @@
-import { realpathSync } from 'node:fs';
+import { realpathSync } from "node:fs";
 
 /**
  * The path with symlinks resolved, or the path as given when it does not

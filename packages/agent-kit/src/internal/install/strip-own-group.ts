@@ -1,5 +1,5 @@
-import { isOwnHook } from '@/internal/install/is-own-hook';
-import { isRecord } from '@/internal/install/is-record';
+import { isOwnHook } from "@/internal/install/is-own-hook";
+import { isRecord } from "@/internal/install/is-record";
 
 /**
  * One `hooks[event][]` entry without this kit's commands, and whether taking them out left it
