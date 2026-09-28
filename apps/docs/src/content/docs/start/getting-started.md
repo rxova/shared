@@ -6,20 +6,20 @@ description: Add the shared packages and actions to a repository.
 ## Runtime helpers
 
 ```sh
-pnpm add -D @rxova/ts-utils
+pnpm add -D -w @rxova/ts-utils
 ```
 
 ```ts
 import { errorMessage, isRecord } from "@rxova/ts-utils";
 ```
 
-Add it as a dev dependency of a published package so its build inlines the helpers. The package
-stays dependency-free.
+Add it once, to the root `package.json`, never to a published package's dependencies: the package's
+build inlines the helpers it uses (`deps.onlyBundle`), so the package stays dependency-free.
 
 ## Repository tooling
 
 ```sh
-pnpm add -D @rxova/repo-config
+pnpm add -D -w @rxova/repo-config
 ```
 
 ```json
