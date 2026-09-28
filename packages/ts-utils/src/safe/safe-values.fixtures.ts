@@ -6,8 +6,8 @@ export const hostile = (): object => {
 };
 
 /** An object whose `value` getter throws. */
-export const throwingGetter = Object.defineProperty({}, 'value', {
+export const throwingGetter = Object.defineProperty({}, "value", {
   get() {
-    throw new Error('getter');
+    throw new Error("getter");
   },
 });

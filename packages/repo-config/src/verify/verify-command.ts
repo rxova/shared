@@ -1,10 +1,10 @@
-import { runCommand } from '@/internal/verify/run-command';
-import type { Reader } from '@/config/config.types';
-import type { Runner } from '@/verify/verify.types';
-import { defaultSteps } from '@/verify/default-steps';
-import { readConfig } from '@/config/read-config';
-import { runSteps } from '@/verify/run-steps';
-import { selectSteps } from '@/verify/select-steps';
+import { runCommand } from "@/internal/verify/run-command";
+import type { Reader } from "@/config/config.types";
+import type { Runner } from "@/verify/verify.types";
+import { defaultSteps } from "@/verify/default-steps";
+import { readConfig } from "@/config/read-config";
+import { runSteps } from "@/verify/run-steps";
+import { selectSteps } from "@/verify/select-steps";
 
 /**
  * `rxova-repo-config verify [--only a,b]`: the pre-push gate. The list is

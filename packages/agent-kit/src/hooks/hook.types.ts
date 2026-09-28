@@ -9,7 +9,7 @@ export interface HookInput {
 }
 
 /** The events the kit hooks into. */
-export type HookEvent = 'PreToolUse' | 'PostToolUse' | 'PreCompact' | 'SessionStart' | 'SessionEnd';
+export type HookEvent = "PreToolUse" | "PostToolUse" | "PreCompact" | "SessionStart" | "SessionEnd";
 
 /** A finished child process. */
 export interface RunResult {

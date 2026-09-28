@@ -5,22 +5,22 @@
  * the way npm reads them.
  */
 export const globRegExp = (pattern: string): RegExp => {
-  const glob = pattern.replace(/^\.?\/+/, '').replace(/\/+$/, '');
-  let source = '';
+  const glob = pattern.replace(/^\.?\/+/, "").replace(/\/+$/, "");
+  let source = "";
   for (let at = 0; at < glob.length; at += 1) {
     const char = glob.charAt(at);
-    if (glob.startsWith('**/', at)) {
-      source += '(?:.*/)?';
+    if (glob.startsWith("**/", at)) {
+      source += "(?:.*/)?";
       at += 2;
-    } else if (glob.startsWith('**', at)) {
-      source += '.*';
+    } else if (glob.startsWith("**", at)) {
+      source += ".*";
       at += 1;
-    } else if (char === '*') source += '[^/]*';
-    else if (char === '?') source += '[^/]';
-    else if (char === '{') source += '(?:';
-    else if (char === '}') source += ')';
-    else if (char === ',') source += '|';
-    else source += char.replace(/[.+^$()|[\]\\]/g, '\\$&');
+    } else if (char === "*") source += "[^/]*";
+    else if (char === "?") source += "[^/]";
+    else if (char === "{") source += "(?:";
+    else if (char === "}") source += ")";
+    else if (char === ",") source += "|";
+    else source += char.replace(/[.+^$()|[\]\\]/g, "\\$&");
   }
   return new RegExp(`^${source}$`);
 };

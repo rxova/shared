@@ -1,8 +1,8 @@
-import { basename, resolve } from 'node:path';
-import type { Guard } from '@/hooks/hook.types';
-import { allow } from '@/internal/hooks/allow';
-import { EDITING_TOOLS } from '@/internal/hooks/editing-tools';
-import { isConfigFile } from '@/internal/hooks/is-config-file';
+import { basename, resolve } from "node:path";
+import type { Guard } from "@/hooks/hook.types";
+import { allow } from "@/internal/hooks/allow";
+import { EDITING_TOOLS } from "@/internal/hooks/editing-tools";
+import { isConfigFile } from "@/internal/hooks/is-config-file";
 
 /**
  * Stops edits to a lint, format, type, commit or coverage config that already exists, the
@@ -10,13 +10,13 @@ import { isConfigFile } from '@/internal/hooks/is-config-file';
  */
 export const configLock: Guard = (input, context) => {
   const path = input.tool_input?.file_path;
-  if (!EDITING_TOOLS.has(input.tool_name ?? '') || typeof path !== 'string') return allow;
+  if (!EDITING_TOOLS.has(input.tool_name ?? "") || typeof path !== "string") return allow;
   const name = basename(path);
-  if (!isConfigFile(name) || !context.exists(resolve(input.cwd ?? '.', path))) return allow;
+  if (!isConfigFile(name) || !context.exists(resolve(input.cwd ?? ".", path))) return allow;
   return {
     block: true,
     reason:
       `${name} decides what the checks accept. Fix the code the check flags instead; ` +
-      'if the config itself has to change, ask the user first.',
+      "if the config itself has to change, ask the user first.",
   };
 };

@@ -1,5 +1,5 @@
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { exportTargets } from '@/internal/pack-smoke/export-targets';
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { exportTargets } from "@/internal/pack-smoke/export-targets";
 
 /**
  * The manifest's targets (see `exportTargets`) the tarball does not hold: a
@@ -9,8 +9,8 @@ import { exportTargets } from '@/internal/pack-smoke/export-targets';
  */
 export const missingTargets = (manifest: PackageManifest, contents: readonly string[]): string[] =>
   exportTargets(manifest).filter((target) => {
-    if (!target.includes('*')) return !contents.includes(target);
-    const escaped = target.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '.+');
+    if (!target.includes("*")) return !contents.includes(target);
+    const escaped = target.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".+");
     const pattern = new RegExp(`^${escaped}$`);
     return !contents.some((path) => pattern.test(path));
   });

@@ -1,4 +1,4 @@
-import { isRecord } from '@/predicates/is-record';
+import { isRecord } from "@/predicates/is-record";
 
 /**
  * A plain data object: an object literal, a `JSON.parse` result, or an

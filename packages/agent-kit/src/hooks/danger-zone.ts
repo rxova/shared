@@ -1,13 +1,13 @@
-import type { Guard } from '@/hooks/hook.types';
-import { allow } from '@/internal/hooks/allow';
-import { bashCommand } from '@/internal/hooks/bash-command';
-import { destructiveCommand } from '@/internal/hooks/destructive-command';
-import { discardsWork } from '@/internal/hooks/discards-work';
-import { forcePushTarget } from '@/internal/hooks/force-push-target';
-import { gitOutput } from '@/internal/hooks/git-output';
-import { recursiveRemoval } from '@/internal/hooks/recursive-removal';
-import { gitCall } from '@/internal/shell/git-call';
-import { shellSegments } from '@/internal/shell/shell-segments';
+import type { Guard } from "@/hooks/hook.types";
+import { allow } from "@/internal/hooks/allow";
+import { bashCommand } from "@/internal/hooks/bash-command";
+import { destructiveCommand } from "@/internal/hooks/destructive-command";
+import { discardsWork } from "@/internal/hooks/discards-work";
+import { forcePushTarget } from "@/internal/hooks/force-push-target";
+import { gitOutput } from "@/internal/hooks/git-output";
+import { recursiveRemoval } from "@/internal/hooks/recursive-removal";
+import { gitCall } from "@/internal/shell/git-call";
+import { shellSegments } from "@/internal/shell/shell-segments";
 
 /**
  * Stops commands that destroy something hard to get back: a recursive `rm` outside the project,
@@ -17,9 +17,9 @@ import { shellSegments } from '@/internal/shell/shell-segments';
 export const dangerZone: Guard = (input, context) => {
   const command = bashCommand(input);
   if (command === undefined) return allow;
-  const cwd = input.cwd ?? context.env.PWD ?? '/';
-  const home = context.env.HOME ?? '/nonexistent-home';
-  const ask = 'If it is really wanted, ask the user to run it themselves.';
+  const cwd = input.cwd ?? context.env.PWD ?? "/";
+  const home = context.env.HOME ?? "/nonexistent-home";
+  const ask = "If it is really wanted, ask the user to run it themselves.";
 
   for (const words of shellSegments(command)) {
     const target = recursiveRemoval(words, cwd, home);
@@ -32,14 +32,14 @@ export const dangerZone: Guard = (input, context) => {
     const call = gitCall(words);
     if (call === undefined) continue;
     const branch = forcePushTarget(call, () =>
-      gitOutput(context, cwd, ['rev-parse', '--abbrev-ref', 'HEAD']),
+      gitOutput(context, cwd, ["rev-parse", "--abbrev-ref", "HEAD"]),
     );
     if (branch !== undefined)
       return {
         block: true,
         reason: `A force push would rewrite ${branch}. Push a branch and open a pull request instead.`,
       };
-    if (discardsWork(call) && (gitOutput(context, cwd, ['status', '--porcelain']) ?? '') !== '')
+    if (discardsWork(call) && (gitOutput(context, cwd, ["status", "--porcelain"]) ?? "") !== "")
       return {
         block: true,
         reason: `git ${call.subcommand} would throw away uncommitted changes. Commit or stash them first. ${ask}`,

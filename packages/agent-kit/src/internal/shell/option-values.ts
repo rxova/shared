@@ -6,7 +6,7 @@ export const optionValues = (args: readonly string[], names: readonly string[]):
   const values: string[] = [];
   args.forEach((arg, index) => {
     for (const name of names) {
-      if (arg === name) values.push(args[index + 1] ?? '');
+      if (arg === name) values.push(args[index + 1] ?? "");
       else if (arg.startsWith(`${name}=`)) values.push(arg.slice(name.length + 1));
       else if (/^-[A-Za-z]$/.test(name) && arg.startsWith(name) && arg.length > 2)
         values.push(arg.slice(2));

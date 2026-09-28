@@ -1,4 +1,4 @@
-import type { Linter } from 'eslint';
+import type { Linter } from "eslint";
 
 export interface BaseEslintOptions {
   /** The directory holding the root tsconfig: `import.meta.dirname` in `eslint.config.js`. */

@@ -1,6 +1,6 @@
-import { isError } from '@/errors/is-error';
-import { objectTag } from '@/safe/object-tag';
-import { readString } from '@/safe/read-string';
+import { isError } from "@/errors/is-error";
+import { objectTag } from "@/safe/object-tag";
+import { readString } from "@/safe/read-string";
 
 /**
  * The message to show for anything thrown. An `Error` gives its `message`, a
@@ -9,11 +9,11 @@ import { readString } from '@/safe/read-string';
  * back to the object's tag rather than escaping the handler it runs in.
  */
 export const errorMessage = (value: unknown): string => {
-  if (typeof value === 'string') return value;
-  if (isError(value)) return readString(value, 'message') ?? '';
+  if (typeof value === "string") return value;
+  if (isError(value)) return readString(value, "message") ?? "";
   try {
     return String(value);
   } catch {
-    return objectTag(value) ?? 'Unknown error';
+    return objectTag(value) ?? "Unknown error";
   }
 };

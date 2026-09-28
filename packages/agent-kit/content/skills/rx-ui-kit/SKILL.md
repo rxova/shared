@@ -48,9 +48,9 @@ dropdown-menu skeleton sonner`. Components land in `components/ui/`; edit them f
 ## Example
 
 ```tsx
-import { Loader2, Inbox, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2, Inbox, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props<T> = {
   data?: T[];

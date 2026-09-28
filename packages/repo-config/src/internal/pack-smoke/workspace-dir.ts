@@ -1,14 +1,14 @@
-import { join } from 'node:path';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import type { ScratchFiles } from '@/pack-smoke/pack-smoke.types';
+import { join } from "node:path";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import type { ScratchFiles } from "@/pack-smoke/pack-smoke.types";
 
 /** The directory beside `pkgDir` holding the workspace package `name`. */
 export const workspaceDir = (pkgDir: string, name: string, fs: ScratchFiles): string => {
-  const parent = join(pkgDir, '..');
+  const parent = join(pkgDir, "..");
   for (const dir of fs.list(parent)) {
     try {
       const { name: found } = JSON.parse(
-        fs.read(join(parent, dir, 'package.json')),
+        fs.read(join(parent, dir, "package.json")),
       ) as PackageManifest;
       if (found === name) return join(parent, dir);
     } catch {

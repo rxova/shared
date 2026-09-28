@@ -1,14 +1,14 @@
-import { changesetFiles } from '@/internal/changeset/changeset-files';
-import { gitDiff } from '@/internal/changeset/git-diff';
-import { labelsOf } from '@/internal/changeset/labels-of';
-import { readFile } from '@/internal/config/read-file';
-import { singlePackageProblems } from '@/internal/changeset/single-package-problems';
-import type { Differ } from '@/changeset/changeset.types';
-import type { Reader } from '@/config/config.types';
-import { join } from 'node:path';
-import { checkChangeset } from '@/changeset/check-changeset';
-import { publishedDirs } from '@/changeset/published-dirs';
-import { readConfig } from '@/config/read-config';
+import { changesetFiles } from "@/internal/changeset/changeset-files";
+import { gitDiff } from "@/internal/changeset/git-diff";
+import { labelsOf } from "@/internal/changeset/labels-of";
+import { readFile } from "@/internal/config/read-file";
+import { singlePackageProblems } from "@/internal/changeset/single-package-problems";
+import type { Differ } from "@/changeset/changeset.types";
+import type { Reader } from "@/config/config.types";
+import { join } from "node:path";
+import { checkChangeset } from "@/changeset/check-changeset";
+import { publishedDirs } from "@/changeset/published-dirs";
+import { readConfig } from "@/config/read-config";
 
 /**
  * `rxova-repo-config check-changeset`: a change to a published package needs a
@@ -34,7 +34,7 @@ export const checkChangesetCommand = (
   const head = env.HEAD_SHA;
 
   if (!base || !head) {
-    console.error('check-changeset: BASE_SHA and HEAD_SHA must be set');
+    console.error("check-changeset: BASE_SHA and HEAD_SHA must be set");
     return 1;
   }
 
@@ -44,7 +44,7 @@ export const checkChangesetCommand = (
     const verdict = checkChangeset(
       diff(base, head),
       published ?? publishedDirs(root),
-      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? '' },
+      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? "" },
       { present },
     );
 
@@ -55,8 +55,8 @@ export const checkChangesetCommand = (
       );
       if (problems.length > 0) {
         console.error(
-          ['check-changeset: each changeset must name exactly one package.', ...problems].join(
-            '\n',
+          ["check-changeset: each changeset must name exactly one package.", ...problems].join(
+            "\n",
           ),
         );
         return 1;

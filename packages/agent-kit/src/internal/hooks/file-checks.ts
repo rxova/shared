@@ -1,6 +1,6 @@
-import { extname, join } from 'node:path';
-import type { HookContext } from '@/hooks/hook.types';
-import { FORMATTED, LINTED } from '@/internal/hooks/checked-extensions';
+import { extname, join } from "node:path";
+import type { HookContext } from "@/hooks/hook.types";
+import { FORMATTED, LINTED } from "@/internal/hooks/checked-extensions";
 
 /** A program and its arguments, run from the project root. */
 export interface Check {
@@ -17,43 +17,43 @@ export interface Check {
  */
 export const fileChecks = (file: string, root: string, context: HookContext): Check[] => {
   const ext = extname(file);
-  const bin = (name: string) => join(root, 'node_modules', '.bin', name);
+  const bin = (name: string) => join(root, "node_modules", ".bin", name);
   const has = (name: string) => context.exists(bin(name));
 
-  if (ext === '.cs')
+  if (ext === ".cs")
     return [
       {
-        program: 'dotnet',
-        args: ['format', 'whitespace', root, '--folder', '--include', file],
+        program: "dotnet",
+        args: ["format", "whitespace", root, "--folder", "--include", file],
         reports: false,
       },
     ];
-  if (ext === '.py') {
-    const venv = join(root, '.venv', 'bin', 'ruff');
-    const ruff = context.exists(venv) ? venv : 'ruff';
+  if (ext === ".py") {
+    const venv = join(root, ".venv", "bin", "ruff");
+    const ruff = context.exists(venv) ? venv : "ruff";
     return [
-      { program: ruff, args: ['format', file], reports: false },
-      { program: ruff, args: ['check', '--quiet', file], reports: true },
+      { program: ruff, args: ["format", file], reports: false },
+      { program: ruff, args: ["check", "--quiet", file], reports: true },
     ];
   }
   if (!FORMATTED.has(ext)) return [];
-  if (has('biome'))
+  if (has("biome"))
     return [
-      { program: bin('biome'), args: ['format', '--write', file], reports: false },
-      ...(LINTED.has(ext) ? [{ program: bin('biome'), args: ['lint', file], reports: true }] : []),
+      { program: bin("biome"), args: ["format", "--write", file], reports: false },
+      ...(LINTED.has(ext) ? [{ program: bin("biome"), args: ["lint", file], reports: true }] : []),
     ];
   return [
-    ...(has('prettier')
+    ...(has("prettier")
       ? [
           {
-            program: bin('prettier'),
-            args: ['--write', '--log-level', 'warn', file],
+            program: bin("prettier"),
+            args: ["--write", "--log-level", "warn", file],
             reports: false,
           },
         ]
       : []),
-    ...(has('eslint') && LINTED.has(ext)
-      ? [{ program: bin('eslint'), args: ['--no-warn-ignored', file], reports: true }]
+    ...(has("eslint") && LINTED.has(ext)
+      ? [{ program: bin("eslint"), args: ["--no-warn-ignored", file], reports: true }]
       : []),
   ];
 };

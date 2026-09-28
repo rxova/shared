@@ -6,10 +6,10 @@
 export const directivesOf = (source: string): string[] => {
   const skip = /^(?:\s+|\/\/[^\n]*|\/\*[\s\S]*?\*\/)*/;
   const statement = /^(['"])([^'"\\\n]*)\1\s*;?/;
-  let rest = source.replace(/^#![^\n]*/, '');
+  let rest = source.replace(/^#![^\n]*/, "");
   const found: string[] = [];
   for (;;) {
-    rest = rest.replace(skip, '');
+    rest = rest.replace(skip, "");
     const match = statement.exec(rest);
     if (match === null) return found;
     found.push(String(match[2]));

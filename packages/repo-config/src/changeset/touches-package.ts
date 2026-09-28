@@ -1,4 +1,4 @@
-import { isTestFile } from '@/internal/changeset/is-test-file';
+import { isTestFile } from "@/internal/changeset/is-test-file";
 
 /**
  * Whether the diff touches something a published package ships. Markdown and
@@ -9,6 +9,6 @@ export const touchesPackage = (changed: string[], published: string[]): boolean 
   changed.some(
     (file) =>
       published.some((dir) => file.startsWith(`packages/${dir}/`)) &&
-      !file.endsWith('.md') &&
+      !file.endsWith(".md") &&
       !isTestFile(file),
   );

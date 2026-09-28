@@ -1,19 +1,19 @@
-import { describe, expect, it } from 'vitest';
-import { SKIP_LABEL } from '@/internal/changeset/skip-label';
-import { skipReason } from '@/internal/changeset/skip-reason';
+import { describe, expect, it } from "vitest";
+import { SKIP_LABEL } from "@/internal/changeset/skip-label";
+import { skipReason } from "@/internal/changeset/skip-reason";
 
-describe('skipReason', () => {
-  it('reads the label', () => {
-    expect(skipReason({ labels: ['dependencies', SKIP_LABEL] })).toContain('set on this pull');
+describe("skipReason", () => {
+  it("reads the label", () => {
+    expect(skipReason({ labels: ["dependencies", SKIP_LABEL] })).toContain("set on this pull");
   });
 
-  it('reads the bracketed marker in the title, but not the bare word', () => {
-    expect(skipReason({ title: `chore: bump [${SKIP_LABEL}]` })).toContain('title');
+  it("reads the bracketed marker in the title, but not the bare word", () => {
+    expect(skipReason({ title: `chore: bump [${SKIP_LABEL}]` })).toContain("title");
     expect(skipReason({ title: SKIP_LABEL })).toBeUndefined();
   });
 
-  it('is nothing for a pull request that asks for no excuse', () => {
+  it("is nothing for a pull request that asks for no excuse", () => {
     expect(skipReason({})).toBeUndefined();
-    expect(skipReason({ labels: ['dependencies'] })).toBeUndefined();
+    expect(skipReason({ labels: ["dependencies"] })).toBeUndefined();
   });
 });

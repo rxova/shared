@@ -1,4 +1,4 @@
-import { profiles } from '@/install/profiles';
+import { profiles } from "@/install/profiles";
 
 /**
  * The items to install: a profile's set, plus `add`, minus `skip`. With no profile, the previous
@@ -21,7 +21,7 @@ export const selectItems = ({
   const unknown = [...add, ...skip].filter((name) => !names.includes(name));
   if (unknown.length > 0)
     throw new Error(
-      `unknown item ${unknown.join(', ')}; run \`rxova-agent-kit list\` to see every item`,
+      `unknown item ${unknown.join(", ")}; run \`rxova-agent-kit list\` to see every item`,
     );
 
   let base: { profile: string; items: readonly string[] };
@@ -31,11 +31,11 @@ export const selectItems = ({
       items: previous.items.filter((name) => names.includes(name)),
     };
   } else {
-    const key = profile ?? 'core';
+    const key = profile ?? "core";
     const pick = Object.hasOwn(profiles, key) ? profiles[key] : undefined;
     if (pick === undefined)
       throw new Error(
-        `unknown profile "${key}"; choose one of ${Object.keys(profiles).join(', ')}`,
+        `unknown profile "${key}"; choose one of ${Object.keys(profiles).join(", ")}`,
       );
     base = { profile: key, items: pick(names) };
   }

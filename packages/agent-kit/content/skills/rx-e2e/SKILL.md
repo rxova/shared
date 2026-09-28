@@ -31,23 +31,23 @@ renamed button, a missing env var, a redirect loop. Keep it small, stable and fa
 
    ```ts
    // playwright.config.ts
-   import { defineConfig, devices } from '@playwright/test';
+   import { defineConfig, devices } from "@playwright/test";
 
-   const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
+   const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
    const isRemote = Boolean(process.env.E2E_BASE_URL);
 
    export default defineConfig({
-     testDir: 'e2e',
+     testDir: "e2e",
      retries: process.env.CI ? 1 : 0,
      use: {
        baseURL,
-       trace: 'retain-on-failure',
-       screenshot: 'only-on-failure',
+       trace: "retain-on-failure",
+       screenshot: "only-on-failure",
      },
-     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+     projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
      webServer: isRemote
        ? undefined
-       : { command: 'pnpm dev', url: baseURL, reuseExistingServer: !process.env.CI },
+       : { command: "pnpm dev", url: baseURL, reuseExistingServer: !process.env.CI },
    });
    ```
 
@@ -80,15 +80,15 @@ renamed button, a missing env var, a redirect loop. Keep it small, stable and fa
 
 ```ts
 // e2e/split.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('upload a receipt and get one payment link per person', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Friday dinner' }).click();
-  await page.getByLabel('Receipt photo').setInputFiles('e2e/fixtures/receipt.jpg');
-  await expect(page.getByRole('listitem').filter({ hasText: 'Pad thai' })).toBeVisible();
+test("upload a receipt and get one payment link per person", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Friday dinner" }).click();
+  await page.getByLabel("Receipt photo").setInputFiles("e2e/fixtures/receipt.jpg");
+  await expect(page.getByRole("listitem").filter({ hasText: "Pad thai" })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Send links' }).click();
-  await expect(page.getByTestId('payment-link')).toHaveCount(3);
+  await page.getByRole("button", { name: "Send links" }).click();
+  await expect(page.getByTestId("payment-link")).toHaveCount(3);
 });
 ```

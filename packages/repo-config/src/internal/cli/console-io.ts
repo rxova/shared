@@ -1,4 +1,4 @@
-import type { Io } from '@/cli/cli.types';
+import type { Io } from "@/cli/cli.types";
 
 /** stdout and stderr, for the CLI's own messages. */
 export const consoleIo: Io = {

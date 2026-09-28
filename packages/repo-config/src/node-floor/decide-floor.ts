@@ -1,4 +1,4 @@
-import type { Published } from '@/node-floor/node-floor.types';
+import type { Published } from "@/node-floor/node-floor.types";
 
 /**
  * The one Node floor the published packages share, or undefined when nothing
@@ -8,7 +8,7 @@ import type { Published } from '@/node-floor/node-floor.types';
 export const decideFloor = (published: Published[]): string | undefined => {
   const floors = [...new Set(published.map((pkg) => pkg.floor))];
   if (floors.length > 1) {
-    const each = published.map((pkg) => `${pkg.name} ${pkg.floor}`).join(', ');
+    const each = published.map((pkg) => `${pkg.name} ${pkg.floor}`).join(", ");
     throw new Error(`published packages disagree on the Node floor (${each}); give them one`);
   }
   return floors[0];

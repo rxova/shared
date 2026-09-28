@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { consoleIo } from '@/internal/cli/console-io';
-import { packageVersion } from '@/internal/cli/package-version';
-import { usage } from '@/internal/cli/usage';
-import type { CommandEntry, Io } from '@/cli/cli.types';
-import { commands } from '@/cli/commands';
-import { isEntry } from '@/internal/entry/is-entry';
+import { consoleIo } from "@/internal/cli/console-io";
+import { packageVersion } from "@/internal/cli/package-version";
+import { usage } from "@/internal/cli/usage";
+import type { CommandEntry, Io } from "@/cli/cli.types";
+import { commands } from "@/cli/commands";
+import { isEntry } from "@/internal/entry/is-entry";
 
 /**
  * `rxova-agent-kit <command>`: installs, inspects and removes the kit. Picks the command by name and
@@ -20,11 +20,11 @@ export const cli = async (
   }: { table?: Record<string, CommandEntry>; io?: Io; version?: () => string } = {},
 ): Promise<number> => {
   const [name, ...rest] = argv;
-  if (name === '--version' || name === '-v') {
+  if (name === "--version" || name === "-v") {
     io.out(version());
     return 0;
   }
-  if (name === undefined || name === '--help' || name === '-h') {
+  if (name === undefined || name === "--help" || name === "-h") {
     io.out(usage(table));
     return 0;
   }

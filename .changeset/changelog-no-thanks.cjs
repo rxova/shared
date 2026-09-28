@@ -12,7 +12,7 @@
 // rendered string, so a change to its output format makes it a silent no-op
 // rather than an error. `pnpm exec changeset version` on a throwaway branch,
 // then grep the changelogs for "Thanks", is the check.
-const github = require('@changesets/changelog-github').default;
+const github = require("@changesets/changelog-github").default;
 
 // Upstream builds the segment as ` Thanks ${users}!` where `users` is a
 // comma-joined list, so the trailing group is required — matching a single
@@ -29,6 +29,6 @@ module.exports = {
   ...github,
   getReleaseLine: async (changeset, type, options) =>
     (await github.getReleaseLine(changeset, type, options))
-      .replace(ATTRIBUTION, '')
-      .replace(EMPTY_PREFIX, '$1- '),
+      .replace(ATTRIBUTION, "")
+      .replace(EMPTY_PREFIX, "$1- "),
 };

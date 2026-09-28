@@ -1,5 +1,5 @@
-import type { PackageManifest } from '@/manifest/manifest.types';
-import { exportLeaves } from '@/internal/pack-smoke/export-leaves';
+import type { PackageManifest } from "@/manifest/manifest.types";
+import { exportLeaves } from "@/internal/pack-smoke/export-leaves";
 
 /**
  * The files a manifest points a consumer at — every target in `exports`, plus
@@ -9,7 +9,7 @@ import { exportLeaves } from '@/internal/pack-smoke/export-leaves';
  */
 export const exportTargets = (manifest: PackageManifest): string[] => {
   const bins =
-    typeof manifest.bin === 'string' ? [manifest.bin] : Object.values(manifest.bin ?? {});
+    typeof manifest.bin === "string" ? [manifest.bin] : Object.values(manifest.bin ?? {});
   const targets = [
     ...exportLeaves(manifest.exports),
     manifest.main,
@@ -18,7 +18,7 @@ export const exportTargets = (manifest: PackageManifest): string[] => {
     manifest.typings,
     ...bins,
   ]
-    .filter((target): target is string => typeof target === 'string' && target !== '')
-    .map((target) => target.replace(/^\.?\/+/, ''));
+    .filter((target): target is string => typeof target === "string" && target !== "")
+    .map((target) => target.replace(/^\.?\/+/, ""));
   return [...new Set(targets)];
 };

@@ -66,8 +66,8 @@ command.
 
 ```ts
 // src/index.ts
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 type Bindings = {
   DB: D1Database;
@@ -78,17 +78,17 @@ type Bindings = {
 };
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.use('/api/*', (c, next) => cors({ origin: c.env.CORS_ORIGIN })(c, next));
+app.use("/api/*", (c, next) => cors({ origin: c.env.CORS_ORIGIN })(c, next));
 
-app.get('/api/notes', async (c) => {
+app.get("/api/notes", async (c) => {
   const { results } = await c.env.DB.prepare(
-    'select id, body from notes order by id desc limit 50',
+    "select id, body from notes order by id desc limit 50",
   ).all();
   return c.json(results);
 });
 
-app.put('/api/files/:key', async (c) => {
-  await c.env.UPLOADS.put(c.req.param('key'), c.req.raw.body);
+app.put("/api/files/:key", async (c) => {
+  await c.env.UPLOADS.put(c.req.param("key"), c.req.raw.body);
   return c.body(null, 204);
 });
 

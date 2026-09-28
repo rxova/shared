@@ -10,10 +10,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/docs/**'
-      - 'packages/*/src/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/docs.yml'
+      - "apps/docs/**"
+      - "packages/*/src/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:

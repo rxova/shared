@@ -1,6 +1,6 @@
-import { collectLlmsFailures } from '@/internal/llms/collect-llms-failures';
-import { formatLlmsFailures } from '@/internal/llms/format-llms-failures';
-import { resolve } from 'node:path';
+import { collectLlmsFailures } from "@/internal/llms/collect-llms-failures";
+import { formatLlmsFailures } from "@/internal/llms/format-llms-failures";
+import { resolve } from "node:path";
 
 /**
  * `rxova-repo-config check-llms [root]`: fails when a published package's
@@ -22,6 +22,6 @@ export const checkLlmsCommand = (root: string = process.cwd()): number => {
     return 1;
   }
 
-  console.log('check:llms ok — every published llms.txt matches its exports and is in the index');
+  console.log("check:llms ok — every published llms.txt matches its exports and is in the index");
   return 0;
 };

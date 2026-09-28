@@ -1,6 +1,6 @@
-import { readdirSync, rmdirSync, rmSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { fromTarget } from '@/internal/install/from-target';
+import { readdirSync, rmdirSync, rmSync } from "node:fs";
+import { dirname } from "node:path";
+import { fromTarget } from "@/internal/install/from-target";
 
 /**
  * Removes the target-relative files, then each directory they leave empty, up to (not

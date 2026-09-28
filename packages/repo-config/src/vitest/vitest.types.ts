@@ -2,7 +2,7 @@ export interface BaseVitestOptions {
   /** The package directory; `@/` maps to its `src/`. Defaults to the working directory. */
   readonly root?: string;
   /** Vitest `environment`. `jsdom` or `happy-dom` must be installed in the package. */
-  readonly environment?: 'node' | 'jsdom' | 'happy-dom';
+  readonly environment?: "node" | "jsdom" | "happy-dom";
   /** Test discovery globs. Defaults to `src/**\/*.test.ts(x)`. */
   readonly include?: readonly string[];
   /** Globs kept out of test discovery, on top of Vitest's own (`node_modules`, …). */

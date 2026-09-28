@@ -5,9 +5,9 @@ import {
   QA_EXTRAS,
   REACT_EXTRAS,
   isDotnetItem,
-} from '@/internal/install/profile-items';
-import { coreWith } from '@/internal/install/core-with';
-import { isSetItem } from '@/internal/install/is-set-item';
+} from "@/internal/install/profile-items";
+import { coreWith } from "@/internal/install/core-with";
+import { isSetItem } from "@/internal/install/is-set-item";
 
 /**
  * The ready-made selections. `core` is the everyday set: the safety hooks and the agents and
@@ -22,15 +22,15 @@ export const profiles: Record<string, (names: readonly string[]) => string[]> = 
   hackathon: (names) =>
     names.filter(
       (name) =>
-        !['rx-tdd', 'rx-theme-audit'].includes(name) &&
+        !["rx-tdd", "rx-theme-audit"].includes(name) &&
         !isDotnetItem(name) &&
-        !isSetItem(name, 'fe') &&
-        !isSetItem(name, 'qa') &&
-        !isSetItem(name, 'mkt'),
+        !isSetItem(name, "fe") &&
+        !isSetItem(name, "qa") &&
+        !isSetItem(name, "mkt"),
     ),
   dotnet: coreWith(DOTNET_EXTRAS, isDotnetItem),
-  react: coreWith(REACT_EXTRAS, (name) => isSetItem(name, 'fe')),
-  qa: coreWith(QA_EXTRAS, (name) => isSetItem(name, 'qa')),
-  marketing: coreWith(MARKETING_EXTRAS, (name) => isSetItem(name, 'mkt')),
+  react: coreWith(REACT_EXTRAS, (name) => isSetItem(name, "fe")),
+  qa: coreWith(QA_EXTRAS, (name) => isSetItem(name, "qa")),
+  marketing: coreWith(MARKETING_EXTRAS, (name) => isSetItem(name, "mkt")),
   full: (names) => [...names],
 };

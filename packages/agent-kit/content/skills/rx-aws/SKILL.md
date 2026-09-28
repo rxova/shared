@@ -58,20 +58,20 @@ when judging ends.
 export default $config({
   app(input) {
     return {
-      name: 'hack-api',
-      home: 'aws',
-      removal: input?.stage === 'prod' ? 'retain' : 'remove',
+      name: "hack-api",
+      home: "aws",
+      removal: input?.stage === "prod" ? "retain" : "remove",
     };
   },
   async run() {
-    const table = new sst.aws.Dynamo('Notes', {
-      fields: { pk: 'string', sk: 'string' },
-      primaryIndex: { hashKey: 'pk', rangeKey: 'sk' },
+    const table = new sst.aws.Dynamo("Notes", {
+      fields: { pk: "string", sk: "string" },
+      primaryIndex: { hashKey: "pk", rangeKey: "sk" },
     });
-    const apiKey = new sst.Secret('AnthropicApiKey');
-    const api = new sst.aws.ApiGatewayV2('Api');
-    api.route('GET /notes', { handler: 'src/notes.list', link: [table] });
-    api.route('POST /notes', { handler: 'src/notes.create', link: [table, apiKey] });
+    const apiKey = new sst.Secret("AnthropicApiKey");
+    const api = new sst.aws.ApiGatewayV2("Api");
+    api.route("GET /notes", { handler: "src/notes.list", link: [table] });
+    api.route("POST /notes", { handler: "src/notes.create", link: [table, apiKey] });
     return { url: api.url };
   },
 });

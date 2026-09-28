@@ -1,5 +1,5 @@
-import type { Reader } from '@/config/config.types';
-import { packagesNamed } from '@/internal/changeset/packages-named';
+import type { Reader } from "@/config/config.types";
+import { packagesNamed } from "@/internal/changeset/packages-named";
 
 /** One line per changeset that does not name exactly one package. */
 export const singlePackageProblems = (files: string[], read: Reader): string[] =>

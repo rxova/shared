@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { runHooks } from '@/hooks/run-hooks';
-import { isEntry } from '@/internal/entry/is-entry';
-import { liveContext } from '@/internal/hooks/live-context';
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { runHooks } from "@/hooks/run-hooks";
+import { isEntry } from "@/internal/entry/is-entry";
+import { liveContext } from "@/internal/hooks/live-context";
 
 /**
  * The hook runner the installer copies into `.claude/rx-ai/`, built as one file that imports only
@@ -22,7 +22,7 @@ export const main = (
   } catch {
     return 0;
   }
-  const outcome = run(argv[0] ?? '', raw);
+  const outcome = run(argv[0] ?? "", raw);
   if (outcome.stdout !== undefined) io.stdout(outcome.stdout);
   if (outcome.message !== undefined) io.stderr(outcome.message);
   return outcome.code;
@@ -30,11 +30,11 @@ export const main = (
 
 /* v8 ignore start -- the process shell around `main`; the end-to-end test spawns it. */
 if (isEntry(import.meta.url)) {
-  const stateDir = join(dirname(fileURLToPath(import.meta.url)), 'state');
+  const stateDir = join(dirname(fileURLToPath(import.meta.url)), "state");
   process.exitCode = main(
     process.argv.slice(2),
     {
-      stdin: () => readFileSync(0, 'utf8'),
+      stdin: () => readFileSync(0, "utf8"),
       stdout: (text) => process.stdout.write(`${text}\n`),
       stderr: (text) => process.stderr.write(`${text}\n`),
     },

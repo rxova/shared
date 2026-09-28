@@ -1,5 +1,5 @@
-import { join } from 'node:path';
-import type { HookContext } from '@/hooks/hook.types';
+import { join } from "node:path";
+import type { HookContext } from "@/hooks/hook.types";
 
 /**
  * The newest note in `dir` no older than `maxDays`, by the `yyyy-mm-dd` its name starts with;

@@ -1,7 +1,7 @@
-import type { HookContext, HookOutcome } from '@/hooks/hook.types';
-import { hooks } from '@/hooks/hooks-table';
-import { liveContext } from '@/internal/hooks/live-context';
-import { switchedOff } from '@/internal/hooks/switched-off';
+import type { HookContext, HookOutcome } from "@/hooks/hook.types";
+import { hooks } from "@/hooks/hooks-table";
+import { liveContext } from "@/internal/hooks/live-context";
+import { switchedOff } from "@/internal/hooks/switched-off";
 
 /**
  * Runs one hook over the raw input Claude Code sent. Anything unexpected (an unknown or
@@ -17,7 +17,7 @@ export const runHook = (
     return { code: 0 };
   try {
     const input: unknown = JSON.parse(raw);
-    if (typeof input !== 'object' || input === null) return { code: 0 };
+    if (typeof input !== "object" || input === null) return { code: 0 };
     return hooks[name as keyof typeof hooks].run(input, context);
   } catch {
     return { code: 0 };

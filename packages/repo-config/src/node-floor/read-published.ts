@@ -1,14 +1,14 @@
-import { workspaceFiles } from '@/internal/node-floor/workspace-files';
-import type { PackageManifest } from '@/manifest/manifest.types';
-import type { Published, WorkspaceFiles } from '@/node-floor/node-floor.types';
-import { join } from 'node:path';
-import { floorOf } from '@/node-floor/floor-of';
+import { workspaceFiles } from "@/internal/node-floor/workspace-files";
+import type { PackageManifest } from "@/manifest/manifest.types";
+import type { Published, WorkspaceFiles } from "@/node-floor/node-floor.types";
+import { join } from "node:path";
+import { floorOf } from "@/node-floor/floor-of";
 
 /** Every non-private package under `packages/`, with the Node floor its `engines` declares. */
 export const readPublished = (root: string, fs: WorkspaceFiles = workspaceFiles): Published[] =>
-  fs.list(join(root, 'packages')).flatMap((entry) => {
+  fs.list(join(root, "packages")).flatMap((entry) => {
     const dir = `packages/${entry}`;
-    const raw = fs.read(join(root, dir, 'package.json'));
+    const raw = fs.read(join(root, dir, "package.json"));
     if (raw === undefined) return [];
 
     const manifest = JSON.parse(raw) as PackageManifest;

@@ -1,9 +1,9 @@
-import { parseArgs } from 'node:util';
+import { parseArgs } from "node:util";
 
 /** The options the commands take; each command allows a subset. */
 export interface Options {
   project?: boolean;
-  'dry-run'?: boolean;
+  "dry-run"?: boolean;
   force?: boolean;
   profile?: string;
   target?: string;
@@ -19,22 +19,22 @@ type Name = keyof Options;
  */
 export const parseOptions = (argv: readonly string[], allowed: readonly Name[]): Options => {
   const every = {
-    project: { type: 'boolean' },
-    'dry-run': { type: 'boolean' },
-    force: { type: 'boolean' },
-    profile: { type: 'string' },
-    target: { type: 'string' },
-    add: { type: 'string', multiple: true },
-    skip: { type: 'string', multiple: true },
+    project: { type: "boolean" },
+    "dry-run": { type: "boolean" },
+    force: { type: "boolean" },
+    profile: { type: "string" },
+    target: { type: "string" },
+    add: { type: "string", multiple: true },
+    skip: { type: "string", multiple: true },
   } as const;
   const options = Object.fromEntries(allowed.map((name) => [name, every[name]]));
   const { values } = parseArgs({ args: [...argv], options, strict: true, allowPositionals: false });
   const parsed = values as Options;
   const split = (list: string[] | undefined) =>
     list
-      ?.flatMap((entry) => entry.split(','))
+      ?.flatMap((entry) => entry.split(","))
       .map((name) => name.trim())
-      .filter((name) => name !== '');
+      .filter((name) => name !== "");
   const add = split(parsed.add);
   const skip = split(parsed.skip);
   return { ...parsed, ...(add && { add }), ...(skip && { skip }) };

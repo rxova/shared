@@ -52,36 +52,36 @@ so you can switch without a deploy.
 
 ```ts
 // app/api/chat/route.ts (Next.js); streams plain text to the browser
-import Anthropic from '@anthropic-ai/sdk';
-import { z } from 'zod';
+import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY
 const Body = z.object({ message: z.string().min(1).max(4000) });
 
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json());
-  if (!parsed.success) return new Response('Bad request', { status: 400 });
+  if (!parsed.success) return new Response("Bad request", { status: 400 });
   // rate-limit here (per IP or user) before spending tokens
 
   const stream = client.messages.stream({
     model: process.env.CLAUDE_MODEL!, // from the models overview page
     max_tokens: 1024,
-    system: [{ type: 'text', text: LONG_PRODUCT_DOCS, cache_control: { type: 'ephemeral' } }],
-    messages: [{ role: 'user', content: parsed.data.message }],
+    system: [{ type: "text", text: LONG_PRODUCT_DOCS, cache_control: { type: "ephemeral" } }],
+    messages: [{ role: "user", content: parsed.data.message }],
   });
 
   const body = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
-      stream.on('text', (t) => controller.enqueue(enc.encode(t)));
-      stream.on('error', (e) => controller.error(e));
+      stream.on("text", (t) => controller.enqueue(enc.encode(t)));
+      stream.on("error", (e) => controller.error(e));
       await stream.finalMessage();
       controller.close();
     },
   });
-  return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8" } });
 }
-const LONG_PRODUCT_DOCS = 'You answer questions about ...';
+const LONG_PRODUCT_DOCS = "You answer questions about ...";
 ```
 
 ```python

@@ -1,15 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import { changesetFiles } from '@/internal/changeset/changeset-files';
+import { describe, expect, it } from "vitest";
+import { changesetFiles } from "@/internal/changeset/changeset-files";
 
-describe('changesetFiles', () => {
-  it('keeps the changesets and drops everything else', () => {
+describe("changesetFiles", () => {
+  it("keeps the changesets and drops everything else", () => {
     expect(
       changesetFiles([
-        '.changeset/tidy-pandas-smile.md',
-        '.changeset/README.md',
-        '.changeset/config.json',
-        'docs/changeset.md',
+        ".changeset/tidy-pandas-smile.md",
+        ".changeset/README.md",
+        ".changeset/config.json",
+        "docs/changeset.md",
       ]),
-    ).toEqual(['.changeset/tidy-pandas-smile.md']);
+    ).toEqual([".changeset/tidy-pandas-smile.md"]);
   });
 });

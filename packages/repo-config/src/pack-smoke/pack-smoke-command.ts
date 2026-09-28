@@ -1,5 +1,5 @@
-import type { ScratchFiles, Shell } from '@/pack-smoke/pack-smoke.types';
-import { packSmoke } from '@/pack-smoke/pack-smoke';
+import type { ScratchFiles, Shell } from "@/pack-smoke/pack-smoke.types";
+import { packSmoke } from "@/pack-smoke/pack-smoke";
 
 /**
  * `rxova-repo-config pack-smoke [dir]`: smoke-tests the package in `dir`, the

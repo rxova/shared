@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { consoleIo } from '@/internal/cli/console-io';
-import { ownVersion } from '@/internal/cli/own-version';
-import { usage } from '@/internal/cli/usage';
-import type { CommandEntry, Io } from '@/cli/cli.types';
-import { commands } from '@/cli/commands';
-import { isEntry } from '@/entry/is-entry';
+import { consoleIo } from "@/internal/cli/console-io";
+import { ownVersion } from "@/internal/cli/own-version";
+import { usage } from "@/internal/cli/usage";
+import type { CommandEntry, Io } from "@/cli/cli.types";
+import { commands } from "@/cli/commands";
+import { isEntry } from "@/entry/is-entry";
 
 /**
  * `rxova-repo-config <command>`: every repo script behind one bin, so a repository
@@ -21,11 +21,11 @@ export const cli = async (
   }: { table?: Record<string, CommandEntry>; io?: Io; version?: () => string } = {},
 ): Promise<number> => {
   const [name, ...rest] = argv;
-  if (name === '--version' || name === '-v') {
+  if (name === "--version" || name === "-v") {
     io.out(version());
     return 0;
   }
-  if (name === undefined || name === '--help' || name === '-h') {
+  if (name === undefined || name === "--help" || name === "-h") {
     io.out(usage(table));
     return 0;
   }

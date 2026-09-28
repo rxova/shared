@@ -1,5 +1,5 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 
 /** Writes a value as two-space JSON with a trailing newline, creating the directory. */
 export const writeJson = (path: string, value: unknown): void => {

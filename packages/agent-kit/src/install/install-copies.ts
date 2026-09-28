@@ -1,13 +1,13 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { hooks } from '@/hooks/hooks-table';
-import type { Copy, InstallTarget } from '@/install/install.types';
-import { opencodeAgent } from '@/install/opencode-agent';
-import { opencodeHooks } from '@/install/opencode-hooks';
-import { opencodePlugin } from '@/install/opencode-plugin';
-import { contentFiles } from '@/internal/install/content-files';
-import { fromTarget } from '@/internal/install/from-target';
-import { PLUGIN, RUNNER } from '@/internal/install/install-paths';
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { hooks } from "@/hooks/hooks-table";
+import type { Copy, InstallTarget } from "@/install/install.types";
+import { opencodeAgent } from "@/install/opencode-agent";
+import { opencodeHooks } from "@/install/opencode-hooks";
+import { opencodePlugin } from "@/install/opencode-plugin";
+import { contentFiles } from "@/internal/install/content-files";
+import { fromTarget } from "@/internal/install/from-target";
+import { PLUGIN, RUNNER } from "@/internal/install/install-paths";
 
 /**
  * The files an install writes for the chosen items into one target. Claude Code: each chosen
@@ -19,26 +19,26 @@ import { PLUGIN, RUNNER } from '@/internal/install/install-paths';
 export const installCopies = (
   packageDir: string,
   items: readonly string[],
-  target: InstallTarget = { kind: 'claude', root: '/' },
+  target: InstallTarget = { kind: "claude", root: "/" },
   { withSkills = true }: { withSkills?: boolean } = {},
 ): Copy[] => {
-  const content = join(packageDir, 'content');
+  const content = join(packageDir, "content");
   const chosen = new Set(items);
   const files = contentFiles(content).filter((file) => {
-    const [kind, name = ''] = file.split('/');
-    return chosen.has(kind === 'agents' ? name.replace(/\.md$/, '') : name);
+    const [kind, name = ""] = file.split("/");
+    return chosen.has(kind === "agents" ? name.replace(/\.md$/, "") : name);
   });
-  const copy = (file: string): Copy => ({ from: join(content, ...file.split('/')), to: file });
-  const runner: Copy = { from: join(packageDir, 'dist', 'hooks.js'), to: RUNNER };
-  if (target.kind === 'claude') return [...files.map(copy), runner];
+  const copy = (file: string): Copy => ({ from: join(content, ...file.split("/")), to: file });
+  const runner: Copy = { from: join(packageDir, "dist", "hooks.js"), to: RUNNER };
+  if (target.kind === "claude") return [...files.map(copy), runner];
 
   const agents = files
-    .filter((file) => file.startsWith('agents/'))
+    .filter((file) => file.startsWith("agents/"))
     .map((file) => ({
       to: file,
-      text: opencodeAgent(readFileSync(join(content, ...file.split('/')), 'utf8')),
+      text: opencodeAgent(readFileSync(join(content, ...file.split("/")), "utf8")),
     }));
-  const skills = withSkills ? files.filter((file) => file.startsWith('skills/')).map(copy) : [];
+  const skills = withSkills ? files.filter((file) => file.startsWith("skills/")).map(copy) : [];
   const hookNames = items.filter((name) => Object.hasOwn(hooks, name));
   const plugin: Copy[] =
     hookNames.length === 0

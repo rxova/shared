@@ -3,4 +3,4 @@
  * neither, and some server runtimes define `window` without a `document`.
  */
 export const canUseDOM = (): boolean =>
-  typeof window !== 'undefined' && typeof document !== 'undefined';
+  typeof window !== "undefined" && typeof document !== "undefined";

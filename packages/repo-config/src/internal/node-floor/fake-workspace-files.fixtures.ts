@@ -1,4 +1,4 @@
-import type { WorkspaceFiles } from '@/node-floor/node-floor.types';
+import type { WorkspaceFiles } from "@/node-floor/node-floor.types";
 
 /** A fake workspace: package directory → manifest, or undefined for a directory without one. */
 export const fakeWorkspaceFiles = (
@@ -6,7 +6,7 @@ export const fakeWorkspaceFiles = (
 ): WorkspaceFiles => ({
   list: () => Object.keys(manifests),
   read: (file) => {
-    const entry = file.split(/[\\/]/).at(-2) ?? '';
+    const entry = file.split(/[\\/]/).at(-2) ?? "";
     const manifest = manifests[entry];
     return manifest === undefined ? undefined : JSON.stringify(manifest);
   },

@@ -1,4 +1,4 @@
-import { isRecord } from '@/internal/install/is-record';
+import { isRecord } from "@/internal/install/is-record";
 
 /**
  * A transcript entry's message content as blocks: a plain string becomes one text block, and
@@ -8,6 +8,6 @@ export const messageBlocks = (entry: Record<string, unknown>): Record<string, un
   const message = entry.message;
   if (!isRecord(message)) return [];
   const { content } = message;
-  if (typeof content === 'string') return [{ type: 'text', text: content }];
+  if (typeof content === "string") return [{ type: "text", text: content }];
   return Array.isArray(content) ? content.filter(isRecord) : [];
 };

@@ -1,12 +1,12 @@
-import type { HookContext, HookInput, RunResult } from '@/hooks/hook.types';
+import type { HookContext, HookInput, RunResult } from "@/hooks/hook.types";
 
 /** A Bash tool call running `command`. */
 export const bash = (
   command: string,
-  cwd = '/repo',
+  cwd = "/repo",
   extra: Record<string, unknown> = {},
 ): HookInput => ({
-  tool_name: 'Bash',
+  tool_name: "Bash",
   tool_input: { command, ...extra },
   cwd,
 });
@@ -16,7 +16,7 @@ export const bash = (
  * POSIX paths match what `node:path` builds on Windows (`C:\\repo\\a` and `/repo/a` are one file).
  */
 const canonical = (path: string): string =>
-  path.replace(/^[A-Za-z]:(?=[\\/])/, '').replaceAll('\\', '/');
+  path.replace(/^[A-Za-z]:(?=[\\/])/, "").replaceAll("\\", "/");
 
 /**
  * A context over an in-memory file system holding `files` (absolute path → text). `run` answers
@@ -28,8 +28,8 @@ export const contextWith = ({
   files: given = {},
   programs = {},
   env = {},
-  now = new Date('2026-09-28T12:00:00Z'),
-  platform = 'linux',
+  now = new Date("2026-09-28T12:00:00Z"),
+  platform = "linux",
 }: {
   files?: Record<string, string>;
   programs?: Record<string, Partial<RunResult>>;
@@ -64,20 +64,20 @@ export const contextWith = ({
     list: (dir) => {
       const key = canonical(dir);
       return Object.keys(files)
-        .filter((file) => file.startsWith(`${key}/`) && !file.slice(key.length + 1).includes('/'))
+        .filter((file) => file.startsWith(`${key}/`) && !file.slice(key.length + 1).includes("/"))
         .map((file) => file.slice(key.length + 1));
     },
     run: (program, args) => {
-      const command = [program, ...args].map(canonical).join(' ');
+      const command = [program, ...args].map(canonical).join(" ");
       ran.push(command);
       const answer = programs[command];
       return answer === undefined
-        ? { status: null, stdout: '', stderr: '' }
-        : { status: 0, stdout: '', stderr: '', ...answer };
+        ? { status: null, stdout: "", stderr: "" }
+        : { status: 0, stdout: "", stderr: "", ...answer };
     },
     env,
     now: () => now,
     platform,
-    stateDir: '/state',
+    stateDir: "/state",
   };
 };

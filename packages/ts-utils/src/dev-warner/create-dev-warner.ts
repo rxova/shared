@@ -2,8 +2,8 @@ import type {
   DevWarner,
   DevWarnerOptions,
   WarnOptions,
-} from '@/dev-warner/create-dev-warner.types';
-import { isDevelopment } from '@/env/is-development';
+} from "@/dev-warner/create-dev-warner.types";
+import { isDevelopment } from "@/env/is-development";
 
 /**
  * One package's development warnings: a prefix, an optional stable code with a
@@ -27,7 +27,7 @@ export const createDevWarner = ({
 
   const format = (message: string, code?: string): string => {
     if (code === undefined) return `[${prefix}] ${message}`;
-    const link = docsUrl === undefined ? '' : `\n  → ${docsUrl}#${code.toLowerCase()}`;
+    const link = docsUrl === undefined ? "" : `\n  → ${docsUrl}#${code.toLowerCase()}`;
     return `[${prefix}] ${code}: ${message}${link}`;
   };
 
@@ -37,7 +37,7 @@ export const createDevWarner = ({
     // A constant `%s` rather than the line as the format string: a `%` in an
     // interpolated value would otherwise be read as a directive and eat `detail`.
     if (detail === undefined) sink(line);
-    else sink('%s', line, detail);
+    else sink("%s", line, detail);
   };
 
   return {

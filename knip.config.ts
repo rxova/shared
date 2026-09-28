@@ -1,4 +1,4 @@
-import type { KnipConfig } from 'knip';
+import type { KnipConfig } from "knip";
 
 /**
  * Unused files, exports and dependencies, as a gate rather than a report.

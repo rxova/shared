@@ -1,6 +1,6 @@
-import { runCommand } from '@/internal/verify/run-command';
-import type { Runner } from '@/verify/verify.types';
-import type { Step } from '@/config/config.types';
+import { runCommand } from "@/internal/verify/run-command";
+import type { Runner } from "@/verify/verify.types";
+import type { Step } from "@/config/config.types";
 
 /**
  * Runs the gate in order and stops at the first failure, because the second
@@ -18,6 +18,6 @@ export const runSteps = (steps: Step[], { run = runCommand }: { run?: Runner } =
     }
   }
 
-  process.stdout.write('\nverify: all checks passed\n');
+  process.stdout.write("\nverify: all checks passed\n");
   return 0;
 };

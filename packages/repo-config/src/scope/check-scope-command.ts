@@ -1,7 +1,7 @@
-import { gitReader } from '@/internal/scope/git-reader';
-import type { Git } from '@/scope/scope.types';
-import { appendFileSync } from 'node:fs';
-import { decideScope } from '@/scope/decide-scope';
+import { gitReader } from "@/internal/scope/git-reader";
+import type { Git } from "@/scope/scope.types";
+import { appendFileSync } from "node:fs";
+import { decideScope } from "@/scope/decide-scope";
 
 /**
  * `rxova-repo-config check-scope`: reports whether the pushed range changed code,

@@ -1,6 +1,6 @@
-import type { HookContext, HookOutcome } from '@/hooks/hook.types';
-import { runHook } from '@/hooks/run-hook';
-import { liveContext } from '@/internal/hooks/live-context';
+import type { HookContext, HookOutcome } from "@/hooks/hook.types";
+import { runHook } from "@/hooks/run-hook";
+import { liveContext } from "@/internal/hooks/live-context";
 
 /**
  * Runs several hooks, named in a comma-separated list, over the same input, in order. The first
@@ -14,13 +14,13 @@ export const runHooks = (
 ): HookOutcome => {
   const replies: string[] = [];
   for (const name of names
-    .split(',')
+    .split(",")
     .map((entry) => entry.trim())
-    .filter((entry) => entry !== '')) {
+    .filter((entry) => entry !== "")) {
     const outcome = runHook(name, raw, context);
     if (outcome.stdout !== undefined) replies.push(outcome.stdout);
     if (outcome.code === 2)
-      return { ...outcome, ...(replies.length > 0 && { stdout: replies.join('\n') }) };
+      return { ...outcome, ...(replies.length > 0 && { stdout: replies.join("\n") }) };
   }
-  return replies.length > 0 ? { code: 0, stdout: replies.join('\n') } : { code: 0 };
+  return replies.length > 0 ? { code: 0, stdout: replies.join("\n") } : { code: 0 };
 };

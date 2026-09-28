@@ -1,4 +1,4 @@
-import { SOURCE_EXTENSIONS } from '@/internal/pack-smoke/source-extensions';
+import { SOURCE_EXTENSIONS } from "@/internal/pack-smoke/source-extensions";
 
 /**
  * Where the source of a built JavaScript file would sit: `dist/client.cjs`
@@ -8,6 +8,6 @@ import { SOURCE_EXTENSIONS } from '@/internal/pack-smoke/source-extensions';
  */
 export const sourceCandidates = (target: string): string[] => {
   if (!/\.[cm]?js$/.test(target)) return [];
-  const stem = target.replace(/^[^/]+\//, '').replace(/\.[cm]?js$/, '');
+  const stem = target.replace(/^[^/]+\//, "").replace(/\.[cm]?js$/, "");
   return SOURCE_EXTENSIONS.map((extension) => `src/${stem}.${extension}`);
 };
