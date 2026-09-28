@@ -5,7 +5,23 @@ inputs:
   browsers:
     description: >
       Space-separated browser list, such as "chromium" for a job that only drives
-      Vitest browser mode. Leave empty to install every browser Playwright ships.
+      Vitest browser mode. Leave empty to install every browser Playwright ships,
+      or the set `install-script` installs.
+    required: false
+    default: ''
+  working-directory:
+    description: >-
+      Directory whose `node_modules` holds Playwright, for a workspace that only
+      installs it in one package (an `e2e` or `docs` app). The version is read
+      from `playwright`, falling back to `@playwright/test`, resolved from there,
+      and the install commands run there.
+    required: false
+    default: '.'
+  install-script:
+    description: >-
+      A package.json script that installs the full browser set, run with
+      `pnpm run` when `browsers` is empty — so contributors and CI install the
+      same thing from one definition. Empty runs `playwright install --with-deps`.
     required: false
     default: ""
 
@@ -13,13 +29,29 @@ runs:
   using: composite
   steps:
     # The binaries only change when Playwright does, so the cache is keyed on
-    # the resolved version rather than the lockfile hash.
+    # the resolved version rather than the lockfile hash. Resolved rather than
+    # read from a fixed path: pnpm only links `playwright` at the root when the
+    # root declares it, and many workspaces declare `@playwright/test` in one app.
     - name: Resolve Playwright version
       id: pw
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BROWSERS: ${{ inputs.browsers }}
+        INSTALL_SCRIPT: ${{ inputs.install-script }}
       run: |
-        echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
-        echo "slug=$(echo '${{ inputs.browsers }}' | tr ' ' '-' | sed 's/^$/all/')" >> "$GITHUB_OUTPUT"
+        version=$(node -e "
+          const { createRequire } = require('node:module');
+          const req = createRequire(process.cwd() + '/');
+          for (const name of ['playwright', '@playwright/test']) {
+            try { process.stdout.write(req(name + '/package.json').version); process.exit(0); } catch {}
+          }
+          process.exit(1);
+        ") || { echo "::error::neither playwright nor @playwright/test is installed in $PWD"; exit 1; }
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        slug=$(printf '%s' "$BROWSERS" | tr ' ' '-')
+        if [ -z "$slug" ]; then slug="all${INSTALL_SCRIPT:+-$INSTALL_SCRIPT}"; fi
+        echo "slug=$slug" >> "$GITHUB_OUTPUT"
 
     # Deliberately outside the checkout. Downloading browsers into the
     # workspace put Chromium's bundled manifest.json and inspector JS in front
@@ -37,16 +69,34 @@ runs:
         # launch with "Executable doesn't exist".
         key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}-${{ steps.pw.outputs.slug }}
 
-    - name: Install browsers
-      if: steps.pw-cache.outputs.cache-hit != 'true'
+    - name: Install the browser set from the install script
+      if: steps.pw-cache.outputs.cache-hit != 'true' && inputs.browsers == '' && inputs.install-script != ''
       shell: bash
-      run: pnpm exec playwright install --with-deps ${{ inputs.browsers }}
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INSTALL_SCRIPT: ${{ inputs.install-script }}
+      run: pnpm run "$INSTALL_SCRIPT"
+
+    - name: Install browsers
+      if: steps.pw-cache.outputs.cache-hit != 'true' && (inputs.browsers != '' || inputs.install-script == '')
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BROWSERS: ${{ inputs.browsers }}
+      run: |
+        # shellcheck disable=SC2086 # split on purpose: one argument per browser
+        pnpm exec playwright install --with-deps $BROWSERS
 
     # System libraries live outside the cached directory, so they are installed
     # on every run even when the binaries were restored.
     - name: Install system dependencies
       if: steps.pw-cache.outputs.cache-hit == 'true'
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BROWSERS: ${{ inputs.browsers }}
       # No argument means "every installed browser", which is exactly right
       # when the input was left empty.
-      run: pnpm exec playwright install-deps ${{ inputs.browsers }}
+      run: |
+        # shellcheck disable=SC2086 # split on purpose: one argument per browser
+        pnpm exec playwright install-deps $BROWSERS
