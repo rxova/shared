@@ -31,6 +31,17 @@ description: Every export, command and action this repository publishes.
 Presets: `@rxova/tooling/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
 `/tsconfig.base.json`.
 
+## `@rxova/ai`
+
+| Command                                              | What it does                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------- |
+| `rxova-ai install [--project] [--dry-run] [--force]` | Installs the agents, skills and guard hooks into `.claude`  |
+| `rxova-ai uninstall [--project] [--dry-run]`         | Removes exactly what the last install wrote                 |
+| `rxova-ai status [--project]`                        | Shows the installed version and any missing or changed file |
+
+Guards: `no-bypass`, `no-attribution`, `config-lock`. Skills: `rx-verify`, `rx-handoff`,
+`rx-slice`, `rx-theme-audit`. Agents: `rx-planner`, `rx-reviewer`, `rx-scout`.
+
 ## GitHub Actions
 
 | Action                                    | Inputs                         | What it does                                                                    |
