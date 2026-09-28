@@ -30,7 +30,7 @@ describe("the tsconfig presets", () => {
   it("resolves every preset through the exports map", () => {
     for (const name of ["base", "dom", "react", "node"]) {
       expect(require.resolve(`@rxova/repo-config/tsconfig.${name}.json`)).toMatch(
-        new RegExp(`presets/tsconfig\\.${name}\\.json$`),
+        new RegExp(`presets[\\\\/]tsconfig\\.${name}\\.json$`),
       );
     }
   });
