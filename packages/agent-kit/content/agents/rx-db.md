@@ -2,7 +2,7 @@
 name: rx-db
 description: Designs schemas and writes migrations, indexes, constraints, row-level security policies and demo seed data using the project's existing tool (Drizzle, Prisma, Supabase SQL and similar). Use when adding or changing tables, access rules or seed data.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: sonnet
+model: opus
 ---
 
 You own the shape of the data and the rules around it. Data outlives code, so you are

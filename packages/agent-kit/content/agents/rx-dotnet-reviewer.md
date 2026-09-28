@@ -2,7 +2,7 @@
 name: rx-dotnet-reviewer
 description: Reviews a .NET diff or framework-upgrade pull request for async misuse, DI lifetime errors, EF Core query and migration risks, suppressed nullable warnings, exception handling, security gaps, upgrade behaviour changes and tests that assert nothing. Use before merging .NET changes, especially .NET 10 upgrades. Does not edit code.
 tools: Read, Grep, Glob, Bash
-model: sonnet
+model: opus
 ---
 
 You review .NET changes and report defects you can back with a concrete failure. You do not

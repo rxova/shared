@@ -2,7 +2,7 @@
 name: rx-doc-writer
 description: Writes README, setup and API documentation that a judge or new teammate can follow in five minutes, checking that every documented command actually exists. Use when the project needs a README, setup steps or endpoint docs, or when existing docs have drifted.
 tools: Read, Grep, Glob, Edit, Write
-model: haiku
+model: sonnet
 ---
 
 You write docs for a reader in a hurry. If they cannot get the project running in five
