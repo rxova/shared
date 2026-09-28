@@ -32,13 +32,25 @@ pnpm add -D @rxova/repo-config
 
 ```js
 // eslint.config.js
-import { baseEslintConfig } from "@rxova/repo-config/eslint";
-export default baseEslintConfig({ tsconfigRootDir: import.meta.dirname });
+import { rxova } from "@rxova/repo-config/eslint";
+export default rxova({ tsconfigRootDir: import.meta.dirname, node: true, tests: true });
+```
+
+```json
+// .prettierrc
+"@rxova/repo-config/prettier"
 ```
 
 ```json
 // tsconfig.json
-{ "extends": "@rxova/repo-config/tsconfig.base.json", "include": ["src"] }
+{ "extends": "@rxova/repo-config/tsconfig.react.json", "include": ["src"] }
+```
+
+```ts
+// tsdown.config.ts
+import { defineConfig } from "tsdown";
+import { dualBuildConfig } from "@rxova/repo-config/tsdown";
+export default defineConfig(dualBuildConfig());
 ```
 
 ## GitHub Actions
