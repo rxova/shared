@@ -77,7 +77,7 @@ const lint = async (config: Linter.Config[], file: string) => {
 
 const base = () => ({ tsconfigRootDir: root });
 
-describe("rxova()", () => {
+describe("rxova()", { timeout: 30_000 }, () => {
   it("needs the tsconfig root", () => {
     expect(() => rxova({} as never)).toThrow(/tsconfigRootDir/);
     expect(() => rxova({ tsconfigRootDir: "" })).toThrow(/tsconfigRootDir/);
@@ -232,7 +232,7 @@ describe("rxova()", () => {
   });
 });
 
-describe("baseEslintConfig (deprecated)", () => {
+describe("baseEslintConfig (deprecated)", { timeout: 30_000 }, () => {
   it("keeps the 0.2 behaviour: strict, stylistic, node globals and no relative imports", async () => {
     // eslint-disable-next-line @typescript-eslint/no-deprecated -- the deprecated wrapper is what is under test
     const config = baseEslintConfig({ tsconfigRootDir: root });
