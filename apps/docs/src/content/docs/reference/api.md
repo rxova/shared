@@ -34,10 +34,30 @@ license or any `exports`, `main`, `types` or bin target is missing from the tarb
 built entry lost the `'use client'` directive its source opens with. `workspace:` dependencies,
 optional dependencies and peers resolve the way `pnpm publish` writes them.
 
-Presets: `@rxova/repo-config/tsdown`, `/vitest`, `/eslint`, `/commitlint`, `/prettier`,
-`/tsconfig.base.json`. `baseVitestConfig` holds every file to 95% coverage; a package can override
-single axes with `thresholds` (`{ branches: 88 }`), and change what is measured or discovered with
-`coverageInclude`, `exclude` and `testExclude`.
+### Presets
+
+| Import                                                   | Export or content                                                                                                                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@rxova/repo-config/eslint`                              | `rxova({ tsconfigRootDir, strict, react, astro, node, browser, tests, ignores, consoleAllowed, extends, rules }, ...extra)`; `baseEslintConfig` (deprecated, removed in 0.4.0) |
+| `@rxova/repo-config/prettier`                            | Semicolons, double quotes, `printWidth: 100`, `trailingComma: "all"`, `arrowParens: "always"`, `prettier-plugin-astro`                                                         |
+| `@rxova/repo-config/lint-staged`                         | ESLint then Prettier over staged code, Prettier over data and prose                                                                                                            |
+| `@rxova/repo-config/tsdown`                              | `baseBuildConfig`, `dualBuildConfig`, `reactBuildConfig`                                                                                                                       |
+| `@rxova/repo-config/vitest`                              | `baseVitestConfig`                                                                                                                                                             |
+| `@rxova/repo-config/playwright`                          | `basePlaywrightConfig`, `astroPreview`                                                                                                                                         |
+| `@rxova/repo-config/knip`                                | `baseKnipConfig`                                                                                                                                                               |
+| `@rxova/repo-config/commitlint`                          | Conventional Commits, no length limits, plus `rename`                                                                                                                          |
+| `@rxova/repo-config/changelog`                           | `@changesets/changelog-github` without the "Thanks" line                                                                                                                       |
+| `@rxova/repo-config/tsconfig.{base,dom,react,node}.json` | Strict ESM TypeScript; plus DOM; plus `react-jsx`; Node type stripping                                                                                                         |
+
+`rxova()` is `@eslint/js` recommended and typescript-eslint `recommendedTypeChecked`
+(`strictTypeChecked` with `strict`) plus `no-unused-vars`, `consistent-type-imports`,
+`no-explicit-any` and `no-console`, with no formatting or import-path rules; each option turns on a
+layer or adds globs. `baseVitestConfig` holds every file to 95% coverage; a package can override
+single axes with `thresholds` (`{ branches: 88 }`) or report only (`false`), drop coverage
+(`coverage: false`), split a `browser` project from the unit one, and pass `plugins`, `dedupe`,
+`alias`, timeouts, `globals`, `setupFiles`, `fileParallelism` and `silent` to Vitest. The
+[package README](https://github.com/rxova/shared/tree/main/packages/repo-config#presets) lists
+every option.
 
 ## `@rxova/agent-kit`
 
