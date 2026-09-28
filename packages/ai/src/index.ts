@@ -1,0 +1,11 @@
+export { runGuard } from '@/hooks/run-guard';
+export type { GuardOutcome } from '@/hooks/run-guard';
+export { guards } from '@/hooks/guards';
+export type { GuardName } from '@/hooks/guards';
+export type { Guard, GuardFiles, HookInput, Verdict } from '@/hooks/guard.types';
+export { planInstall } from '@/install/plan-install';
+export { installCopies } from '@/install/install-copies';
+export { hookGroups } from '@/install/hook-groups';
+export { withOwnHooks } from '@/install/with-own-hooks';
+export { withoutOwnHooks } from '@/install/without-own-hooks';
+export type { Copy, HookGroup, InstallPlan, Manifest } from '@/install/install.types';

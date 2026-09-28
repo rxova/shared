@@ -1,0 +1,21 @@
+// Linter, formatter, type-checker, commit and coverage configs, by file name.
+export const CONFIG_FILES: readonly RegExp[] = [
+  /^\.eslintrc(\.(c?js|mjs|json|ya?ml))?$/,
+  /^eslint\.config\.[cm]?[jt]s$/,
+  /^\.prettierrc(\.(c?js|mjs|json5?|ya?ml|toml))?$/,
+  /^prettier\.config\.[cm]?[jt]s$/,
+  /^\.stylelintrc(\.(c?js|mjs|json|ya?ml))?$/,
+  /^stylelint\.config\.[cm]?js$/,
+  /^biome\.jsonc?$/,
+  /^\.editorconfig$/,
+  /^tsconfig(\..+)?\.json$/,
+  /^jsconfig\.json$/,
+  /^\.commitlintrc(\..+)?$/,
+  /^commitlint\.config\.[cm]?[jt]s$/,
+  /^\.lintstagedrc(\..+)?$/,
+  /^lint-staged\.config\.[cm]?js$/,
+  /^\.markdownlint(-cli2)?\.(jsonc?|ya?ml|cjs)$/,
+  /^(vitest|jest)\.config\.[cm]?[jt]s$/,
+  /^\.?ruff\.toml$/,
+  /^\.golangci\.ya?ml$/,
+];
