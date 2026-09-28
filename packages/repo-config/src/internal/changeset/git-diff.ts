@@ -2,11 +2,17 @@ import { execFileSync } from 'node:child_process';
 import type { Differ } from '@/changeset/changeset.types';
 import { revisionRange } from '@/internal/scope/revision-range';
 
-/** The paths a commit range touched; with `existing`, only those still present at the head. */
+/** The paths a commit range touched, both sides of a rename; with `existing`, only those still present at the head. */
 export const gitDiff: Differ = (base, head, { existing = false } = {}) =>
   execFileSync(
     'git',
-    ['diff', '--name-only', ...(existing ? ['--diff-filter=d'] : []), revisionRange(base, head)],
+    [
+      'diff',
+      '--name-only',
+      '--no-renames',
+      ...(existing ? ['--diff-filter=d'] : []),
+      revisionRange(base, head),
+    ],
     { encoding: 'utf8' },
   )
     .split('\n')
