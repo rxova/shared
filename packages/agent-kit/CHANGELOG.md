@@ -1,5 +1,13 @@
 # @rxova/agent-kit
 
+## 0.2.0
+
+### Minor Changes
+
+- [#18](https://github.com/rxova/shared/pull/18) [`28ae490`](https://github.com/rxova/shared/commit/28ae4904ca0037c08503577ae1d6ab3ec9356005) - Agents run on stronger models: the planning, architecture, security and advisor agents move to Fable, every agent that was on Sonnet moves to Opus, and `rx-scout` and `rx-doc-writer` move from Haiku to Sonnet.
+
+- [#18](https://github.com/rxova/shared/pull/18) [`9850140`](https://github.com/rxova/shared/commit/9850140c43a4302cd7ce0483f2391797987b3e80) - Add three sets, each with its own profile: `rx-fe-*` for React (Redux Toolkit, code splitting, hooks, performance, state, testing; `react`), `rx-qa-*` for quality assurance (test plans, exploratory testing, bug reports, regression, flaky tests, accessibility; `qa`), and `rx-mkt-*` for marketing, the CEO's view and in-app language (positioning, landing copy, launch, voice; `marketing`). 17 skills and 7 agents in all; `hackathon` leaves the three sets out.
+
 ## 0.1.0
 
 ### Minor Changes
