@@ -82,9 +82,7 @@ jobs:
 | `pages-deploy.yml`          | Builds and deploys the docs to GitHub Pages.                                                  |
 | `codeql-analysis.yml`       | CodeQL, skipped where code scanning is not enabled.                                           |
 
-Inputs, outputs, a full CI graph and how releases work:
-[.github/workflows/README.md](.github/workflows/README.md). Callers pin a release by SHA
-(`@<sha> # v1.2.0`), never `@main`; Renovate moves the pin.
+Inputs, outputs and a full CI graph: [.github/workflows/README.md](.github/workflows/README.md).
 
 ### Renovate preset
 
@@ -122,8 +120,7 @@ export default rxova({ tsconfigRootDir: import.meta.dirname, node: true, tests: 
 { "extends": "@rxova/repo-config/tsconfig.react.json", "include": ["src"] }
 ```
 
-And CI at the shared workflows, each pinned to a release by SHA (shown here as `@main` for brevity;
-see [Versioning](.github/workflows/README.md#versioning)):
+And CI at the shared workflows, pinned to `@main`:
 
 ```yaml
 jobs:

@@ -1,7 +1,6 @@
 # Shared GitHub Actions
 
-Composite actions for rxova repositories. Reference them by path, pinned to a release by SHA (see
-[Versioning](../.github/workflows/README.md#versioning)):
+Composite actions for rxova repositories. Reference them by path and ref:
 
 ```yaml
 - uses: rxova/shared/actions/setup-pnpm@main
@@ -18,7 +17,8 @@ Composite actions for rxova repositories. Reference them by path, pinned to a re
 | `notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.org to publish this run's `docs-dist` artifact (rxova-website `docs/INPUTS-CONTRACT.md`, gate 1) |
 
 This repository's own workflows use them through `./actions/<name>`, so a change here is tested by
-its own CI before it is released. Renaming or removing an input is a major release.
+its own CI before anyone else picks it up. Inputs stay backward compatible: a rename breaks every
+workflow pinned to `@main`.
 
 ## `setup-playwright`
 
