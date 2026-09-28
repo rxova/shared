@@ -51,6 +51,9 @@
       "default": "./presets/lint-staged.js"
     },
     "./tsconfig.base.json": "./presets/tsconfig.base.json",
+    "./tsconfig.dom.json": "./presets/tsconfig.dom.json",
+    "./tsconfig.react.json": "./presets/tsconfig.react.json",
+    "./tsconfig.node.json": "./presets/tsconfig.node.json",
     "./package.json": "./package.json"
   },
   "files": [
