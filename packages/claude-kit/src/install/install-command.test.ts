@@ -126,7 +126,7 @@ describe('installCommand', () => {
     expect(installCommand(['--profile', 'huge'], env)).toBe(1);
     expect(env.io.err).toHaveBeenLastCalledWith(expect.stringContaining('unknown profile'));
     expect(installCommand(['--add', 'rx-nothing'], env)).toBe(1);
-    expect(env.io.err).toHaveBeenLastCalledWith(expect.stringContaining('rxova-ai list'));
+    expect(env.io.err).toHaveBeenLastCalledWith(expect.stringContaining('rxova-claude-kit list'));
     writeTree(target, { 'settings.json': '{ not json' });
     expect(installCommand([], env)).toBe(1);
     expect(env.io.err).toHaveBeenLastCalledWith(expect.stringContaining('not valid JSON'));

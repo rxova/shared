@@ -1,5 +1,5 @@
 {
-  "name": "@rxova/ai",
+  "name": "@rxova/claude-kit",
   "version": "0.0.0",
   "description": "A small Claude Code kit: guard hooks that enforce commit and config rules, workflow skills, and three least-privilege agents, installed by one bin.",
   "license": "MIT",
@@ -7,9 +7,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rxova/shared.git",
-    "directory": "packages/ai"
+    "directory": "packages/claude-kit"
   },
-  "homepage": "https://github.com/rxova/shared/tree/main/packages/ai#readme",
+  "homepage": "https://github.com/rxova/shared/tree/main/packages/claude-kit#readme",
   "bugs": "https://github.com/rxova/shared/issues",
   "publishConfig": {
     "access": "public"
@@ -19,7 +19,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "rxova-ai": "./dist/cli.js"
+    "rxova-claude-kit": "./dist/cli.js"
   },
   "exports": {
     ".": {

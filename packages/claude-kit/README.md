@@ -1,4 +1,4 @@
-# @rxova/ai
+# @rxova/claude-kit
 
 A Claude Code kit for building fast without breaking things, sized for a hackathon and useful
 after it:
@@ -15,9 +15,9 @@ Install a profile, not everything: every installed agent and skill description i
 every session.
 
 ```sh
-npx @rxova/ai install --profile hackathon   # everything useful in a sprint
-npx @rxova/ai install                        # core: the guards and the everyday set
-npx @rxova/ai list                           # every item, and which profiles include it
+npx @rxova/claude-kit install --profile hackathon   # everything useful in a sprint
+npx @rxova/claude-kit install                        # core: the guards and the everyday set
+npx @rxova/claude-kit list                           # every item, and which profiles include it
 ```
 
 ## How it works
@@ -58,12 +58,12 @@ are picked by how well a request matches their description, so name one when it 
 
 ## Commands
 
-| Command                                                                                   | What it does                                                                                                                                                                                                 |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `rxova-ai list [--profile p]`                                                             | Every agent, skill and hook, the profiles that include it, and what it is for.                                                                                                                               |
-| `rxova-ai install [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile, with items added or skipped, into `~/.claude` (or `./.claude` with `--project`). Run again to update: with no `--profile`, the last selection is kept, so `--add x` alone adds one item. |
-| `rxova-ai uninstall [--project] [--dry-run]`                                              | Removes the files the last install wrote and its hook entries in `settings.json`. Every other file and setting is left as it was.                                                                            |
-| `rxova-ai status [--project]`                                                             | Shows the installed profile and version, and any file that is missing or edited, or hook that is missing. Exits 1 when anything is out of step.                                                              |
+| Command                                                                                           | What it does                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rxova-claude-kit list [--profile p]`                                                             | Every agent, skill and hook, the profiles that include it, and what it is for.                                                                                                                               |
+| `rxova-claude-kit install [--profile p] [--add a,b] [--skip c] [--project] [--dry-run] [--force]` | Installs a profile, with items added or skipped, into `~/.claude` (or `./.claude` with `--project`). Run again to update: with no `--profile`, the last selection is kept, so `--add x` alone adds one item. |
+| `rxova-claude-kit uninstall [--project] [--dry-run]`                                              | Removes the files the last install wrote and its hook entries in `settings.json`. Every other file and setting is left as it was.                                                                            |
+| `rxova-claude-kit status [--project]`                                                             | Shows the installed profile and version, and any file that is missing or edited, or hook that is missing. Exits 1 when anything is out of step.                                                              |
 
 The install records what it wrote in `.claude/rx-ai/manifest.json`, refuses to overwrite a file
 it did not write (unless `--force`), and prints its plan without writing anything under

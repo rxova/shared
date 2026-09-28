@@ -12,7 +12,7 @@ import { readSettings } from '@/internal/install/read-settings';
 import { targetDir } from '@/internal/install/target-dir';
 
 /**
- * `rxova-ai status [--project]`: the installed version against this one, files that are
+ * `rxova-claude-kit status [--project]`: the installed version against this one, files that are
  * missing or differ from this version, and how many guard hooks are registered. Exits 1 when
  * anything is out of step, so it can gate a script.
  */
@@ -57,7 +57,7 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
     for (const problem of problems) io.out(problem);
     return problems.length === 0 && manifest.version === version ? 0 : 1;
   } catch (failure) {
-    io.err(`rxova-ai status: ${(failure as Error).message}`);
+    io.err(`rxova-claude-kit status: ${(failure as Error).message}`);
     return 1;
   }
 };
