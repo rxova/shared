@@ -20,6 +20,42 @@ npx @rxova/ai install                        # core: the guards and the everyday
 npx @rxova/ai list                           # every item, and which profiles include it
 ```
 
+## How it works
+
+You install once. After that you talk to Claude as usual, and the kit works at three levels:
+
+| Part       | Who starts it                             | How                                                                                                                                                 |
+| ---------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hooks**  | Claude Code, on its own                   | They fire on events: before a command or an edit, after an edit, at session start and end, before compaction. Neither you nor Claude calls them.    |
+| **Skills** | Claude, when your request matches; or you | Claude reads each skill's description and loads the skill when it fits. Type `/rx-kickoff`, `/rx-demo`, … to load one yourself.                     |
+| **Agents** | Claude, when a task matches; or you       | Claude hands work to an agent whose description fits, and gets a summary back. Say "use rx-architect" or "have rx-reviewer check this" to pick one. |
+
+Restart Claude Code after installing so it loads the new agents, skills and hooks. A guard only
+watches Claude's own tool calls: when it blocks something you really want, run it yourself in
+a terminal, or switch that guard off for the session (see [Hooks](#hooks)). Skills and agents
+are picked by how well a request matches their description, so name one when it matters.
+
+### Example: a hackathon
+
+1. **"We're building a split-the-bill app for group trips, 24 hours. Let's kick off."**
+   Claude follows `rx-kickoff`: the demo moment, one golden path, a boring stack, a
+   `CLAUDE.md`, a deploy in the first hour. `rx-architect` designs the data model, and
+   `rx-slice` cuts the work into slices and stops for your go-ahead.
+2. **"Go, slice 1."** `rx-builder` builds it. After every edit `quick-check` lints the file and
+   Claude fixes what it reports. `pnpm dev` in the foreground is stopped by `dev-server` and
+   rerun in the background; a Supabase key written into a source file is stopped by
+   `secret-guard` and moved to `.env`; a `--no-verify` commit is stopped by `no-bypass`.
+   `rx-ship` opens the pull request the repository's way.
+3. **Hour 14.** `context-nudge` says the context is 60% full; Claude writes a handoff note
+   (`rx-handoff`). Before the compact, `memory-snapshot` saves where things stand, and next
+   session `handoff-reminder` points Claude at it.
+4. **"Login works locally but not on Vercel."** Claude follows `rx-debug` and
+   `rx-deploy-vercel`. A panicked `git reset --hard` on uncommitted work is stopped by
+   `danger-zone`.
+5. **"Get us demo-ready."** `rx-security-sweep` and the `rx-security` agent check for leaks and
+   missing row-level security, `rx-demo` adds seed data and a click-by-click script, and
+   `rx-pitch` writes the pitch.
+
 ## Commands
 
 | Command                                                                                   | What it does                                                                                                                                                                                                 |
@@ -70,34 +106,48 @@ Settings, as environment variables:
 
 ## Skills
 
-| Skill                  | Use it to                                                                                       |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| `rx-kickoff`           | Turn an idea into a scoped plan, a repo with agent instructions, and a live deploy in hour one. |
-| `rx-timebox`           | Run the build against the clock: checkpoints, cut lists, a feature freeze, the last two hours.  |
-| `rx-slice`             | Break a feature into thin end-to-end slices and ship them one at a time.                        |
-| `rx-parallel`          | Run several sessions and agents at once with worktrees, without collisions.                     |
-| `rx-tdd`               | Test first where it pays, and skip it where it does not.                                        |
-| `rx-debug`             | Reproduce, isolate and fix a bug at its root, with a regression test.                           |
-| `rx-verify`            | Run the repository's own gate before calling work done.                                         |
-| `rx-ship`              | Get a change merged the repository's way: branch, commits, checks, pull request.                |
-| `rx-handoff`           | Write a note a fresh session can resume from, or resume from one.                               |
-| `rx-e2e`               | Put a Playwright smoke suite on the demo path.                                                  |
-| `rx-security-sweep`    | Do a 30-minute security pass before the demo.                                                   |
-| `rx-demo`              | Make the demo impossible to fail: seed data, a script, fallbacks, a backup video.               |
-| `rx-theme-audit`       | Measure a site's dark and light themes in a browser and trace each problem to its source.       |
-| `rx-react-web`         | Build with Next.js or Vite: rendering, data fetching, forms, env vars.                          |
-| `rx-ui-kit`            | Get a good-looking, accessible UI fast with Tailwind and shadcn/ui, dark mode included.         |
-| `rx-node-api`          | Build a typed API with Hono (or Fastify/Express): validation, errors, auth, CORS, tests.        |
-| `rx-python-api`        | Build an API with FastAPI and uv: models, dependencies, async database, tests, Docker.          |
-| `rx-expo`              | Ship a React Native app with Expo: routing, devices, env vars, auth, EAS.                       |
-| `rx-claude-api`        | Add AI features with the Claude API: streaming, tools, structured output, caching, cost caps.   |
-| `rx-auth`              | Pick and wire authentication fast, with a seeded demo account.                                  |
-| `rx-supabase`          | Use Supabase: local dev, migrations, row-level security, storage, edge functions, types.        |
-| `rx-postgres`          | Use Postgres with Drizzle or Prisma: schema, migrations, pooling, indexes, seeds.               |
-| `rx-deploy-vercel`     | Deploy to Vercel or Netlify: previews, env vars, monorepos, limits, rollback.                   |
-| `rx-deploy-cloudflare` | Deploy Workers and Pages with wrangler: bindings, secrets, D1, R2, KV.                          |
-| `rx-deploy-container`  | Deploy containers to Fly.io, Railway or anywhere Docker runs.                                   |
-| `rx-aws`               | Take the fast paths on AWS, with a budget alarm first and a teardown list last.                 |
+Each skill is a folder with a `SKILL.md`: when to use it, the steps, and an example.
+
+**Workflow**
+
+| Skill               | Use it to                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| `rx-kickoff`        | Turn an idea into a scoped plan, a repo with agent instructions, and a live deploy in hour one. |
+| `rx-timebox`        | Run the build against the clock: checkpoints, cut lists, a feature freeze, the last two hours.  |
+| `rx-slice`          | Break a feature into thin end-to-end slices and ship them one at a time.                        |
+| `rx-parallel`       | Run several sessions and agents at once with worktrees, without collisions.                     |
+| `rx-tdd`            | Test first where it pays, and skip it where it does not.                                        |
+| `rx-debug`          | Reproduce, isolate and fix a bug at its root, with a regression test.                           |
+| `rx-verify`         | Run the repository's own gate before calling work done.                                         |
+| `rx-ship`           | Get a change merged the repository's way: branch, commits, checks, pull request.                |
+| `rx-handoff`        | Write a note a fresh session can resume from, or resume from one.                               |
+| `rx-e2e`            | Put a Playwright smoke suite on the demo path.                                                  |
+| `rx-security-sweep` | Do a 30-minute security pass before the demo.                                                   |
+| `rx-demo`           | Make the demo impossible to fail: seed data, a script, fallbacks, a backup video.               |
+| `rx-theme-audit`    | Measure a site's dark and light themes in a browser and trace each problem to its source.       |
+
+**Stacks**
+
+| Skill           | Use it to                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `rx-react-web`  | Build with Next.js or Vite: rendering, data fetching, forms, env vars.                        |
+| `rx-ui-kit`     | Get a good-looking, accessible UI fast with Tailwind and shadcn/ui, dark mode included.       |
+| `rx-node-api`   | Build a typed API with Hono (or Fastify/Express): validation, errors, auth, CORS, tests.      |
+| `rx-python-api` | Build an API with FastAPI and uv: models, dependencies, async database, tests, Docker.        |
+| `rx-expo`       | Ship a React Native app with Expo: routing, devices, env vars, auth, EAS.                     |
+| `rx-claude-api` | Add AI features with the Claude API: streaming, tools, structured output, caching, cost caps. |
+| `rx-auth`       | Pick and wire authentication fast, with a seeded demo account.                                |
+
+**Platforms**
+
+| Skill                  | Use it to                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `rx-supabase`          | Use Supabase: local dev, migrations, row-level security, storage, edge functions, types. |
+| `rx-postgres`          | Use Postgres with Drizzle or Prisma: schema, migrations, pooling, indexes, seeds.        |
+| `rx-deploy-vercel`     | Deploy to Vercel or Netlify: previews, env vars, monorepos, limits, rollback.            |
+| `rx-deploy-cloudflare` | Deploy Workers and Pages with wrangler: bindings, secrets, D1, R2, KV.                   |
+| `rx-deploy-container`  | Deploy containers to Fly.io, Railway or anywhere Docker runs.                            |
+| `rx-aws`               | Take the fast paths on AWS, with a budget alarm first and a teardown list last.          |
 
 ## Agents
 
