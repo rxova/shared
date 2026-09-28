@@ -1,0 +1,119 @@
+name: Release workflows
+
+# Cuts a `vX.Y.Z` release of the reusable workflows and composite actions, the
+# ref other repositories pin by SHA (Renovate keeps the pin current):
+#
+#   uses: rxova/shared/.github/workflows/repo-checks.yml@<sha> # v1.2.0
+#
+# On main they call each other at `@main`, so this repository's own CI tests a
+# change before it is released. The release commit rewrites every such ref to
+# the release's own tag and is tagged off-branch, so a pinned release runs its
+# own actions all the way down, never whatever main holds today.
+#
+# Run it from Actions → Release workflows → Run workflow, with the bump.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: What the changes since the last release are.
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-workflows
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # the tag and the GitHub release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Work out the version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          set -euo pipefail
+          last=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          if [ -z "$last" ]; then
+            next=v1.0.0
+          else
+            IFS=. read -r major minor patch <<<"${last#v}"
+            case "$BUMP" in
+              major) next="v$((major + 1)).0.0" ;;
+              minor) next="v${major}.$((minor + 1)).0" ;;
+              patch) next="v${major}.${minor}.$((patch + 1))" ;;
+            esac
+          fi
+          echo "last=$last" >> "$GITHUB_OUTPUT"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+          echo "releasing $next (previous: ${last:-none})"
+
+      # Only `@main` is expected on main: anything else would ship a release
+      # that quietly runs some other version of its own actions.
+      - name: Pin the internal references to the release
+        env:
+          VERSION: ${{ steps.version.outputs.next }}
+        run: |
+          set -euo pipefail
+          # `uses:` lines only (comments that show one count too, so the
+          # examples in a release name the release), outside this file.
+          ref='uses:[[:space:]]+rxova/shared/[^@[:space:]]+@'
+          scan() { grep -rnE "$@" --exclude=release-workflows.yml actions .github/workflows; }
+          stray=$(scan "${ref}" | grep -vE "${ref}main([^[:alnum:]]|$)" || true)
+          if [ -n "$stray" ]; then
+            echo "::error::internal references must be @main on main:"
+            echo "$stray"
+            exit 1
+          fi
+          scan -l "${ref}main" | xargs sed -i -E "s#(${ref})main#\\1${VERSION}#g"
+          if scan "${ref}main"; then
+            echo "::error::a reference was left at @main"
+            exit 1
+          fi
+          git --no-pager diff --stat
+
+      - name: Tag the release commit
+        env:
+          VERSION: ${{ steps.version.outputs.next }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qam "chore: release workflows $VERSION"
+          git tag -a "$VERSION" -m "Workflows and actions $VERSION"
+          git push origin "refs/tags/$VERSION"
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.next }}
+          LAST: ${{ steps.version.outputs.last }}
+        run: |
+          set -euo pipefail
+          range=${LAST:+$LAST..}${GITHUB_SHA}
+          {
+            echo "Pin it by SHA; Renovate keeps the pin current:"
+            echo
+            echo '```yaml'
+            echo "uses: rxova/shared/.github/workflows/<name>.yml@$(git rev-parse "$VERSION^{commit}") # $VERSION"
+            echo '```'
+            echo
+            echo "## Changes"
+            echo
+            git log --format='- %s' "$range" -- actions .github/workflows renovate
+          } > notes.md
+          gh release create "$VERSION" --verify-tag --title "$VERSION" --notes-file notes.md

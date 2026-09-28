@@ -43,6 +43,12 @@
     // against the live registry, so a lockfile goes stale on its own as
     // upstream publishes patches, with no change here at all.
     ":maintainLockFilesMonthly",
+
+    // Every action and reusable workflow referenced by commit SHA, with the
+    // version as a comment, and kept current by Renovate. A tag can be moved to
+    // point at other code; a SHA cannot. This covers rxova/shared's own
+    // workflows too, which callers pin at a release.
+    "helpers:pinGitHubActionDigests",
   ],
 
   // `skip-changeset` is what the changeset gate reads. A bump changes what the

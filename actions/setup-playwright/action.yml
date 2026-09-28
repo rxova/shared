@@ -60,7 +60,7 @@ runs:
       shell: bash
       run: echo "PLAYWRIGHT_BROWSERS_PATH=${{ runner.temp }}/pw-browsers" >> "$GITHUB_ENV"
 
-    - uses: actions/cache@v6
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       id: pw-cache
       with:
         path: ${{ runner.temp }}/pw-browsers

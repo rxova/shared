@@ -74,8 +74,17 @@ jobs:
 | `node-floor-smoke.yml`      | Installs each packed package on exactly the oldest Node its `engines` promises.               |
 | `changesets-release.yml`    | The version pull request, then publishing with npm trusted publishing and provenance.         |
 | `snapshot-release.yml`      | Publishes a prerelease under a dist-tag other than `latest`, to try a change in another repo. |
+| `repo-checks.yml`           | Lint, format, actionlint, build, typecheck and a test-script check in one job.                |
+| `unit-tests.yml`            | The suite on every Node × OS pair, with coverage to Codecov from one leg.                     |
+| `supply-chain.yml`          | Audit, sherif, knip and dedupe.                                                               |
+| `package-contract.yml`      | publint, Are The Types Wrong and the pack smoke.                                              |
+| `docs-build.yml`            | The docs site built at the GitHub Pages base path.                                            |
+| `pages-deploy.yml`          | Builds and deploys the docs to GitHub Pages.                                                  |
+| `codeql-analysis.yml`       | CodeQL, skipped where code scanning is not enabled.                                           |
 
-Inputs, outputs and a full CI graph: [.github/workflows/README.md](.github/workflows/README.md).
+Inputs, outputs, a full CI graph and how releases work:
+[.github/workflows/README.md](.github/workflows/README.md). Callers pin a release by SHA
+(`@<sha> # v1.2.0`), never `@main`; Renovate moves the pin.
 
 ### Renovate preset
 
@@ -113,7 +122,8 @@ export default rxova({ tsconfigRootDir: import.meta.dirname, node: true, tests: 
 { "extends": "@rxova/repo-config/tsconfig.react.json", "include": ["src"] }
 ```
 
-And CI at the shared workflows, pinned to `@main`:
+And CI at the shared workflows, each pinned to a release by SHA (shown here as `@main` for brevity;
+see [Versioning](.github/workflows/README.md#versioning)):
 
 ```yaml
 jobs:

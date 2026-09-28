@@ -8,10 +8,30 @@ jobs:
     uses: rxova/shared/.github/workflows/commit-messages.yml@main
 ```
 
-They call the [composite actions](../../actions/README.md) as `rxova/shared/actions/<name>@main`.
-This repository's own CI calls them by local path (`./.github/workflows/<name>.yml`), so a change to
-a workflow runs on the pull request that makes it. The caller's workflow-level `env` does not reach
-a called workflow, and a called workflow cannot hold more `permissions` than the calling job grants.
+They call the [composite actions](../../actions/README.md). The caller's workflow-level `env` does
+not reach a called workflow, and a called workflow cannot hold more `permissions` than the calling
+job grants.
+
+## Versioning
+
+Callers pin a release by commit SHA, with the version as a comment, and never `@main`:
+
+```yaml
+uses: rxova/shared/.github/workflows/repo-checks.yml@<sha> # v1.2.0
+```
+
+A tag can be moved to point at other code; a SHA cannot. The org Renovate preset
+(`helpers:pinGitHubActionDigests`) opens the pull request that moves a pin to the next release, and
+automerges a minor or patch once `all checks` passes. Every release, its SHA and its changes are on
+the [releases page](https://github.com/rxova/shared/releases).
+
+On main, the workflows and actions call each other at `@main`, so this repository's own CI (which
+calls them by local path) tests a change before it ships. A release is cut from Actions → **Release
+workflows** → Run workflow, with the bump: it rewrites every internal `@main` to the release's own
+tag in an off-branch commit and tags that, so a pinned release runs its own actions all the way
+down. A breaking change to an input or output is a major.
+
+The examples below say `@main` on main; in a release they name that release.
 
 | Workflow                    | Inputs                                                                                                                                                                        | Outputs                                     | What it does                                                                                                                                                                                       |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

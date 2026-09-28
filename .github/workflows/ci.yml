@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./actions/setup-pnpm
       - run: pnpm install --frozen-lockfile
       - uses: ./actions/pin-react
@@ -157,7 +157,7 @@ jobs:
     timeout-minutes: 5
     steps:
       # Only for the local action below.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: actions
       - uses: ./actions/require-jobs
