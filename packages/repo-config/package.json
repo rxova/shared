@@ -35,8 +35,8 @@
       "default": "./dist/vitest.js"
     },
     "./eslint": {
-      "types": "./presets/base-eslint-config.d.ts",
-      "default": "./presets/base-eslint-config.js"
+      "types": "./presets/eslint.d.ts",
+      "default": "./presets/eslint.js"
     },
     "./commitlint": {
       "types": "./presets/commitlint.d.ts",
@@ -75,6 +75,10 @@
     "@commitlint/config-conventional": ">=19",
     "@eslint/js": ">=9",
     "eslint": ">=9",
+    "eslint-plugin-astro": ">=3",
+    "eslint-plugin-jsx-a11y": ">=6.10",
+    "eslint-plugin-react": ">=7.37",
+    "eslint-plugin-react-hooks": ">=7",
     "globals": ">=15",
     "prettier": ">=3.5",
     "tsdown": ">=0.15",
@@ -90,6 +94,18 @@
       "optional": true
     },
     "eslint": {
+      "optional": true
+    },
+    "eslint-plugin-astro": {
+      "optional": true
+    },
+    "eslint-plugin-jsx-a11y": {
+      "optional": true
+    },
+    "eslint-plugin-react": {
+      "optional": true
+    },
+    "eslint-plugin-react-hooks": {
       "optional": true
     },
     "globals": {
@@ -117,6 +133,10 @@
     "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.12.0",
     "prettier": "^3.9.8",
     "publint": "^0.3.24",
