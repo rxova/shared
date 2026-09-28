@@ -20,6 +20,9 @@ export const destructiveCommand = (words: readonly string[]): string | undefined
   )
     return 'resets a remote Supabase database';
   if (program === 'prisma' && has('migrate', 'reset')) return 'resets the database';
+  if (program === 'dotnet' && has('ef', 'database', 'drop')) return 'drops the database';
+  if (program === 'dotnet' && has('ef', 'database', 'update') && args.at(-1) === '0')
+    return 'reverts every migration';
   if (program === 'terraform' && has('destroy')) return 'destroys infrastructure';
   if (program === 'aws' && has('s3', 'rb') && args.includes('--force'))
     return 'deletes an S3 bucket and its contents';

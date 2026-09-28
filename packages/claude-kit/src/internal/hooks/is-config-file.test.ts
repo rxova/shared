@@ -24,6 +24,9 @@ describe('isConfigFile', () => {
     'jest.config.cjs',
     'ruff.toml',
     '.golangci.yml',
+    'stylecop.json',
+    'Company.ruleset',
+    '.globalconfig',
   ])('knows %s', (name) => {
     expect(isConfigFile(name)).toBe(true);
   });

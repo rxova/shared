@@ -1,4 +1,4 @@
-import { dirname, isAbsolute, resolve } from 'node:path';
+import { dirname, extname, isAbsolute, resolve } from 'node:path';
 import type { HookSpec } from '@/hooks/hook.types';
 import { fileChecks } from '@/internal/hooks/file-checks';
 import { findUp } from '@/internal/hooks/find-up';
@@ -16,11 +16,10 @@ export const quickCheck: HookSpec = {
     const path = input.tool_input?.file_path;
     if (typeof path !== 'string' || context.platform === 'win32') return { code: 0 };
     const file = isAbsolute(path) ? path : resolve(input.cwd ?? '.', path);
-    const root = findUp(
-      dirname(file),
-      ['package.json', 'pyproject.toml', 'ruff.toml'],
-      context.exists,
-    );
+    const root =
+      extname(file) === '.cs'
+        ? dirname(file)
+        : findUp(dirname(file), ['package.json', 'pyproject.toml', 'ruff.toml'], context.exists);
     if (root === undefined) return { code: 0 };
 
     const problems = fileChecks(file, root, context)
