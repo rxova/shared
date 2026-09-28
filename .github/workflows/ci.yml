@@ -37,145 +37,39 @@ jobs:
       # From source: this repository is where the bin is built.
       repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
 
+  # The reusable workflows are this repository's product as much as the packages
+  # are: a typo in an expression fails in someone else's CI, so actionlint (with
+  # shellcheck on every `run:` block) runs as the extra check.
   checks:
     name: lint · format · types · build
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./actions/setup-pnpm
-      - uses: ./actions/turbo-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
-      - name: Check formatting
-        run: pnpm format:check
-      # The reusable workflows are this repository's product as much as the
-      # packages are: a typo in an expression fails in someone else's CI.
-      # shellcheck runs on every `run:` block too (preinstalled on the runner).
-      - name: Lint the workflows
-        env:
-          ACTIONLINT_VERSION: 1.7.12
-        run: |
-          bash <(curl -sSfL "https://raw.githubusercontent.com/rhysd/actionlint/v${ACTIONLINT_VERSION}/scripts/download-actionlint.bash") "$ACTIONLINT_VERSION" "$RUNNER_TEMP"
-          "$RUNNER_TEMP/actionlint" -color
-      # The docs app is built by the `docs` job below, at the base path Pages
-      # serves it from — the only build of it whose output matters.
-      - name: Build
-        run: pnpm exec turbo run build --filter='!docs'
-      - name: Typecheck
-        run: pnpm exec turbo run typecheck
-      # Turbo only runs suites it knows about. A package with a vitest config
-      # but no `test` script would be skipped without a word, so look for the
-      # config rather than trusting the task graph.
-      - name: Every package with tests is in the task graph
-        run: |
-          set -eu
-          missing=''
-          for config in packages/*/vitest.config.* apps/*/vitest.config.*; do
-            [ -e "$config" ] || continue
-            pkg=$(dirname "$config")
-            node -e "process.exit(require('./$pkg/package.json').scripts?.test ? 0 : 1)" \
-              || missing="$missing $pkg"
-          done
-          if [ -n "$missing" ]; then
-            echo "::error::these packages have a vitest config but no test script:$missing"
-            exit 1
-          fi
+    uses: ./.github/workflows/repo-checks.yml
+    with:
+      repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
+      extra-command: |
+        bash <(curl -sSfL "https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash") 1.7.12 "$RUNNER_TEMP"
+        "$RUNNER_TEMP/actionlint" -color
 
   test:
-    name: unit (node ${{ matrix.node-version }}, ${{ matrix.os }})
+    name: unit
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        # 22 is the major `engines` promises; 24 is
-        # current LTS. Path separators, line endings and the shell all differ
-        # on Windows, and only a Windows leg would notice.
-        node-version: [22, 24]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./actions/setup-pnpm
-        with:
-          node-version: ${{ matrix.node-version }}
-      # Turbo hashes files and env, not the Node binary, and the cache action
-      # keys on the job name — one string for every leg. Naming the partition
-      # after the leg keeps one Node from replaying a result from another.
-      - uses: ./actions/turbo-cache
-        with:
-          key: unit-${{ matrix.os }}-node${{ matrix.node-version }}
-      - run: pnpm install --frozen-lockfile
-      - name: Test with coverage thresholds
-        run: pnpm test
-      # One leg reports, so the numbers are never averaged across platforms.
-      # Informational: vitest's per-file thresholds are the real gate, and an
-      # outage at the coverage service must not turn a pull request red.
-      - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 24
-        uses: codecov/codecov-action@v7
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
+    uses: ./.github/workflows/unit-tests.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   supply-chain:
     name: audit · sherif · knip · dedupe
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./actions/setup-pnpm
-      - uses: ./actions/turbo-cache
-      - run: pnpm install --frozen-lockfile
-      # Not a Turbo task: its verdict changes with the advisory database, not
-      # with any file here, so a cached pass could replay over a fresh CVE.
-      # `--ignore-registry-errors` keeps an unreachable advisory endpoint from
-      # failing the job; `timeout-minutes` is the backstop.
-      - name: Audit dependencies
-        timeout-minutes: 5
-        run: pnpm run audit:check
-      # One version of each dependency across the workspace. Two packages on
-      # two minors of the same library typecheck fine and then disagree at
-      # runtime.
-      - name: Check dependency versions across the workspace
-        run: pnpm run sherif:check
-      # Unused files, exports and dependencies. The only check here that
-      # notices an export nothing imports. It loads every vitest and tsdown
-      # config, which import the built presets, so the script builds
-      # @rxova/repo-config first.
-      - name: Check for unused files, exports and dependencies
-        run: pnpm run knip:check
-      # Last, and it has to stay last: `pnpm dedupe --check` removes the
-      # modules directory when CI is set, so any step after it runs without
-      # node_modules and fails looking for its own binary.
-      - name: Check dependency dedupe
-        run: pnpm exec turbo run //#dedupe:check
+    uses: ./.github/workflows/supply-chain.yml
 
   pack-smoke:
     name: package contract
     needs: [commitlint]
     if: needs.commitlint.outputs.code-changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./actions/setup-pnpm
-      - uses: ./actions/turbo-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Publint and Are The Types Wrong
-        run: pnpm run check:exports
-      # Packs the real tarball, installs it into a scratch project and imports
-      # it with plain Node. The only check that catches a `files` entry that
-      # dropped dist.
-      - name: Pack smoke test
-        run: pnpm run pack:smoke
+    uses: ./.github/workflows/package-contract.yml
 
   # The unit matrix runs the newest release of each Node major, which says little
   # about the oldest one `engines` promises; this installs each packed tarball on
@@ -223,21 +117,7 @@ jobs:
     if: >-
       needs.commitlint.outputs.code-changed == 'true' ||
       needs.commitlint.outputs.docs-changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./actions/setup-pnpm
-      - uses: ./actions/turbo-cache
-      - run: pnpm install --frozen-lockfile
-      # At the base path Pages serves it from, so an absolute link that only
-      # works at a domain root fails here. The build also runs
-      # starlight-links-validator, so a broken internal link fails too.
-      - name: Build the docs at the Pages base path
-        env:
-          DOCS_URL: https://${{ github.repository_owner }}.github.io
-          DOCS_BASE_URL: /${{ github.event.repository.name }}/
-        run: pnpm exec turbo run build --filter=docs
+    uses: ./.github/workflows/docs-build.yml
 
   # What a documentation-only range runs in place of `checks`: formatting. The
   # changeset gate below and `docs` above still run on their own terms.

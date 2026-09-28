@@ -18,6 +18,13 @@ a called workflow, and a called workflow cannot hold more `permissions` than the
 | `commit-messages.yml`       | `node-version`, `repo-config-command`, `check-scope`                                                                                                                          | `code-changed`, `docs-only`, `docs-changed` | The root CI job: lints the branch commits (or the pushed commit) and decides with `check-scope` what the range touched; `code-changed` is false for a release commit or a documentation-only range |
 | `docs-checks.yml`           | `node-version`, `command`                                                                                                                                                     | —                                           | The light job for a documentation-only range (`docs-only`): `prettier --check .` by default, plus any prose checks the caller names                                                                |
 | `lint-pr-title.yml`         | `node-version`                                                                                                                                                                | —                                           | Lints the PR title, read live from the API and piped to commitlint. Needs `pull-requests: read`                                                                                                    |
+| `repo-checks.yml`           | `node-version`, `build-command`, `extra-command`, `repo-config-command`                                                                                                       | —                                           | Lint, format check, an optional extra check, build (docs left out), typecheck and `check-test-scripts`                                                                                             |
+| `unit-tests.yml`            | `node-versions`, `operating-systems`, `test-command`, `coverage-node-version`, `coverage-os`; secret `CODECOV_TOKEN`                                                          | —                                           | The test suite on every Node × OS pair (22/24 × Linux/macOS/Windows by default), coverage uploaded to Codecov from one leg                                                                         |
+| `supply-chain.yml`          | `node-version`                                                                                                                                                                | —                                           | `audit:check`, `sherif:check`, `knip:check`, then `//#dedupe:check` last                                                                                                                           |
+| `package-contract.yml`      | `node-version`                                                                                                                                                                | —                                           | `check:exports` (publint + attw) and `pack:smoke`                                                                                                                                                  |
+| `docs-build.yml`            | `node-version`, `build-command`                                                                                                                                               | —                                           | Builds the docs site at the Pages base path (`DOCS_URL`, `DOCS_BASE_URL`), so a root-only link fails on the pull request                                                                           |
+| `pages-deploy.yml`          | `node-version`, `build-command`, `path`                                                                                                                                       | —                                           | Builds and deploys the docs to GitHub Pages; skipped on a template and until Pages is enabled. Needs `pages: write`, `id-token: write`                                                             |
+| `codeql-analysis.yml`       | `languages`                                                                                                                                                                   | —                                           | CodeQL per language, skipped with a notice where code scanning is not enabled. Needs `security-events: write`, `actions: read`                                                                     |
 | `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                           | `check-changeset` on pull requests (not the release branch), with the base/head SHAs, labels and title from the event                                                                              |
 | `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                           | Pins the oldest React at the root and in `filters` (`pin-react`), then builds, tests and typechecks against it                                                                                     |
 | `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                           | Builds, reads the Node floor from `engines`, switches to it and runs `pack-smoke` for each published package with plain `node`                                                                     |
@@ -36,7 +43,38 @@ content changes still build it.
 
 ## Examples
 
-A CI graph:
+A whole CI, every job a call. The caller keeps only the triggers, the `if:`
+gates and the `all checks` gate:
+
+```yaml
+jobs:
+  commitlint:
+    uses: rxova/shared/.github/workflows/commit-messages.yml@main
+  checks:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true'
+    uses: rxova/shared/.github/workflows/repo-checks.yml@main
+  test:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true'
+    uses: rxova/shared/.github/workflows/unit-tests.yml@main
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  supply-chain:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true'
+    uses: rxova/shared/.github/workflows/supply-chain.yml@main
+  pack-smoke:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true'
+    uses: rxova/shared/.github/workflows/package-contract.yml@main
+  docs:
+    needs: [commitlint]
+    if: needs.commitlint.outputs.code-changed == 'true' || needs.commitlint.outputs.docs-changed == 'true'
+    uses: rxova/shared/.github/workflows/docs-build.yml@main
+```
+
+A CI graph with the release-side jobs:
 
 ```yaml
 jobs:

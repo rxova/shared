@@ -1,0 +1,49 @@
+name: Docs build
+
+# Reusable: builds the docs site at the base path GitHub Pages serves it from
+# (`/<repository>/`), so an absolute link that only works at a domain root fails
+# on the pull request rather than on the live site. The site reads the mount
+# from `DOCS_URL` and `DOCS_BASE_URL`.
+#
+#   jobs:
+#     docs:
+#       needs: [commitlint]
+#       if: >-
+#         needs.commitlint.outputs.code-changed == 'true' ||
+#         needs.commitlint.outputs.docs-changed == 'true'
+#       uses: rxova/shared/.github/workflows/docs-build.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      build-command:
+        description: Builds the docs site.
+        type: string
+        required: false
+        default: pnpm exec turbo run build --filter=docs
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: docs build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-cache@main
+      - run: pnpm install --frozen-lockfile
+      - name: Build the docs at the Pages base path
+        env:
+          DOCS_URL: https://${{ github.repository_owner }}.github.io
+          DOCS_BASE_URL: /${{ github.event.repository.name }}/
+        run: ${{ inputs.build-command }}

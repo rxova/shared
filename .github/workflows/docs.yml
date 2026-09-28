@@ -26,62 +26,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    if: ${{ !github.event.repository.is_template }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  # By local path, so a change to the reusable workflow runs here first.
+  pages:
+    name: Pages
     permissions:
       contents: read
-      pages: read
-    outputs:
-      enabled: ${{ steps.pages.outputs.enabled }}
-    steps:
-      - name: Check that Pages is enabled
-        id: pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh api "repos/$GITHUB_REPOSITORY/pages" --silent 2>/dev/null; then
-            echo 'enabled=true' >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::GitHub Pages is not enabled; skipping the deploy. Settings → Pages → Source: GitHub Actions."
-            echo 'enabled=false' >> "$GITHUB_OUTPUT"
-          fi
-
-      - if: steps.pages.outputs.enabled == 'true'
-        uses: actions/checkout@v7
-      - if: steps.pages.outputs.enabled == 'true'
-        uses: ./actions/setup-pnpm
-      - if: steps.pages.outputs.enabled == 'true'
-        uses: ./actions/turbo-cache
-      - if: steps.pages.outputs.enabled == 'true'
-        run: pnpm install --frozen-lockfile
-
-      - name: Build the docs at the Pages base path
-        if: steps.pages.outputs.enabled == 'true'
-        env:
-          DOCS_URL: https://${{ github.repository_owner }}.github.io
-          DOCS_BASE_URL: /${{ github.event.repository.name }}/
-        run: pnpm exec turbo run build --filter=docs
-
-      - if: steps.pages.outputs.enabled == 'true'
-        uses: actions/configure-pages@v6
-      - if: steps.pages.outputs.enabled == 'true'
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: apps/docs/dist
-
-  deploy:
-    needs: build
-    if: needs.build.outputs.enabled == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
       pages: write
       id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5
+    uses: ./.github/workflows/pages-deploy.yml
