@@ -12,10 +12,16 @@ description: Every export, command and action this repository publishes.
 | `hasProperty` / `safeKeys` / `isInstanceOf`           | `in`, `Object.keys` and `instanceof` that never throw                        |
 | `objectTag` / `arrayItems`                            | The `[object Tag]` string; a copy of an array                                |
 | `isError` / `errorMessage`                            | A real `Error` from any realm; the text to show for anything thrown          |
+| `isErrorLike`                                         | Any object with a string `message`                                           |
 | `shallowEqual`                                        | `Object.is` per own key                                                      |
 | `isDevelopment` / `createDevWarner`                   | Development detection; prefixed, coded, warn-once diagnostics                |
+| `isNonProduction`                                     | Conservative non-production detection (`import.meta.env`, then `NODE_ENV`)   |
+| `randomHex` / `escapeHtml` / `prefersReducedMotion`   | Random hex ids; HTML/XML escaping; the reduced-motion preference, now        |
 | `canUseDOM` / `deepFreeze` / `clamp`                  | DOM presence; recursive freeze; a bounded number                             |
 | `useIsomorphicLayoutEffect` (`@rxova/ts-utils/react`) | `useLayoutEffect` in the browser, `useEffect` on the server                  |
+| `useLatestRef` / `useMediaQuery` (`/react`)           | The latest committed value in a stable ref; a live media query               |
+| `assignRef` / `useMergedRefs` (`/react`)              | Feed a value to any ref; one callback ref for several                        |
+| `useDevWarner` (`/react`)                             | `createDevWarner` per component instance, with an `onWarn` sink              |
 
 ## `@rxova/repo-config`
 

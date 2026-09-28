@@ -23,3 +23,10 @@ export type {
 export { canUseDOM } from "@/dom/can-use-dom";
 export { deepFreeze } from "@/freeze/deep-freeze";
 export { clamp } from "@/number/clamp";
+export { isNonProduction } from "@/env/is-non-production";
+export type { BundlerEnv, NonProductionOptions } from "@/env/is-non-production.types";
+export { isErrorLike } from "@/errors/is-error-like";
+export { randomHex } from "@/random/random-hex";
+export type { RandomHexOptions } from "@/random/random-hex.types";
+export { escapeHtml } from "@/string/escape-html";
+export { prefersReducedMotion } from "@/dom/prefers-reduced-motion";
