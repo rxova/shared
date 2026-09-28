@@ -80,13 +80,14 @@
     "dev": "tsdown --watch",
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "check:exports": "publint --strict && attw --pack . --profile esm-only",
+    "check:exports": "node --import tsx src/cli/cli.ts check-exports",
     "pack:smoke": "node --import tsx src/cli/cli.ts pack-smoke"
   },
   "dependencies": {
     "prettier-plugin-astro": "^1.1.0"
   },
   "peerDependencies": {
+    "@arethetypeswrong/cli": ">=0.17",
     "@changesets/changelog-github": ">=0.5",
     "@commitlint/config-conventional": ">=19",
     "@eslint/js": ">=9",
@@ -99,12 +100,16 @@
     "globals": ">=15",
     "knip": ">=5",
     "prettier": ">=3.5",
+    "publint": ">=0.3",
     "tsdown": ">=0.15",
     "typescript": ">=5.5",
     "typescript-eslint": ">=8",
     "vitest": ">=3"
   },
   "peerDependenciesMeta": {
+    "@arethetypeswrong/cli": {
+      "optional": true
+    },
     "@changesets/changelog-github": {
       "optional": true
     },
@@ -141,6 +146,9 @@
     "prettier": {
       "optional": true
     },
+    "publint": {
+      "optional": true
+    },
     "tsdown": {
       "optional": true
     },
@@ -175,5 +183,10 @@
     "typescript": "6.0.3",
     "typescript-eslint": "^8.70.0",
     "vitest": "^5.0.1"
+  },
+  "repoConfig": {
+    "exports": {
+      "profile": "esm-only"
+    }
   }
 }

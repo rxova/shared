@@ -8,7 +8,7 @@ import { packSmoke } from "@/pack-smoke/pack-smoke";
  */
 export const packSmokeCommand = (
   pkgDir: string = process.cwd(),
-  deps: { sh?: Shell; fs?: ScratchFiles } = {},
+  deps: { sh?: Shell; output?: Shell; fs?: ScratchFiles } = {},
 ): number => {
   try {
     console.log(packSmoke({ pkgDir, ...deps }));

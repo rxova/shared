@@ -15,4 +15,7 @@ export interface PackageManifest {
   optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   engines?: { node?: string };
+  scripts?: Record<string, string>;
+  /** The package's own `repoConfig` settings, unchecked; `parsePackageConfig` reads them. */
+  repoConfig?: unknown;
 }
