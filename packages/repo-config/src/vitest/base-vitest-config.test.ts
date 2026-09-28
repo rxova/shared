@@ -76,4 +76,82 @@ describe("baseVitestConfig", () => {
     expect(resolve("vitest/config")).toBe("vitest/config");
     expect(baseVitestConfig().resolve?.alias).toHaveLength(1);
   });
+
+  it("keeps the 0.2 shape when no new option is given", () => {
+    const config = baseVitestConfig({ root: "/repo/pkg" });
+    expect(Object.keys(config)).toEqual(["resolve", "test"]);
+    expect(Object.keys(config.resolve ?? {})).toEqual(["alias"]);
+    expect(Object.keys(config.test ?? {})).toEqual([
+      "environment",
+      "include",
+      "exclude",
+      "coverage",
+    ]);
+  });
+
+  it("passes plugins, dedupe and extra aliases to Vite", () => {
+    const plugin = { name: "fake" };
+    const config = baseVitestConfig({
+      root: "/repo/pkg",
+      plugins: [plugin],
+      dedupe: ["react", "react-dom"],
+      alias: { "@core": "/repo/core/src" },
+    });
+    expect(config.plugins).toEqual([plugin]);
+    expect(config.resolve?.dedupe).toEqual(["react", "react-dom"]);
+    expect(config.resolve?.alias).toEqual([
+      { find: /^@\//, replacement: `${join("/repo/pkg", "src")}/` },
+      { find: "@core", replacement: "/repo/core/src" },
+    ]);
+  });
+
+  it("sets Vitest's own options only when given", () => {
+    const { test } = baseVitestConfig({
+      testTimeout: 60_000,
+      hookTimeout: 30_000,
+      globals: true,
+      setupFiles: ["src/setup.ts"],
+      fileParallelism: false,
+      silent: true,
+    });
+    expect(test).toMatchObject({
+      testTimeout: 60_000,
+      hookTimeout: 30_000,
+      globals: true,
+      setupFiles: ["src/setup.ts"],
+      fileParallelism: false,
+      silent: true,
+    });
+  });
+
+  it("reports without thresholds, into a chosen directory, or drops coverage", () => {
+    const reportOnly = baseVitestConfig({ thresholds: false, reportsDirectory: "coverage/app" })
+      .test?.coverage;
+    expect(reportOnly).not.toHaveProperty("thresholds");
+    expect(reportOnly).toMatchObject({ reportsDirectory: "coverage/app" });
+    expect(baseVitestConfig({ coverage: false }).test).not.toHaveProperty("coverage");
+  });
+
+  it("splits into a unit and a browser project with browser", () => {
+    const provider = { name: "fake" } as never;
+    const { test } = baseVitestConfig({
+      environment: "jsdom",
+      unitName: "logic",
+      browser: {
+        include: ["src/**/*.browser.test.tsx"],
+        instances: [{ browser: "chromium" }],
+        provider,
+      },
+    });
+    expect(test).not.toHaveProperty("include");
+    expect(test).not.toHaveProperty("environment");
+    expect(test?.projects).toMatchObject([
+      { extends: true, test: { name: "logic", environment: "jsdom" } },
+      {
+        extends: true,
+        test: { name: "browser", include: ["src/**/*.browser.test.tsx"], browser: { provider } },
+      },
+    ]);
+    expect(test?.coverage).toMatchObject({ provider: "v8" });
+  });
 });
