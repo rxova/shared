@@ -1,0 +1,126 @@
+name: Changesets release
+
+# Reusable: opens the `chore: version packages` pull request, and publishes
+# with npm trusted publishing (OIDC, provenance) once that pull request merges.
+# Call it after CI has gone green on main:
+#
+#   on:
+#     workflow_run: { workflows: [CI], types: [completed], branches: [main] }
+#     workflow_dispatch:
+#   jobs:
+#     release:
+#       if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+#       permissions: { contents: write, pull-requests: write, id-token: write }
+#       uses: rxova/shared/.github/workflows/changesets-release.yml@main
+#       with:
+#         enabled: ${{ vars.RELEASE_ENABLED == 'true' }}
+#
+# Repository-specific tails (moving a tag, a GitHub release, a post-publish
+# smoke) run as follow-up jobs on the `published` and `published-packages`
+# outputs. Configure the npm trusted publisher with the calling workflow's file
+# name, and check the first release after switching.
+
+on:
+  workflow_call:
+    inputs:
+      enabled:
+        description: >-
+          `false` skips the job. Pass `vars.RELEASE_ENABLED == 'true'` as an expression to
+          keep publishing opt-in until trusted publishing is configured.
+        type: boolean
+        required: false
+        default: true
+      version-script:
+        description: What changesets/action runs to version the packages.
+        type: string
+        required: false
+        default: pnpm exec changeset version
+      publish-script:
+        description: What changesets/action runs to publish (build, then `changeset publish`).
+        type: string
+        required: false
+        default: pnpm run release
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: '24'
+      run-verify:
+        description: Run `pnpm run verify` before versioning or publishing.
+        type: boolean
+        required: false
+        default: false
+      turbo-cache:
+        description: Restore the local Turbo cache first.
+        type: boolean
+        required: false
+        default: false
+      commit-message:
+        description: The version commit's message.
+        type: string
+        required: false
+        default: 'chore: version packages'
+      pr-title:
+        description: The version pull request's title.
+        type: string
+        required: false
+        default: 'chore: version packages'
+    outputs:
+      published:
+        description: '`true` when this run published.'
+        value: ${{ jobs.release.outputs.published }}
+      published-packages:
+        description: The changesets/action `published-packages` JSON (`[{ name, version }]`).
+        value: ${{ jobs.release.outputs.published-packages }}
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: version or publish
+    if: inputs.enabled && !github.event.repository.is_template
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # The version commit would otherwise fire the pre-commit hook. CI already
+      # gated this code on the pull request.
+      HUSKY: '0'
+    permissions:
+      contents: write # version commit and tags
+      pull-requests: write # the version pull request
+      id-token: write # npm trusted publishing (OIDC), with provenance
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      published-packages: ${{ steps.changesets.outputs.published-packages }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # By name, not a workflow_run's detached SHA, so the action knows its
+          # base branch when it opens the version pull request.
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+      - uses: rxova/shared/actions/turbo-cache@main
+        if: inputs.turbo-cache
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@^11.5.1
+      - run: pnpm install --frozen-lockfile
+      - name: Verify
+        if: inputs.run-verify
+        run: pnpm run verify
+
+      - name: Create version PR or publish
+        id: changesets
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ github.token }}
+          version-script: ${{ inputs.version-script }}
+          publish-script: ${{ inputs.publish-script }}
+          commit-message: ${{ inputs.commit-message }}
+          pr-title: ${{ inputs.pr-title }}
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'

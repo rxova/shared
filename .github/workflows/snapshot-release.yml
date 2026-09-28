@@ -1,0 +1,93 @@
+name: Snapshot release
+
+# Reusable: publishes an immutable prerelease under a dist-tag (never `latest`,
+# no changelog, no git tag) so another repository can try an in-progress change
+# end to end: `pnpm add @rxova/<package>@next`. Call it from a
+# `workflow_dispatch` workflow; the caller grants `id-token: write`.
+#
+#   on:
+#     workflow_dispatch:
+#       inputs:
+#         tag: { description: dist-tag to publish under, default: next }
+#   jobs:
+#     snapshot:
+#       permissions: { contents: read, id-token: write }
+#       uses: rxova/shared/.github/workflows/snapshot-release.yml@main
+#       with:
+#         tag: ${{ inputs.tag }}
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: The dist-tag to publish under.
+        type: string
+        required: false
+        default: next
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: '24'
+      verify-command:
+        description: >-
+          Runs before publishing — a snapshot goes to the real registry, and a
+          broken one wastes a round trip in whichever repository waits on it.
+          Empty skips it.
+        type: string
+        required: false
+        default: pnpm run verify
+      build-command:
+        description: Builds what gets published. Empty when `verify-command` already builds.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    name: snapshot (${{ inputs.tag }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: '0'
+    permissions:
+      contents: read
+      id-token: write # trusted publishing
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@^11.5.1
+      - run: pnpm install --frozen-lockfile
+      - name: Verify
+        if: inputs.verify-command != ''
+        run: ${{ inputs.verify-command }}
+      - name: Build
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+      # `latest` would make the snapshot what a plain `pnpm add` installs.
+      - name: Refuse the latest tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [ -z "$TAG" ] || [ "$TAG" = latest ]; then
+            echo "::error::a snapshot needs a dist-tag other than latest"
+            exit 1
+          fi
+      - name: Version as a snapshot
+        env:
+          TAG: ${{ inputs.tag }}
+        run: pnpm exec changeset version --snapshot "$TAG"
+      - name: Publish
+        env:
+          TAG: ${{ inputs.tag }}
+          NPM_CONFIG_PROVENANCE: 'true'
+        run: pnpm exec changeset publish --tag "$TAG" --no-git-tag
