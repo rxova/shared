@@ -1,6 +1,6 @@
 {
   "name": "@rxova/agent-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A kit for coding agents (Claude Code and OpenCode): guard and helper hooks, 51 skills and 25 agents, installed in profiles by one bin.",
   "license": "MIT",
   "author": "Jonatan Kruszewski",

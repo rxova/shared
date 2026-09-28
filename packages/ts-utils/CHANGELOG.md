@@ -1,5 +1,11 @@
 # @rxova/ts-utils
 
+## 0.2.0
+
+### Minor Changes
+
+- [#21](https://github.com/rxova/shared/pull/21) [`bf85833`](https://github.com/rxova/shared/commit/bf8583362eaf65063e5ce6fac917583af140fe9c) - Add `randomHex`, `isNonProduction`, `isErrorLike`, `escapeHtml` and `prefersReducedMotion`, and to `@rxova/ts-utils/react` add `useLatestRef`, `assignRef`, `useMergedRefs`, `useMediaQuery` and `useDevWarner`.
+
 ## 0.1.0
 
 ### Minor Changes
