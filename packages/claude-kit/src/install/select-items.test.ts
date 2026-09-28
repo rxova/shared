@@ -41,7 +41,7 @@ describe('selectItems', () => {
 
   it('rejects an unknown profile or name', () => {
     expect(() => selectItems({ names, profile: 'huge', previous: undefined })).toThrow(
-      'core, hackathon, full',
+      'core, hackathon, dotnet, full',
     );
     expect(() => selectItems({ names, profile: 'toString', previous: undefined })).toThrow(
       'unknown profile',

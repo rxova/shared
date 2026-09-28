@@ -52,8 +52,8 @@ describe('listCommand', () => {
     expect(listCommand([], env)).toBe(0);
     const out = printed(env.io.out);
     expect(out).toMatch(/agents \(2\)/);
-    expect(out).toMatch(/rx-planner +chf +rx-planner does a thing/);
-    expect(out).toMatch(/rx-pitch +·hf/);
+    expect(out).toMatch(/rx-planner +chdf +rx-planner does a thing/);
+    expect(out).toMatch(/rx-pitch +·h·f/);
     expect(out).toContain('profiles: c = core');
   });
 
