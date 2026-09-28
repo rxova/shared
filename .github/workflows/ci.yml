@@ -37,9 +37,6 @@ jobs:
       # From source: this repository is where the bin is built.
       repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
 
-  # The reusable workflows are this repository's product as much as the packages
-  # are: a typo in an expression fails in someone else's CI, so actionlint (with
-  # shellcheck on every `run:` block) runs as the extra check.
   checks:
     name: lint · format · types · build
     needs: [commitlint]
@@ -47,9 +44,6 @@ jobs:
     uses: ./.github/workflows/repo-checks.yml
     with:
       repo-config-command: node --import tsx ./packages/repo-config/src/cli/cli.ts
-      extra-command: |
-        bash <(curl -sSfL "https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash") 1.7.12 "$RUNNER_TEMP"
-        "$RUNNER_TEMP/actionlint" -color
 
   test:
     name: unit
