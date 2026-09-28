@@ -1,3 +1,4 @@
+import { trimTrailingSlashes } from '@/internal/links/trim-trailing-slashes';
 import { linkLine } from '@/internal/llms/link-line';
 import { llmsHead } from '@/internal/llms/llms-head';
 import { groupPages } from '@/llms/group-pages';
@@ -21,7 +22,7 @@ export const llmsIndex = (
     'Every link below is raw markdown. The human page is the same URL without the',
     '`.md` suffix.',
     '',
-    `Everything inlined in one fetch: ${mount.replace(/\/+$/, '')}/llms-full.txt`,
+    `Everything inlined in one fetch: ${trimTrailingSlashes(mount)}/llms-full.txt`,
     '',
     ...preamble,
   ];
