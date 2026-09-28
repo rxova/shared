@@ -14,9 +14,10 @@ describe("renameFiles", () => {
       ["README.md", "same.txt", "logo.png", "gone.md"],
       [["template-oss", "idea"]],
       {
-        read: (file) => files[file],
+        // Keyed with `/`; `path.join` hands the fakes `\\` on Windows.
+        read: (file) => files[file.replaceAll("\\", "/")],
         write: (file, contents) => {
-          written[file] = contents;
+          written[file.replaceAll("\\", "/")] = contents;
         },
       },
     );
