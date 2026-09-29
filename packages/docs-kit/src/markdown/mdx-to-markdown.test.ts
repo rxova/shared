@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mdxToMarkdown } from "@/markdown/mdx-to-markdown";
 
-const origin = "https://rxova.org";
+const origin = "https://rxova.dev";
 
 describe("mdxToMarkdown", () => {
   it("strips MDX imports but never an import inside a fence", () => {
@@ -41,13 +41,13 @@ describe("mdxToMarkdown", () => {
   it("resolves doc-relative links against fromRoute and absolutizes root links under the base", () => {
     const source = "See [a](../rules/x.md#y) and [b](/learn/) and ![c](/c.png).";
     expect(mdxToMarkdown(source, { origin, base: "/pkg/", fromRoute: "/learn/intro.md" })).toBe(
-      "See [a](https://rxova.org/pkg/rules/x.md#y) and [b](https://rxova.org/pkg/learn/) and ![c](https://rxova.org/pkg/c.png).",
+      "See [a](https://rxova.dev/pkg/rules/x.md#y) and [b](https://rxova.dev/pkg/learn/) and ![c](https://rxova.dev/pkg/c.png).",
     );
   });
 
   it("resolves from the home twin by default", () => {
     expect(mdxToMarkdown("[a](./learn/x.md)", { origin })).toBe(
-      "[a](https://rxova.org/learn/x.md)",
+      "[a](https://rxova.dev/learn/x.md)",
     );
   });
 

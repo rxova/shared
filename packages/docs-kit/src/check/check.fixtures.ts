@@ -13,7 +13,7 @@ export const fakeDist = async (files: Record<string, string>): Promise<string> =
   return dir;
 };
 
-export const PREFIX = "https://rxova.org/packages/overlock";
+export const PREFIX = "https://rxova.dev/packages/overlock";
 
 /** A twin whose `source:` frontmatter pins the site prefix the check reads back. */
 export const fakeTwin = (route: string, body = "Body."): string =>

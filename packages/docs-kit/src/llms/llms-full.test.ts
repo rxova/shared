@@ -15,7 +15,7 @@ describe("llmsFull", () => {
         "",
         "# index",
         "",
-        "Source: https://rxova.org/index/",
+        "Source: https://rxova.dev/index/",
         "",
         "Body of index",
         "",

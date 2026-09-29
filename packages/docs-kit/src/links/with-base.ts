@@ -4,7 +4,7 @@ import { trimTrailingSlashes } from "@/internal/links/trim-trailing-slashes";
  * A site-root-relative URL prefixed with the site's `base`.
  *
  * Astro emits a root-relative URL verbatim, so a site mounted under a prefix
- * (`/packages/overlock/` on the rxova.org aggregator) would otherwise link one
+ * (`/packages/overlock/` on the rxova.dev aggregator) would otherwise link one
  * directory above itself. Everything that writes a link into the agent-facing
  * surfaces goes through here.
  *

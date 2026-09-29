@@ -7,8 +7,8 @@ export const fakePage = (id: string, section: string, extra: Partial<DocsPage> =
   title: id,
   description: `About ${id}`,
   mdRoute: `/${id}.md`,
-  mdUrl: `https://rxova.org/${id}.md`,
-  htmlUrl: `https://rxova.org/${id}/`,
+  mdUrl: `https://rxova.dev/${id}.md`,
+  htmlUrl: `https://rxova.dev/${id}/`,
   body: `Body of ${id}`,
   ...extra,
 });

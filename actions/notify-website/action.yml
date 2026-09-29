@@ -1,4 +1,4 @@
-name: Notify rxova.org
+name: Notify rxova.dev
 description: Tell the rxova/rxova-website aggregator that this run built a docs dist it should publish.
 
 # The sender half of the contract in rxova/rxova-website docs/INPUTS-CONTRACT.md
@@ -10,7 +10,7 @@ description: Tell the rxova/rxova-website aggregator that this run built a docs 
 
 inputs:
   project:
-    description: The project slug on rxova.org, such as `overlock` or `storybook-react-inputs`.
+    description: The project slug on rxova.dev, such as `overlock` or `storybook-react-inputs`.
     required: true
   base:
     description: The path the dist is served under. Defaults to `/packages/<project>/`.
