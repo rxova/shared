@@ -1,5 +1,11 @@
 # @rxova/agent-kit
 
+## 0.2.1
+
+### Patch Changes
+
+- [#35](https://github.com/rxova/shared/pull/35) [`0cb1889`](https://github.com/rxova/shared/commit/0cb188991a6179508cd091c0286ba3297f30c737) - Point links at rxova.dev.
+
 ## 0.2.0
 
 ### Minor Changes
