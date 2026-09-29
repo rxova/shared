@@ -1,6 +1,6 @@
 {
   "name": "@rxova/docs-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The agent-facing surfaces of a Starlight docs site: raw-markdown twins of every page, llms.txt and llms-full.txt, doc-relative link rewriting, and a build check that holds them to it.",
   "license": "MIT",
   "author": "Jonatan Kruszewski",
