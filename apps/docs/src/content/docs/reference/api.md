@@ -270,7 +270,7 @@ Datadog:
 | `rxova/shared/actions/setup-playwright`   | `browsers`, `working-directory`, `install-script`                | Installs Playwright browsers, cached by Playwright version (resolved from `working-directory`)   |
 | `rxova/shared/actions/pin-react`          | `react-version`, `types-version`, `types-dom-version`, `filters` | Pins one exact React at the workspace root and in `filters`, and fails if another still resolves |
 | `rxova/shared/actions/require-jobs`       | `needs`                                                          | Fails unless every job in `needs` passed or was skipped (the `all checks` gate)                  |
-| `rxova/shared/actions/notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.org to publish this run's `docs-dist` artifact        |
+| `rxova/shared/actions/notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.dev to publish this run's `docs-dist` artifact        |
 
 ## Reusable workflows
 

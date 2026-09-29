@@ -14,7 +14,7 @@ Composite actions for rxova repositories. Reference them by path and ref:
 | `setup-playwright`   | `browsers`, `working-directory`, `install-script`                | Installs Playwright browsers outside the checkout, cached by Playwright version and browser set                                             |
 | `pin-react`          | `react-version`, `types-version`, `types-dom-version`, `filters` | Pins one exact React at the workspace root and in the filtered packages, then fails unless that React is the only one they resolve          |
 | `require-jobs`       | `needs`                                                          | Fails unless every job in `needs` passed or was skipped: the single `all checks` context branch protection requires                         |
-| `notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.org to publish this run's `docs-dist` artifact (rxova-website `docs/INPUTS-CONTRACT.md`, gate 1) |
+| `notify-website`     | `project`, `token`, `base`, `framework`, `repository`, `dry-run` | Sends the `docs` dispatch that tells rxova.dev to publish this run's `docs-dist` artifact (rxova-website `docs/INPUTS-CONTRACT.md`, gate 1) |
 
 This repository's own workflows use them through `./actions/<name>`, so a change here is tested by
 its own CI before anyone else picks it up. Inputs stay backward compatible: a rename breaks every

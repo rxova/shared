@@ -52,7 +52,7 @@ Each package README lists every export, command and option.
 | `setup-playwright`   | Resolves, caches and installs Playwright browsers.                                       |
 | `pin-react`          | Pins one React at the root and in the given packages, and proves only that one resolves. |
 | `require-jobs`       | Fails unless every job in `needs` passed or was skipped: the one check to require.       |
-| `notify-website`     | Tells the rxova.org website to publish this run's docs build.                            |
+| `notify-website`     | Tells the rxova.dev website to publish this run's docs build.                            |
 
 Inputs and examples: [actions/README.md](actions/README.md).
 

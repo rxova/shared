@@ -8,7 +8,7 @@ const entry = (id: string, data: Partial<DocsEntry["data"]> = {}, body?: string)
   data: { title: id, ...data },
 });
 
-const options = { origin: "https://rxova.org", base: "/packages/x/" };
+const options = { origin: "https://rxova.dev", base: "/packages/x/" };
 
 describe("docsPages", () => {
   it("normalizes each entry, with absolute URLs and a base-relative twin route", () => {
@@ -22,9 +22,9 @@ describe("docsPages", () => {
       description: "Read this first, then go.",
       section: "learn",
       mdRoute: "/learn/intro.md",
-      htmlUrl: "https://rxova.org/packages/x/learn/intro/",
-      mdUrl: "https://rxova.org/packages/x/learn/intro.md",
-      body: "Read [this](https://rxova.org/packages/x/rules/a.md) first, then go.",
+      htmlUrl: "https://rxova.dev/packages/x/learn/intro/",
+      mdUrl: "https://rxova.dev/packages/x/learn/intro.md",
+      body: "Read [this](https://rxova.dev/packages/x/rules/a.md) first, then go.",
     });
   });
 

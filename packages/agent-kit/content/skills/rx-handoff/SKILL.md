@@ -45,7 +45,7 @@ Write facts, not narrative. Paths as `path:line`, commands exactly as run.
 ```markdown
 # Dark-theme contrast fixes (2026-09-28)
 
-**Goal**: every text pair on rxova.org passes WCAG AA in dark; done = the audit shows no failures.
+**Goal**: every text pair on rxova.dev passes WCAG AA in dark; done = the audit shows no failures.
 **State**: branch `fix/dark-theme`, 2 commits, not pushed.
 **What worked**: `--rx-primary` #9d82f6 gives 4.92:1 on tag backgrounds (measured).
 **What did not work**: `filter: invert()` on the SVG diagrams; hue shifts the gradient.
