@@ -28,7 +28,7 @@ a called workflow, and a called workflow cannot hold more `permissions` than the
 | `changeset-gate.yml`        | `node-version`, `repo-config-command`                                                                                                                                         | —                                           | `check-changeset` on pull requests (not the release branch), with the base/head SHAs, labels and title from the event                                                                              |
 | `react-minimum-version.yml` | `react-version`, `test-command`, `types-version`, `types-dom-version`, `filters`, `build-command`, `typecheck-command`, `node-version`, `node-options`, `playwright-browsers` | —                                           | Pins the oldest React at the root and in `filters` (`pin-react`), then builds, tests and typechecks against it                                                                                     |
 | `node-floor-smoke.yml`      | `node-version`, `build-command`, `extra-command`                                                                                                                              | —                                           | Builds, reads the Node floor from `engines`, switches to it and runs `pack-smoke` for each published package with plain `node`                                                                     |
-| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`                                                      | `published`, `published-packages`           | changesets/action: the version pull request, then publishing with npm trusted publishing and provenance                                                                                            |
+| `changesets-release.yml`    | `enabled`, `version-script`, `publish-script`, `node-version`, `run-verify`, `turbo-cache`, `commit-message`, `pr-title`, `create-github-releases`, `push-git-tags`           | `published`, `published-packages`           | changesets/action: the version pull request, then publishing with npm trusted publishing and provenance                                                                                            |
 | `snapshot-release.yml`      | `tag`, `node-version`, `verify-command`, `build-command`                                                                                                                      | —                                           | Publishes a `changeset version --snapshot` prerelease under a dist-tag other than `latest`, with no git tag                                                                                        |
 
 `repo-config-command` defaults to `pnpm exec rxova-repo-config`; only rxova/shared, which builds the
@@ -139,9 +139,11 @@ jobs:
 ```
 
 Repository-specific follow-ups (moving a tag, a GitHub release, a post-publish smoke) are jobs of
-the caller that `needs: [release]` and read `needs.release.outputs.published`. The npm trusted
-publisher names a workflow file; after switching a repository to `changesets-release.yml`, check
-that the first release publishes, and if npm rejects the token, register the file npm reports.
+the caller that `needs: [release]` and read `needs.release.outputs.published`. A caller that cuts
+its own GitHub release passes `create-github-releases: false`, so a version is not released twice.
+The npm trusted publisher names a workflow file; after switching a repository to
+`changesets-release.yml`, check that the first release publishes, and if npm rejects the token,
+register the file npm reports.
 
 ## Renovate
 

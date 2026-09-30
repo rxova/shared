@@ -65,6 +65,19 @@ on:
         type: string
         required: false
         default: "chore: version packages"
+      create-github-releases:
+        description: >-
+          Create a GitHub release per published package. `false` for a repository that
+          cuts its own (overlock's `vX.Y.Z` for the Marketplace action), so a version is
+          not released twice.
+        type: boolean
+        required: false
+        default: true
+      push-git-tags:
+        description: Push the `<package>@<version>` tags `changeset publish` creates.
+        type: boolean
+        required: false
+        default: true
     outputs:
       published:
         description: "`true` when this run published."
@@ -122,5 +135,7 @@ jobs:
           publish-script: ${{ inputs.publish-script }}
           commit-message: ${{ inputs.commit-message }}
           pr-title: ${{ inputs.pr-title }}
+          create-github-releases: ${{ inputs.create-github-releases }}
+          push-git-tags: ${{ inputs.push-git-tags }}
         env:
           NPM_CONFIG_PROVENANCE: "true"
