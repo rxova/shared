@@ -89,6 +89,36 @@ describe("postPublishSmokeCommand", () => {
     }
   });
 
+  it("gives up after the configured registry timeout", () => {
+    const root = mkdtempSync(join(tmpdir(), "post-publish-"));
+    writeFileSync(
+      join(root, "package.json"),
+      JSON.stringify({ repoConfig: { postPublish: { registryTimeoutMinutes: 45 } } }),
+    );
+    let clock = 0;
+    const scratch = memoryScratch({});
+    try {
+      const code = postPublishSmokeCommand({
+        env: { PUBLISHED_PACKAGES: PUBLISHED },
+        root,
+        sh: (command, args) => {
+          if (command === "npm" && args[0] === "view") throw new Error("E404");
+          return healthy(command, args);
+        },
+        fs: scratch.fs,
+        sleep: (milliseconds) => {
+          clock += milliseconds;
+        },
+        now: () => clock,
+      });
+      expect(code).toBe(1);
+      expect(clock).toBe(45 * 60_000);
+      expect(error).toHaveBeenCalledWith(expect.stringContaining("after 2700s"));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it("fails without PUBLISHED_PACKAGES", () => {
     expect(run(undefined, healthy, {}).code).toBe(1);
     expect(error).toHaveBeenCalledWith(expect.stringContaining("lists no published package"));

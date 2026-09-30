@@ -44,7 +44,11 @@ describe("parseConfig", () => {
       },
       snippets: { include: ["README.md"], skipInfo: ["live", "skip"] },
       packages: { marker: "rxova.slug" },
-      postPublish: { importPattern: "^@rxova/react-", peers: { react: "^19" } },
+      postPublish: {
+        importPattern: "^@rxova/react-",
+        peers: { react: "^19" },
+        registryTimeoutMinutes: 45,
+      },
       llms: { api: "props", rootIndex: true },
       scope: { ignore: ["docs/**"], keep: ["docs/fixtures/**"], site: ["site/**"] },
       testScripts: { globs: ["packages/*"] },
@@ -90,6 +94,10 @@ describe("parseConfig", () => {
     [{ snippets: { include: [1] } }, "repoConfig.snippets.include must be an array"],
     [{ packages: { marker: "" } }, "repoConfig.packages.marker must be a non-empty string"],
     [{ postPublish: { importPattern: "[" } }, "repoConfig.postPublish.importPattern"],
+    [
+      { postPublish: { registryTimeoutMinutes: 0 } },
+      "repoConfig.postPublish.registryTimeoutMinutes must be a positive integer",
+    ],
     [{ llms: { api: "x" } }, "repoConfig.llms.api must be one of"],
     [{ scope: { ignore: "**/*.md" } }, "repoConfig.scope.ignore must be an array"],
     [{ scope: { skip: [] } }, 'unknown key "skip"'],
