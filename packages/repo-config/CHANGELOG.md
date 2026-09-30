@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.6.0
+
+### Minor Changes
+
+- [#38](https://github.com/rxova/shared/pull/38) [`3b8f77d`](https://github.com/rxova/shared/commit/3b8f77dc154b88379edfa014127961b8f7611694) - Add `repoConfig.postPublish.registryTimeoutMinutes`, so `post-publish-smoke` can wait longer than its default 10 minutes for npm to serve a release. The registry has been seen taking over 30 minutes to list a published version.
+
 ## 0.5.0
 
 ### Minor Changes
