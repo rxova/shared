@@ -18,7 +18,8 @@ import { readConfig } from "@/config/read-config";
  * installs them with retries, checks the installed versions, and imports the
  * packages matching `repoConfig.postPublish.importPattern` (every one by
  * default) through `import` and `require`. `repoConfig.postPublish.peers` is
- * installed beside them. The tarball smoke before the release cannot catch a
+ * installed beside them, and `repoConfig.postPublish.registryTimeoutMinutes` (10
+ * by default) bounds the wait for the registry. The tarball smoke before the release cannot catch a
  * publish that never reached the registry; this can. Returns the process exit code.
  */
 export const postPublishSmokeCommand = ({
@@ -38,7 +39,11 @@ export const postPublishSmokeCommand = ({
 } = {}): number => {
   try {
     const packages = parsePublishedPackages(env.PUBLISHED_PACKAGES ?? "");
-    const { importPattern, peers = {} } = readConfig(root).postPublish ?? {};
+    const {
+      importPattern,
+      peers = {},
+      registryTimeoutMinutes,
+    } = readConfig(root).postPublish ?? {};
     console.log(`post-publish-smoke: checking ${String(packages.length)} package(s) from npm`);
     waitForRegistry(packages, {
       isPublished: ({ name, version }) => {
@@ -54,6 +59,9 @@ export const postPublishSmokeCommand = ({
       },
       sleep,
       now,
+      ...(registryTimeoutMinutes === undefined
+        ? {}
+        : { deadlineMs: registryTimeoutMinutes * 60_000 }),
     });
     const scratch = fs.make();
     try {

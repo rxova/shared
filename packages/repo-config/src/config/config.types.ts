@@ -106,6 +106,8 @@ export interface RepoConfig {
     importPattern?: string;
     /** Installed beside the published packages, the way a consumer provides peers. */
     peers?: Record<string, string>;
+    /** How long to wait for npm to serve each published version, in minutes. Default 10. */
+    registryTimeoutMinutes?: number;
   };
   llms?: LlmsConfig;
   scope?: {

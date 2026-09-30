@@ -57,7 +57,11 @@ export const parseConfig = (raw: unknown): RepoConfig => {
   const docs = readSection(raw, "docs", at, ["root", "banned", "allow", "exclude", "readmes"]);
   const snippets = readSection(raw, "snippets", at, ["include", "skipInfo"]);
   const packages = readSection(raw, "packages", at, ["marker"]);
-  const postPublish = readSection(raw, "postPublish", at, ["importPattern", "peers"]);
+  const postPublish = readSection(raw, "postPublish", at, [
+    "importPattern",
+    "peers",
+    "registryTimeoutMinutes",
+  ]);
   const llms = readSection(raw, "llms", at, [
     "api",
     "requiredTerms",
@@ -120,6 +124,11 @@ export const parseConfig = (raw: unknown): RepoConfig => {
       compact<Section<"postPublish">>({
         importPattern: readPattern(postPublish, "importPattern", `${at}.postPublish`),
         peers: readStringRecord(postPublish, "peers", `${at}.postPublish`),
+        registryTimeoutMinutes: readCount(
+          postPublish,
+          "registryTimeoutMinutes",
+          `${at}.postPublish`,
+        ),
       }),
     llms: llms && parseLlmsConfig(llms, `${at}.llms`),
     scope:

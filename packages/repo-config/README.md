@@ -182,7 +182,7 @@ repository root, except `pack-smoke` and `check-exports`, which run from a packa
 | `rxova-repo-config node-floor`                     | Writes `version` (the single `engines.node` floor all published packages share) and `packages` to `GITHUB_OUTPUT`.                                                                                                                                                                              |
 | `rxova-repo-config pack-smoke [dir]`               | Packs the package, installs it in a scratch project, loads it, runs its bins and checks the tarball: see [Pack smoke](#pack-smoke).                                                                                                                                                             |
 | `rxova-repo-config check-exports [--profile p]`    | `publint --strict`, then `attw --pack .` with the profile from the flag or the package's `repoConfig.exports.profile`.                                                                                                                                                                          |
-| `rxova-repo-config post-publish-smoke`             | After a release, waits for npm to serve each version in `PUBLISHED_PACKAGES`, installs them into a scratch project and loads them through `import` and `require`.                                                                                                                               |
+| `rxova-repo-config post-publish-smoke`             | After a release, waits for npm to serve each version in `PUBLISHED_PACKAGES` (`postPublish.registryTimeoutMinutes`, 10 by default), installs them into a scratch project and loads them through `import` and `require`.                                                                         |
 | `rxova-repo-config check-llms [root]`              | Checks each published `llms.txt`: title, summary, sections, `files`, and its table against the source. See [llms.txt](#llmstxt).                                                                                                                                                                |
 | `rxova-repo-config check-tsdoc`                    | Fails a callable export of a published package's entry that has no TSDoc summary.                                                                                                                                                                                                               |
 | `rxova-repo-config check-banned`                   | Fails a hand-written doc or README that names a removed API from `docs.banned`.                                                                                                                                                                                                                 |
@@ -272,35 +272,36 @@ Everything is optional. Settings go in the root `package.json` under `repoConfig
 settings (`packSmoke`, `llms`, `exports.profile`) go in that package's own `package.json`. An
 unknown key is an error, not a silent default.
 
-| Key                              | Read by                              | Default                                                                                            |
-| -------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `verify.steps`                   | `verify`, `pre-push`                 | The default gate under [Quick start](#quick-start). A list replaces it entirely.                   |
-| `changeset.singlePackage`        | `check-changeset`, `lint-changesets` | `false`. `true` requires each changeset to name exactly one package.                               |
-| `changeset.scope`                | `check-changeset`                    | `code`: a package's code changed, markdown and tests aside. `shipped`: anything its tarball ships. |
-| `changeset.roots`                | `add-changeset`                      | `["packages", "apps"]`                                                                             |
-| `changeset.aliasPrefix`          | `add-changeset`                      | None. `journey-` lets `core` name `@rxova/journey-core`.                                           |
-| `changeset.includePrivate`       | `add-changeset`                      | `false`                                                                                            |
-| `changeset.syncRootVersionFrom`  | `version`                            | None: the root version is left alone.                                                              |
-| `majors.packages`                | `check-majors`                       | Every published package.                                                                           |
-| `tsdoc.entries`, `tsdoc.exclude` | `check-tsdoc`                        | `packages/<dir>/src/index.ts`; no exclusions.                                                      |
-| `docs.root`                      | `check-banned`                       | `apps/docs/src/content/docs`                                                                       |
-| `docs.banned`                    | `check-banned`                       | None. `{ name, pattern, flags? }`, `pattern` a regex source.                                       |
-| `docs.allow`, `docs.exclude`     | `check-banned`                       | None. Globs under `docs.root`: allowed to name a banned API, or not scanned at all.                |
-| `docs.readmes`                   | `check-banned`                       | `true`: the root README and every `packages/<dir>/README.md` are scanned too.                      |
-| `snippets.include`               | `check-snippets`                     | `["README.md", "packages/*/README.md", "packages/*/llms.txt"]`: globs, files, directories.         |
-| `snippets.skipInfo`              | `check-snippets`                     | `["live"]`: a fence whose info string holds one of these words is skipped.                         |
-| `packages.marker`                | `list-packages`                      | None: the published packages.                                                                      |
-| `postPublish.importPattern`      | `post-publish-smoke`                 | None: every published package is imported. A regex source.                                         |
-| `postPublish.peers`              | `post-publish-smoke`                 | None. Installed beside the packages, the way a consumer provides peers.                            |
-| `llms`                           | `check-llms`                         | See [llms.txt](#llmstxt).                                                                          |
-| `scope.ignore`                   | `check-scope`                        | `["**/*.md", "**/*.mdx"]`: documentation, see [Scope](#scope).                                     |
-| `scope.keep`                     | `check-scope`                        | `packages/*/*/**` and test and fixture folders: code even where `ignore` matches.                  |
-| `scope.site`                     | `check-scope`                        | `["apps/docs/**"]`: the docs site, reported as `docs-changed`.                                     |
-| `testScripts.globs`              | `check-test-scripts`                 | `["packages/*", "apps/*"]`                                                                         |
-| `fileSize.max`                   | `check-file-size`                    | `500` lines.                                                                                       |
-| `fileSize.extensions`            | `check-file-size`                    | `ts`, `tsx`, `js`, `mjs`, `cjs`, `astro`, `css`, `yaml`, `yml`, `json`                             |
-| `fileSize.ignore`                | `check-file-size`                    | `["pnpm-lock.yaml"]`                                                                               |
-| `fileSize.allow`                 | `check-file-size`                    | None. Files over the limit today; an allowed file back under the limit fails.                      |
+| Key                                  | Read by                              | Default                                                                                            |
+| ------------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `verify.steps`                       | `verify`, `pre-push`                 | The default gate under [Quick start](#quick-start). A list replaces it entirely.                   |
+| `changeset.singlePackage`            | `check-changeset`, `lint-changesets` | `false`. `true` requires each changeset to name exactly one package.                               |
+| `changeset.scope`                    | `check-changeset`                    | `code`: a package's code changed, markdown and tests aside. `shipped`: anything its tarball ships. |
+| `changeset.roots`                    | `add-changeset`                      | `["packages", "apps"]`                                                                             |
+| `changeset.aliasPrefix`              | `add-changeset`                      | None. `journey-` lets `core` name `@rxova/journey-core`.                                           |
+| `changeset.includePrivate`           | `add-changeset`                      | `false`                                                                                            |
+| `changeset.syncRootVersionFrom`      | `version`                            | None: the root version is left alone.                                                              |
+| `majors.packages`                    | `check-majors`                       | Every published package.                                                                           |
+| `tsdoc.entries`, `tsdoc.exclude`     | `check-tsdoc`                        | `packages/<dir>/src/index.ts`; no exclusions.                                                      |
+| `docs.root`                          | `check-banned`                       | `apps/docs/src/content/docs`                                                                       |
+| `docs.banned`                        | `check-banned`                       | None. `{ name, pattern, flags? }`, `pattern` a regex source.                                       |
+| `docs.allow`, `docs.exclude`         | `check-banned`                       | None. Globs under `docs.root`: allowed to name a banned API, or not scanned at all.                |
+| `docs.readmes`                       | `check-banned`                       | `true`: the root README and every `packages/<dir>/README.md` are scanned too.                      |
+| `snippets.include`                   | `check-snippets`                     | `["README.md", "packages/*/README.md", "packages/*/llms.txt"]`: globs, files, directories.         |
+| `snippets.skipInfo`                  | `check-snippets`                     | `["live"]`: a fence whose info string holds one of these words is skipped.                         |
+| `packages.marker`                    | `list-packages`                      | None: the published packages.                                                                      |
+| `postPublish.importPattern`          | `post-publish-smoke`                 | None: every published package is imported. A regex source.                                         |
+| `postPublish.peers`                  | `post-publish-smoke`                 | None. Installed beside the packages, the way a consumer provides peers.                            |
+| `postPublish.registryTimeoutMinutes` | `post-publish-smoke`                 | `10`. How long to wait for npm to serve each published version before failing.                     |
+| `llms`                               | `check-llms`                         | See [llms.txt](#llmstxt).                                                                          |
+| `scope.ignore`                       | `check-scope`                        | `["**/*.md", "**/*.mdx"]`: documentation, see [Scope](#scope).                                     |
+| `scope.keep`                         | `check-scope`                        | `packages/*/*/**` and test and fixture folders: code even where `ignore` matches.                  |
+| `scope.site`                         | `check-scope`                        | `["apps/docs/**"]`: the docs site, reported as `docs-changed`.                                     |
+| `testScripts.globs`                  | `check-test-scripts`                 | `["packages/*", "apps/*"]`                                                                         |
+| `fileSize.max`                       | `check-file-size`                    | `500` lines.                                                                                       |
+| `fileSize.extensions`                | `check-file-size`                    | `ts`, `tsx`, `js`, `mjs`, `cjs`, `astro`, `css`, `yaml`, `yml`, `json`                             |
+| `fileSize.ignore`                    | `check-file-size`                    | `["pnpm-lock.yaml"]`                                                                               |
+| `fileSize.allow`                     | `check-file-size`                    | None. Files over the limit today; an allowed file back under the limit fails.                      |
 
 A full example:
 
