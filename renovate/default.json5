@@ -60,6 +60,14 @@
 
   packageRules: [
     {
+      // Actions from outside GitHub and rxova run with the caller's secrets,
+      // and a tag can be moved. Pin them to a commit, with the version as a
+      // comment; Renovate keeps both current.
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["!actions/**", "!github/**", "!rxova/**"],
+      pinDigests: true,
+    },
+    {
       // Patch and minor merge themselves once CI is green. `platformAutomerge`
       // hands that to GitHub's own auto-merge, so it waits for the required
       // `all checks` status.

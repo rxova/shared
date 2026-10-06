@@ -23,12 +23,15 @@ permissions:
 
 jobs:
   release:
-    # workflow_run fires on failure as well, so the conclusion is checked.
+    # workflow_run fires on failure as well, so the conclusion is checked, and
+    # for a fork's pull request from a branch named main too, so only a CI run
+    # started by a push counts.
     if: >-
       !github.event.repository.is_template &&
       vars.RELEASE_ENABLED == 'true' &&
       (github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success')
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -54,7 +57,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Create version PR or publish
-        uses: changesets/action@v2
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version-script: pnpm exec changeset version
