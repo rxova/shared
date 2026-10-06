@@ -134,7 +134,7 @@ on:
   workflow_dispatch:
 jobs:
   release:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     permissions: { contents: write, pull-requests: write, id-token: write }
     uses: rxova/shared/.github/workflows/changesets-release.yml@main
     with:
@@ -221,7 +221,7 @@ permissions:
   contents: read
 jobs:
   version:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     permissions: { contents: write, pull-requests: write }
     uses: rxova/shared/.github/workflows/changesets-version.yml@main
     secrets:
