@@ -65,7 +65,10 @@ export interface RepoConfig {
     roots?: string[];
     /** A name prefix `add-changeset` also accepts without: `journey-` lets `core` name `@rxova/journey-core`. */
     aliasPrefix?: string;
-    /** `add-changeset` also offers private packages (a versioned private root, say). */
+    /**
+     * `add-changeset` also offers private packages (a versioned private root, say), and
+     * `check-changeset` requires a changeset when one of them changes.
+     */
     includePrivate?: boolean;
     /** `version` copies this package's version into the root `package.json`. */
     syncRootVersionFrom?: string;
