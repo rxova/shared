@@ -63,6 +63,14 @@ export const commands = (): Record<string, CommandEntry> => ({
       return () => fixLockfileCommand();
     },
   },
+  "dependabot-update-type": {
+    summary: "the highest semver update of a Dependabot commit (BASE_SHA, HEAD_SHA)",
+    load: async () => {
+      const { dependabotUpdateTypeCommand } =
+        await import("@/dependabot/dependabot-update-type-command");
+      return () => dependabotUpdateTypeCommand();
+    },
+  },
   init: {
     summary: "turn a repository created from a template into its own project [--dry-run]",
     load: async () => {
