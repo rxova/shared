@@ -121,6 +121,12 @@ jobs:
         if: (steps.scope.outputs.code-changed || 'true') == 'true'
         run: ${{ inputs.repo-config-command }} verify --keep-going
 
+      # A documentation-only range skips verify, but prose still gets the
+      # prettier gate the public repositories run in `docs-checks.yml`.
+      - name: Check formatting
+        if: steps.scope.outputs.docs-only == 'true'
+        run: pnpm format:check
+
       - name: Extra checks
         if: inputs.extra-command != ''
         run: ${{ inputs.extra-command }}
