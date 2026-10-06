@@ -33,7 +33,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=22.13"
+    "node": ">=22.23.3"
   },
   "scripts": {
     "build": "tsdown",
@@ -54,17 +54,17 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@rxova/repo-config": "workspace:*",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitest/coverage-v8": "^5.0.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "happy-dom": "^20.14.5",
-    "publint": "^0.3.24",
+    "publint": "^0.3.25",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tsdown": "^0.23.0",
     "tsx": "^4.23.15",
     "typescript": "6.0.3",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.3"
   }
 }
