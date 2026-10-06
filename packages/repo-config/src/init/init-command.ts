@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Reader } from "@/config/config.types";
 import type { Rename, Repository, Tool } from "@/init/init.types";
 import { readFile } from "@/internal/config/read-file";
+import { addToAppInstallation } from "@/internal/init/add-to-app-installation";
 import { isPrivateRepository } from "@/internal/init/is-private-repository";
 import { nextSteps } from "@/internal/init/next-steps";
 import { privateNextSteps } from "@/internal/init/private-next-steps";
@@ -16,9 +17,9 @@ const USAGE = [
   "Run once, in a repository just created from a template. It renames the template",
   "to this repository everywhere, renames packages/example after it, copies the",
   "template's labels and turns GitHub Pages on. In a private repository it turns on",
-  "auto-merge and branch deletion instead of Pages, and lists the GitHub App, secrets",
-  "and required check to set up rather than the npm steps. --dry-run only says what",
-  "it would do.",
+  "auto-merge and branch deletion instead of Pages, adds the repository to the",
+  "organisation's rxova-bot installation, and lists the secrets and required check",
+  "to set up rather than the npm steps. --dry-run only says what it would do.",
 ].join("\n");
 
 const slug = ({ owner, name }: Repository): string => `${owner}/${name}`;
@@ -34,7 +35,7 @@ const readJson = (read: Reader, file: string): Record<string, unknown> => {
  * template into its own project. The template is the repository the root
  * `package.json` still points at; this repository is the one `gh` reports for
  * the working directory. A private repository gets auto-merge and branch
- * deletion instead of Pages, and no npm steps. Repository rulesets are not copied: in an organisation
+ * deletion instead of Pages, joins the owner's rxova-bot installation, and no npm steps. Repository rulesets are not copied: in an organisation
  * they come from the organisation's rulesets. Returns the process exit code.
  */
 export const initCommand = (
@@ -130,7 +131,8 @@ export const initCommand = (
           console.log("init: could not change the repository settings; do it by hand (below)");
         }
       });
-      console.log(["", ...privateNextSteps(target, settings)].join("\n"));
+      const app = addToAppInstallation(run, target, dryRun);
+      console.log(["", ...privateNextSteps(target, settings, app)].join("\n"));
       return 0;
     }
 

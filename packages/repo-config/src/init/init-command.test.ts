@@ -6,6 +6,8 @@ import type { Tool } from "@/init/init.types";
 import { initCommand } from "@/init/init-command";
 
 const ROOT = "/repo";
+const LOOKUP =
+  'gh api /orgs/ada/installations --jq .installations[] | select(.app_slug == "rxova-bot") | [.id, .repository_selection] | @tsv';
 
 /** The in-memory tree is keyed with `/`; `path.join` hands it `\\` on Windows. */
 const key = (file: string): string => file.replaceAll("\\", "/");
@@ -17,6 +19,8 @@ const setup = ({
   visibility = "PUBLIC",
   pages = (): string => "",
   settings = (): string => "",
+  installation = (): string => "77\tselected",
+  put = (): string => "",
   files: extra = {},
 }: {
   repo?: string;
@@ -24,6 +28,8 @@ const setup = ({
   visibility?: string;
   pages?: () => string;
   settings?: () => string;
+  installation?: () => string;
+  put?: () => string;
   files?: Record<string, string>;
 } = {}) => {
   const files: Record<string, string> = {
@@ -51,7 +57,12 @@ const setup = ({
         .map((file) => file.slice(ROOT.length + 1))
         .join("\0");
     }
-    if (command === "gh" && args[0] === "api") return args[2] === "PATCH" ? settings() : pages();
+    if (command === "gh" && args[0] === "api") {
+      if (args[1]?.startsWith("/orgs/")) return installation();
+      if (args[2] === "PUT") return put();
+      if (args.includes(".id")) return "123";
+      return args[2] === "PATCH" ? settings() : pages();
+    }
     return "";
   };
   const deps = {
@@ -102,6 +113,7 @@ describe("initCommand", () => {
     expect(output).toContain("repository ada/idea, workflow release.yml");
     expect(output).not.toContain("Settings → Pages");
     expect(output).not.toContain("RXOVA_APP_ID");
+    expect(output).not.toContain("rxova-bot");
   });
 
   it("changes nothing on a dry run", () => {
@@ -118,7 +130,7 @@ describe("initCommand", () => {
     expect(log.join("\n")).toContain("would turn GitHub Pages on");
   });
 
-  it("on a private repository turns on auto-merge instead of Pages and lists the org steps", () => {
+  it("on a private repository turns on auto-merge instead of Pages, joins rxova-bot and lists the org steps", () => {
     const { calls, deps } = setup({ visibility: "PRIVATE" });
     expect(initCommand([], deps)).toBe(0);
     expect(calls).toEqual([
@@ -128,10 +140,14 @@ describe("initCommand", () => {
       "git -C /repo ls-files -z",
       "gh label clone rxova/template-oss --repo ada/idea --force",
       "gh api -X PATCH repos/ada/idea -F allow_auto_merge=true -F delete_branch_on_merge=true",
+      LOOKUP,
+      "gh api repos/ada/idea --jq .id",
+      "gh api -X PUT /user/installations/77/repositories/123",
     ]);
     const output = log.join("\n");
     expect(output).toContain("init: ada/idea is private");
-    expect(output).toContain("install the rxova GitHub App on ada/idea");
+    expect(output).toContain("init: added ada/idea to the rxova-bot installation");
+    expect(output).not.toContain("Repository access");
     expect(output).toContain("RXOVA_APP_ID and RXOVA_APP_PRIVATE_KEY");
     expect(output).toContain("`all checks`");
     expect(output).not.toContain("Pages");
@@ -148,9 +164,11 @@ describe("initCommand", () => {
       'gh repo view --json owner,name --jq .owner.login + "/" + .name',
       "gh repo view --json visibility -q .visibility",
       "git -C /repo ls-files -z",
+      LOOKUP,
     ]);
     const output = log.join("\n");
     expect(output).toContain("would turn on auto-merge and delete head branches on merge");
+    expect(output).toContain("would add ada/idea to the rxova-bot installation");
     expect(output).toContain("RXOVA_APP_ID and RXOVA_APP_PRIVATE_KEY");
     expect(output).not.toContain("Pages");
   });
@@ -166,6 +184,43 @@ describe("initCommand", () => {
     const output = log.join("\n");
     expect(output).toContain("could not change the repository settings");
     expect(output).toContain("Settings → General");
+  });
+
+  it("asks to install rxova-bot when the organisation has no installation", () => {
+    const { calls, deps } = setup({ visibility: "PRIVATE", installation: () => "" });
+    expect(initCommand([], deps)).toBe(0);
+    expect(calls.at(-1)).toBe(LOOKUP);
+    expect(log.join("\n")).toContain(
+      'install rxova-bot on ada with "Only select repositories" and include ada/idea',
+    );
+  });
+
+  it("leaves an installation on all repositories alone", () => {
+    const { calls, deps } = setup({ visibility: "PRIVATE", installation: () => "77\tall" });
+    expect(initCommand([], deps)).toBe(0);
+    expect(calls.at(-1)).toBe(LOOKUP);
+    const output = log.join("\n");
+    expect(output).toContain("already covers every repository");
+    expect(output).not.toContain("Repository access");
+  });
+
+  it("prints the installation step when GitHub refuses the change", () => {
+    const { deps } = setup({
+      visibility: "PRIVATE",
+      put: () => {
+        throw new Error(
+          "HTTP 403: You must authenticate with an access token authorized to a GitHub App, a personal access token, or basic auth",
+        );
+      },
+    });
+    expect(initCommand([], deps)).toBe(0);
+    const output = log.join("\n");
+    expect(output).toContain("could not add ada/idea to the rxova-bot installation");
+    expect(output).toContain(
+      "Add ada/idea to the rxova-bot installation: https://github.com/organizations/ada/settings/installations/77 → Repository access → Select repositories",
+    );
+    expect(output).toContain("`repo` scope in GH_TOKEN");
+    expect(output).toContain("`all checks`");
   });
 
   it("works without an example package", () => {
