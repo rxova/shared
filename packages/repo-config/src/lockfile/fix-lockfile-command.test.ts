@@ -4,23 +4,19 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fixLockfileCommand } from "@/lockfile/fix-lockfile-command";
 
-const ROOT = "/repo";
-const LOCKFILE = join(ROOT, "pnpm-lock.yaml");
+const STATUS = "git status --porcelain -- pnpm-lock.yaml";
 
-/** A lockfile held in memory, and a fake pnpm that records its calls and may rewrite the file. */
-const setup = (
-  rewrite?: (lockfile: string | undefined) => string,
-  initial: string | undefined = "lockfileVersion: '9.0'\n",
-) => {
-  let lockfile = initial;
+/** A fake pnpm and git that record their calls; git reports `status` for the lockfile. */
+const setup = (status = "") => {
   const ran: string[] = [];
   const outputs: [string, string][] = [];
   const deps = {
-    root: ROOT,
-    read: (file: string) => (file === LOCKFILE ? lockfile : undefined),
     run: (command: string) => {
       ran.push(command);
-      if (rewrite && command.startsWith("pnpm dedupe")) lockfile = rewrite(lockfile);
+    },
+    tool: (command: string, args: readonly string[]) => {
+      ran.push([command, ...args].join(" "));
+      return status;
     },
     env: { GITHUB_OUTPUT: "/out" },
     append: (file: string, contents: string) => {
@@ -41,31 +37,32 @@ describe("fixLockfileCommand", () => {
     vi.restoreAllMocks();
   });
 
-  it("re-resolves, then dedupes, without running install scripts", () => {
+  it("re-resolves, then dedupes, without running install scripts, then asks git", () => {
     const { ran, deps } = setup();
     expect(fixLockfileCommand(deps)).toBe(0);
     expect(ran).toEqual([
       "pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts",
       "pnpm dedupe --ignore-scripts",
+      STATUS,
     ]);
   });
 
-  it("reports changed=true when the lockfile's contents moved", () => {
-    const { outputs, deps } = setup((lockfile) => `${String(lockfile)}packages: {}\n`);
+  it("reports changed=true when git sees the lockfile modified", () => {
+    const { outputs, deps } = setup("M pnpm-lock.yaml");
     expect(fixLockfileCommand(deps)).toBe(0);
     expect(outputs).toEqual([["/out", "changed=true\n"]]);
     expect(log).toEqual(["fix-lockfile: pnpm-lock.yaml changed; commit it"]);
   });
 
-  it("reports changed=false when they did not", () => {
+  it("reports changed=false when git sees it clean", () => {
     const { outputs, deps } = setup();
     expect(fixLockfileCommand(deps)).toBe(0);
     expect(outputs).toEqual([["/out", "changed=false\n"]]);
     expect(log).toEqual(["fix-lockfile: pnpm-lock.yaml was already up to date"]);
   });
 
-  it("counts a lockfile that appears as a change, and prints without GITHUB_OUTPUT", () => {
-    const { outputs, deps } = setup(() => "new\n", undefined);
+  it("counts an untracked lockfile as a change, and prints without GITHUB_OUTPUT", () => {
+    const { outputs, deps } = setup("?? pnpm-lock.yaml");
     expect(fixLockfileCommand({ ...deps, env: {} })).toBe(0);
     expect(outputs).toEqual([]);
     expect(log).toEqual(["fix-lockfile: pnpm-lock.yaml changed; commit it"]);
@@ -85,14 +82,24 @@ describe("fixLockfileCommand", () => {
     );
   });
 
-  it("reads the lockfile and appends to GITHUB_OUTPUT on disk by default", () => {
+  it("fails when git does, and writes no output", () => {
+    const { outputs, deps } = setup();
+    const tool = () => {
+      throw new Error("not a git repository");
+    };
+    expect(fixLockfileCommand({ ...deps, tool })).toBe(1);
+    expect(outputs).toEqual([]);
+    expect(log.join("\n")).toContain("fix-lockfile failed — `git status`: not a git repository");
+  });
+
+  it("appends to GITHUB_OUTPUT on disk by default", () => {
     const dir = mkdtempSync(join(tmpdir(), "fix-lockfile-"));
-    writeFileSync(join(dir, "pnpm-lock.yaml"), "a\n");
     const output = join(dir, "output");
     writeFileSync(output, "");
-    expect(fixLockfileCommand({ root: dir, run: () => {}, env: { GITHUB_OUTPUT: output } })).toBe(
-      0,
-    );
+    const { deps } = setup();
+    expect(
+      fixLockfileCommand({ run: deps.run, tool: deps.tool, env: { GITHUB_OUTPUT: output } }),
+    ).toBe(0);
     expect(readFileSync(output, "utf8")).toBe("changed=false\n");
     rmSync(dir, { recursive: true, force: true });
   });
