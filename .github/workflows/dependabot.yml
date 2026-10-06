@@ -107,7 +107,7 @@ jobs:
       - name: Mint an app token
         id: app-token
         if: steps.fix.outputs.changed == 'true'
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.RXOVA_APP_ID }}
           private-key: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
