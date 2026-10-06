@@ -6,7 +6,8 @@ import type { CommandEntry } from "@/cli/cli.types";
  */
 export const commands = (): Record<string, CommandEntry> => ({
   verify: {
-    summary: "run the pre-push gate (package.json#repoConfig.verify.steps; --only a,b)",
+    summary:
+      "run the pre-push gate (package.json#repoConfig.verify.steps; --only a,b, --keep-going)",
     load: async () => {
       const { verifyCommand } = await import("@/verify/verify-command");
       return (argv) => verifyCommand(argv);
@@ -45,6 +46,14 @@ export const commands = (): Record<string, CommandEntry> => ({
     load: async () => {
       const { versionCommand } = await import("@/changeset/version-command");
       return () => versionCommand();
+    },
+  },
+  "fix-lockfile": {
+    summary:
+      "re-resolve and dedupe pnpm-lock.yaml after a bump; changed=true|false to GITHUB_OUTPUT",
+    load: async () => {
+      const { fixLockfileCommand } = await import("@/lockfile/fix-lockfile-command");
+      return () => fixLockfileCommand();
     },
   },
   init: {

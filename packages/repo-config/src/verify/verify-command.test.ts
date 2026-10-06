@@ -33,6 +33,17 @@ describe("verifyCommand", () => {
     expect(ran).toEqual(["pnpm lint"]);
   });
 
+  it("honours --keep-going beside --only, in list order", () => {
+    const ran: string[] = [];
+    const run = (command: string) => {
+      ran.push(command);
+      throw new Error("exit 1");
+    };
+    const argv = ["--only", "dependency dedupe,lint", "--keep-going"];
+    expect(verifyCommand(argv, { read: () => undefined, run })).toBe(1);
+    expect(ran).toEqual(["pnpm lint", "pnpm exec turbo run //#dedupe:check"]);
+  });
+
   it("fails with the reason when the config or the flags are wrong", () => {
     expect(verifyCommand([], { read: () => '{"repoConfig":{"verify":[]}}', run: () => {} })).toBe(
       1,
@@ -41,6 +52,7 @@ describe("verifyCommand", () => {
       expect.stringContaining("repoConfig.verify must be an object"),
     );
     expect(verifyCommand(["--only", "nope"], { read: () => undefined, run: () => {} })).toBe(1);
+    expect(verifyCommand(["--keep-going=1"], { read: () => undefined, run: () => {} })).toBe(1);
   });
 
   it("reads the working directory and argv by default", () => {

@@ -2,14 +2,16 @@ import { runCommand } from "@/internal/verify/run-command";
 import type { Reader } from "@/config/config.types";
 import type { Runner } from "@/verify/verify.types";
 import { defaultSteps } from "@/verify/default-steps";
+import { keepGoing } from "@/verify/keep-going";
 import { readConfig } from "@/config/read-config";
 import { runSteps } from "@/verify/run-steps";
 import { selectSteps } from "@/verify/select-steps";
 
 /**
- * `rxova-repo-config verify [--only a,b]`: the pre-push gate. The list is
+ * `rxova-repo-config verify [--only a,b] [--keep-going]`: the pre-push gate. The list is
  * `defaultSteps()` unless the root `package.json` names its own under
- * `repoConfig.verify.steps`. Returns the process exit code rather than taking it,
+ * `repoConfig.verify.steps`. `--keep-going` runs every step and lists the
+ * failures at the end instead of stopping at the first. Returns the process exit code rather than taking it,
  * so tests can call it.
  */
 export const verifyCommand = (
@@ -22,7 +24,7 @@ export const verifyCommand = (
 ): number => {
   try {
     const steps = readConfig(root, read).verify?.steps ?? defaultSteps();
-    return runSteps(selectSteps(steps, argv), { run });
+    return runSteps(selectSteps(steps, argv), { run, keepGoing: keepGoing(argv) });
   } catch (failure) {
     process.stderr.write(`verify: ${(failure as Error).message}\n`);
     return 1;
