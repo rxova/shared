@@ -14,12 +14,16 @@ const key = (file: string): string => file.replaceAll("\\", "/");
 const setup = ({
   repo = "ada/idea",
   example = true,
+  visibility = "PUBLIC",
   pages = (): string => "",
+  settings = (): string => "",
   files: extra = {},
 }: {
   repo?: string;
   example?: boolean;
+  visibility?: string;
   pages?: () => string;
+  settings?: () => string;
   files?: Record<string, string>;
 } = {}) => {
   const files: Record<string, string> = {
@@ -39,13 +43,15 @@ const setup = ({
   const calls: string[] = [];
   const run: Tool = (command, args) => {
     calls.push([command, ...args].join(" "));
-    if (command === "gh" && args[0] === "repo") return repo;
+    if (command === "gh" && args[0] === "repo") {
+      return args.includes("visibility") ? visibility : repo;
+    }
     if (command === "git" && args.includes("ls-files")) {
       return Object.keys(files)
         .map((file) => file.slice(ROOT.length + 1))
         .join("\0");
     }
-    if (command === "gh" && args[0] === "api") return pages();
+    if (command === "gh" && args[0] === "api") return args[2] === "PATCH" ? settings() : pages();
     return "";
   };
   const deps = {
@@ -85,14 +91,17 @@ describe("initCommand", () => {
     );
     expect(calls).toEqual([
       'gh repo view --json owner,name --jq .owner.login + "/" + .name',
+      "gh repo view --json visibility -q .visibility",
       "git -C /repo mv packages/example packages/idea",
       "git -C /repo ls-files -z",
       "gh label clone rxova/template-oss --repo ada/idea --force",
       "gh api -X POST repos/ada/idea/pages -f build_type=workflow",
     ]);
     const output = log.join("\n");
+    expect(output).toContain("init: ada/idea is public");
     expect(output).toContain("repository ada/idea, workflow release.yml");
     expect(output).not.toContain("Settings → Pages");
+    expect(output).not.toContain("RXOVA_APP_ID");
   });
 
   it("changes nothing on a dry run", () => {
@@ -102,9 +111,61 @@ describe("initCommand", () => {
     expect(files).toEqual(before);
     expect(calls).toEqual([
       'gh repo view --json owner,name --jq .owner.login + "/" + .name',
+      "gh repo view --json visibility -q .visibility",
       "git -C /repo ls-files -z",
     ]);
     expect(log.join("\n")).toContain("would move packages/example to packages/idea");
+    expect(log.join("\n")).toContain("would turn GitHub Pages on");
+  });
+
+  it("on a private repository turns on auto-merge instead of Pages and lists the org steps", () => {
+    const { calls, deps } = setup({ visibility: "PRIVATE" });
+    expect(initCommand([], deps)).toBe(0);
+    expect(calls).toEqual([
+      'gh repo view --json owner,name --jq .owner.login + "/" + .name',
+      "gh repo view --json visibility -q .visibility",
+      "git -C /repo mv packages/example packages/idea",
+      "git -C /repo ls-files -z",
+      "gh label clone rxova/template-oss --repo ada/idea --force",
+      "gh api -X PATCH repos/ada/idea -F allow_auto_merge=true -F delete_branch_on_merge=true",
+    ]);
+    const output = log.join("\n");
+    expect(output).toContain("init: ada/idea is private");
+    expect(output).toContain("install the rxova GitHub App on ada/idea");
+    expect(output).toContain("RXOVA_APP_ID and RXOVA_APP_PRIVATE_KEY");
+    expect(output).toContain("`all checks`");
+    expect(output).not.toContain("Pages");
+    expect(output).not.toContain("trusted publisher");
+    expect(output).not.toContain("Settings → General");
+  });
+
+  it("on a private repository only plans on a dry run", () => {
+    const { files, calls, deps } = setup({ visibility: "PRIVATE" });
+    const before = { ...files };
+    expect(initCommand(["--dry-run"], deps)).toBe(0);
+    expect(files).toEqual(before);
+    expect(calls).toEqual([
+      'gh repo view --json owner,name --jq .owner.login + "/" + .name',
+      "gh repo view --json visibility -q .visibility",
+      "git -C /repo ls-files -z",
+    ]);
+    const output = log.join("\n");
+    expect(output).toContain("would turn on auto-merge and delete head branches on merge");
+    expect(output).toContain("RXOVA_APP_ID and RXOVA_APP_PRIVATE_KEY");
+    expect(output).not.toContain("Pages");
+  });
+
+  it("leaves the private settings to the user when the API refuses them", () => {
+    const { deps } = setup({
+      visibility: "PRIVATE",
+      settings: () => {
+        throw new Error("HTTP 403: Must have admin rights to Repository.");
+      },
+    });
+    expect(initCommand([], deps)).toBe(0);
+    const output = log.join("\n");
+    expect(output).toContain("could not change the repository settings");
+    expect(output).toContain("Settings → General");
   });
 
   it("works without an example package", () => {

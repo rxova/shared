@@ -81,6 +81,13 @@ describe("commands", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
+  it("fix-lockfile fails when pnpm does, outside a workspace", async () => {
+    quiet();
+    vi.spyOn(process, "cwd").mockReturnValue(empty);
+    vi.stubEnv("PATH", "");
+    expect(await call("fix-lockfile")).toBe(1);
+  });
+
   it("check-exports refuses a bad profile before running anything", async () => {
     quiet();
     expect(await call("check-exports", ["--profile=x;y"])).toBe(1);

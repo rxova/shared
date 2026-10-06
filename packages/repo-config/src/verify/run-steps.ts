@@ -9,16 +9,25 @@ import type { Step } from "@/config/config.types";
  * failure is usually the first one wearing a different hat. Returns the
  * process exit code.
  *
+ * With `keepGoing` every step runs, still in order, and the failures are
+ * listed at the end: one CI job then reports everything wrong at once.
+ *
  * On the release pull request a step marked `skipOnRelease` is skipped; on
  * GitHub Actions each step's output is folded into its own log group.
  */
 export const runSteps = (
   steps: Step[],
-  { run = runCommand, env = process.env }: { run?: Runner; env?: NodeJS.ProcessEnv } = {},
+  {
+    run = runCommand,
+    env = process.env,
+    keepGoing = false,
+  }: { run?: Runner; env?: NodeJS.ProcessEnv; keepGoing?: boolean } = {},
 ): number => {
   const release = isReleaseBranch(env);
   const fold = env.GITHUB_ACTIONS === "true";
-  for (const [index, { name, command, skipOnRelease }] of steps.entries()) {
+  const failed: Step[] = [];
+  for (const [index, step] of steps.entries()) {
+    const { name, command, skipOnRelease } = step;
     const title = `verify: [${String(index + 1)}/${String(steps.length)}] ${name}`;
     if (release && skipOnRelease === true) {
       process.stdout.write(`\n${title}: skipped on the release branch\n`);
@@ -34,10 +43,20 @@ export const runSteps = (
     });
     if (!passed) {
       process.stderr.write(`\nverify: ${name} failed — \`${command}\`\n`);
-      return 1;
+      if (!keepGoing) return 1;
+      failed.push(step);
     }
   }
 
+  if (failed.length > 0) {
+    process.stderr.write(
+      `\nverify: ${String(failed.length)} of ${String(steps.length)} step(s) failed\n`,
+    );
+    for (const { name, command } of failed) {
+      process.stderr.write(`verify: failed: ${name} — \`${command}\`\n`);
+    }
+    return 1;
+  }
   process.stdout.write("\nverify: all checks passed\n");
   return 0;
 };

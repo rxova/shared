@@ -37,6 +37,45 @@ describe("runSteps", () => {
     expect(out).not.toHaveBeenCalledWith("\nverify: all checks passed\n");
   });
 
+  it("with keepGoing runs every step in order and lists each failure at the end", () => {
+    const ran: string[] = [];
+    const code = runSteps([step("lint", "bad lint"), step("build"), step("dedupe", "bad dedupe")], {
+      run: (command) => {
+        ran.push(command);
+        if (command.startsWith("bad")) throw new Error("exit 1");
+      },
+      env: {},
+      keepGoing: true,
+    });
+
+    expect(code).toBe(1);
+    expect(ran).toEqual(["bad lint", "echo build", "bad dedupe"]);
+    const summary = err.mock.calls.map(([line]) => String(line));
+    expect(summary.slice(-3)).toEqual([
+      "\nverify: 2 of 3 step(s) failed\n",
+      "verify: failed: lint — `bad lint`\n",
+      "verify: failed: dedupe — `bad dedupe`\n",
+    ]);
+    expect(out).not.toHaveBeenCalledWith("\nverify: all checks passed\n");
+  });
+
+  it("with keepGoing passes when nothing fails, and still skips release-only steps", () => {
+    const ran: string[] = [];
+    const steps = [
+      { name: "audit", command: "audit", skipOnRelease: true },
+      { name: "lint", command: "lint" },
+    ];
+    const code = runSteps(steps, {
+      run: (command) => void ran.push(command),
+      env: { GITHUB_HEAD_REF: "changeset-release/main" },
+      keepGoing: true,
+    });
+    expect(code).toBe(0);
+    expect(ran).toEqual(["lint"]);
+    expect(err).not.toHaveBeenCalled();
+    expect(out).toHaveBeenCalledWith("\nverify: all checks passed\n");
+  });
+
   it("announces each step with its position before running it", () => {
     runSteps([step("lint"), step("format")], { run: () => {}, env: {} });
     expect(out).toHaveBeenCalledWith("\nverify: [1/2] lint\n");
