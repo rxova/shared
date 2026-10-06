@@ -79,5 +79,13 @@
       matchPackageNames: ["typescript"],
       allowedVersions: "<7",
     },
+    {
+      // A published package's `engines` is its Node floor, which consumers
+      // install against. Raising it is a deliberate, changesetted decision, not
+      // a dependency bump. The root and `apps/` engines keep updating.
+      matchFileNames: ["packages/**"],
+      matchDepTypes: ["engines"],
+      enabled: false,
+    },
   ],
 }
