@@ -12,6 +12,12 @@ name: Changeset gate
 #       uses: rxova/shared/.github/workflows/changeset-gate.yml@main
 #
 # Only pull requests are checked, and never the changesets release branch.
+#
+# The labels are read from the pull request as it is now (`PR_NUMBER`), not
+# from the event payload, so "Re-run failed jobs" after adding `skip-changeset`
+# passes; a caller can then leave `labeled`/`unlabeled` out of its triggers. In
+# a private repository the caller's job grants `pull-requests: read` for that;
+# without it the read fails and the payload's labels are used.
 
 on:
   workflow_call:
@@ -49,5 +55,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
+          GH_TOKEN: ${{ github.token }}
         run: ${{ inputs.repo-config-command }} check-changeset
