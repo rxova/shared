@@ -1,5 +1,15 @@
 # @rxova/repo-config
 
+## 0.8.0
+
+### Minor Changes
+
+- [#51](https://github.com/rxova/shared/pull/51) [`6356b23`](https://github.com/rxova/shared/commit/6356b2344d9e9db9f4e62ac794f48e706bac7260) - `init` now formats the files it rewrites, adds a changeset for the renamed package in a private repository, adds a public repository to the renovate installation, opens the app installation page when it cannot add the repository itself, and prints only the setup steps still missing.
+
+### Patch Changes
+
+- [#58](https://github.com/rxova/shared/pull/58) [`4036dbd`](https://github.com/rxova/shared/commit/4036dbde4df0f3373c83f758352bbab33510ab18) - `version-pr` runs the version script with `GITHUB_TOKEN` taken from `GH_TOKEN` when only `GH_TOKEN` is set, so one token serves `gh` and the changelog preset.
+
 ## 0.7.1
 
 ### Patch Changes
