@@ -4,22 +4,32 @@ import type { Reader } from "@/config/config.types";
 import type { Rename, Repository, Tool } from "@/init/init.types";
 import { readFile } from "@/internal/config/read-file";
 import { addToAppInstallation } from "@/internal/init/add-to-app-installation";
+import { RXOVA_APP_SECRETS } from "@/internal/init/app-secrets";
+import { formatFiles } from "@/internal/init/format-files";
+import { hasRequiredCheck } from "@/internal/init/has-required-check";
+import { installationPage } from "@/internal/init/installation-page";
 import { isPrivateRepository } from "@/internal/init/is-private-repository";
+import { missingSecrets } from "@/internal/init/missing-secrets";
 import { nextSteps } from "@/internal/init/next-steps";
+import { openInBrowser } from "@/internal/init/open-in-browser";
 import { privateNextSteps } from "@/internal/init/private-next-steps";
 import { renameFiles } from "@/internal/init/rename-files";
 import { repositoryOf } from "@/internal/init/repository-of";
+import { REQUIRED_CHECK } from "@/internal/init/required-check";
 import { runTool } from "@/internal/init/run-tool";
+import { startChangeset } from "@/internal/init/start-changeset";
 
 const USAGE = [
   "usage: rxova-repo-config init [--dry-run]",
   "",
   "Run once, in a repository just created from a template. It renames the template",
   "to this repository everywhere, renames packages/example after it, copies the",
-  "template's labels and turns GitHub Pages on. In a private repository it turns on",
+  "template's labels, formats the files it rewrote and turns GitHub Pages on. In a",
+  "private repository it adds a changeset for the renamed package, turns on",
   "auto-merge and branch deletion instead of Pages, adds the repository to the",
-  "organisation's rxova-bot installation, and lists the secrets and required check",
-  "to set up rather than the npm steps. --dry-run only says what it would do.",
+  "organisation's rxova-bot installation (or opens its page), and lists only the",
+  "secrets and required check still missing rather than the npm steps. --dry-run",
+  "only says what it would do.",
 ].join("\n");
 
 const slug = ({ owner, name }: Repository): string => `${owner}/${name}`;
@@ -34,8 +44,12 @@ const readJson = (read: Reader, file: string): Record<string, unknown> => {
  * `rxova-repo-config init [--dry-run]`: turns a repository created from a
  * template into its own project. The template is the repository the root
  * `package.json` still points at; this repository is the one `gh` reports for
- * the working directory. A private repository gets auto-merge and branch
- * deletion instead of Pages, joins the owner's rxova-bot installation, and no npm steps. Repository rulesets are not copied: in an organisation
+ * the working directory. Prettier formats every file init rewrote or added. A
+ * private repository gets a changeset for its renamed package, auto-merge and
+ * branch deletion instead of Pages, joins the owner's rxova-bot installation,
+ * and lists only the secrets and required check still missing, with no npm
+ * steps. `platform`, `isTTY` and `env` decide whether init may open the
+ * installation page in a browser. Repository rulesets are not copied: in an organisation
  * they come from the organisation's rulesets. Returns the process exit code.
  */
 export const initCommand = (
@@ -48,12 +62,18 @@ export const initCommand = (
       writeFileSync(file, contents);
     },
     exists = existsSync,
+    platform = process.platform,
+    isTTY = process.stdout.isTTY,
+    env = process.env,
   }: {
     root?: string;
     run?: Tool;
     read?: Reader;
     write?: (file: string, contents: string) => void;
     exists?: (path: string) => boolean;
+    platform?: NodeJS.Platform;
+    isTTY?: boolean;
+    env?: Record<string, string | undefined>;
   } = {},
 ): number => {
   if (argv.includes("--help") || argv.includes("-h")) {
@@ -90,10 +110,13 @@ export const initCommand = (
     }
 
     const example = join(root, "packages", "example");
-    if (exists(join(example, "package.json"))) {
+    const moved = exists(join(example, "package.json"));
+    let renamedPackage: string | undefined;
+    if (moved) {
       const packageName = readJson(read, join(example, "package.json")).name;
       if (typeof packageName === "string") {
-        renames.unshift([packageName, packageName.replace(/[^/]+$/, target.name)]);
+        renamedPackage = packageName.replace(/[^/]+$/, target.name);
+        renames.unshift([packageName, renamedPackage]);
       }
       renames.push(["packages/example", `packages/${target.name}`]);
       act(`move packages/example to packages/${target.name}`, () => {
@@ -103,10 +126,30 @@ export const initCommand = (
 
     const files = run("git", ["-C", root, "ls-files", "-z"]).split("\0").filter(Boolean);
     for (const [from, to] of renames) console.log(`init: rename "${from}" → "${to}"`);
-    if (!dryRun) {
-      const changed = renameFiles(root, files, renames, { read, write });
-      console.log(`init: rewrote ${String(changed.length)} file(s)`);
+    const changed = renameFiles(root, files, renames, {
+      read,
+      write: dryRun ? () => undefined : write,
+    });
+    if (!dryRun) console.log(`init: rewrote ${String(changed.length)} file(s)`);
+    const packageDir = `packages/${dryRun ? "example" : target.name}/`;
+    const touched = new Set([
+      ...changed,
+      ...(moved ? files.filter((file) => file.startsWith(packageDir)) : []),
+    ]);
+
+    if (
+      privateRepository &&
+      moved &&
+      renamedPackage !== undefined &&
+      exists(join(root, ".changeset"))
+    ) {
+      const changeset = startChangeset(renamedPackage, target, template);
+      touched.add(changeset.file);
+      act(`add a changeset for ${renamedPackage}`, () => {
+        write(join(root, changeset.file), changeset.body);
+      });
     }
+    formatFiles(run, root, [...touched], dryRun);
 
     act(`copy the labels of ${slug(template)}`, () => {
       run("gh", ["label", "clone", slug(template), "--repo", slug(target), "--force"]);
@@ -132,7 +175,25 @@ export const initCommand = (
         }
       });
       const app = addToAppInstallation(run, target, dryRun);
-      console.log(["", ...privateNextSteps(target, settings, app)].join("\n"));
+      if (!dryRun && app.step === "configure" && app.installationId !== undefined) {
+        const page = installationPage(owner, app.installationId);
+        if (openInBrowser(run, page, { platform, isTTY, env })) {
+          console.log(`init: opened ${page} — add ${slug(target)} under Repository access`);
+        }
+      }
+      const secrets = missingSecrets(run, owner);
+      if (secrets?.actions.length === 0 && secrets.dependabot.length === 0) {
+        console.log(
+          `init: the organisation secrets ${RXOVA_APP_SECRETS.join(" and ")} already reach ${slug(target)}`,
+        );
+      }
+      const requiredCheck = hasRequiredCheck(run, target);
+      if (requiredCheck) {
+        console.log(`init: the default branch already requires \`${REQUIRED_CHECK}\``);
+      }
+      console.log(
+        ["", ...privateNextSteps(target, { settings, app, secrets, requiredCheck })].join("\n"),
+      );
       return 0;
     }
 

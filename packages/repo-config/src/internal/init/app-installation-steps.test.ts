@@ -10,14 +10,14 @@ describe("appInstallationSteps", () => {
 
   it("asks to install the app on the organisation", () => {
     expect(appInstallationSteps(TARGET, { step: "install" })).toEqual([
-      '  -  install rxova-bot on ada with "Only select repositories" and include ada/idea',
+      'install rxova-bot on ada with "Only select repositories" and include ada/idea',
     ]);
   });
 
   it("links the installation and names the token that lets init do it", () => {
     expect(appInstallationSteps(TARGET, { step: "configure", installationId: "77" })).toEqual([
-      "  -  Add ada/idea to the rxova-bot installation: https://github.com/organizations/ada/settings/installations/77 → Repository access → Select repositories",
-      "     (a classic personal access token with `repo` scope in GH_TOKEN lets init do it)",
+      "add ada/idea to the rxova-bot installation: https://github.com/organizations/ada/settings/installations/77 → Repository access → Select repositories",
+      "(a classic personal access token with `repo` scope in GH_TOKEN lets init do it)",
     ]);
   });
 
