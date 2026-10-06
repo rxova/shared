@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.7.1
+
+### Patch Changes
+
+- [#47](https://github.com/rxova/shared/pull/47) [`45013ca`](https://github.com/rxova/shared/commit/45013ca77a153248f5bdfd906f9f2d226e181c07) - `check-changeset` reads the pull request's current labels through `gh` when `PR_NUMBER` is set, falling back to `PR_LABELS`.
+
 ## 0.7.0
 
 ### Minor Changes
