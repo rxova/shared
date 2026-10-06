@@ -1,4 +1,6 @@
 import { SKIP_LABEL } from "@/internal/changeset/skip-label";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { checkChangesetCommand } from "@/changeset/check-changeset-command";
@@ -53,6 +55,51 @@ describe("checkChangesetCommand", () => {
     expect(checkChangesetCommand(range, options)).toBe(0);
     expect(log).toHaveBeenCalledWith(expect.stringContaining("no publishable change"));
     cwd.mockRestore();
+  });
+
+  describe("in a repository whose packages are all private", () => {
+    const repo = (changeset: object) => {
+      const root = mkdtempSync(join(tmpdir(), "check-changeset-private-"));
+      mkdirSync(join(root, "packages", "app"), { recursive: true });
+      writeFileSync(join(root, "package.json"), JSON.stringify({ repoConfig: { changeset } }));
+      writeFileSync(join(root, "packages", "app", "package.json"), '{"private":true}');
+      return root;
+    };
+    const diff = () => ["packages/app/src/index.ts"];
+
+    it("requires nothing by default", () => {
+      const root = repo({});
+      try {
+        expect(checkChangesetCommand(range, { root, diff })).toBe(0);
+        expect(log).toHaveBeenCalledWith(expect.stringContaining("no publishable change"));
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    });
+
+    it("requires a changeset with includePrivate, unless the PR is labelled to skip", () => {
+      const root = repo({ includePrivate: true });
+      try {
+        expect(checkChangesetCommand(range, { root, diff })).toBe(1);
+        expect(error).toHaveBeenCalledWith(expect.stringContaining("adds no changeset"));
+        expect(checkChangesetCommand({ ...range, PR_LABELS: SKIP_LABEL }, { root, diff })).toBe(0);
+        const withChangeset = () => [...diff(), ".changeset/a.md"];
+        expect(
+          checkChangesetCommand(range, {
+            root,
+            diff: withChangeset,
+            read: (file: string) =>
+              file.endsWith("a.md")
+                ? '---\n"app": patch\n---\n\nFix it.\n'
+                : file.endsWith("package.json")
+                  ? JSON.stringify({ repoConfig: { changeset: { includePrivate: true } } })
+                  : undefined,
+          }),
+        ).toBe(0);
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    });
   });
 
   describe("with singlePackage set", () => {

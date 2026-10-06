@@ -3,11 +3,11 @@ import { changesetProblems } from "@/internal/changeset/changeset-problems";
 import { gitDiff } from "@/internal/changeset/git-diff";
 import { labelsOf } from "@/internal/changeset/labels-of";
 import { shippedChanges } from "@/internal/changeset/shipped-changes";
+import { versionedDirs } from "@/internal/changeset/versioned-dirs";
 import { readFile } from "@/internal/config/read-file";
 import type { Differ } from "@/changeset/changeset.types";
 import type { Reader } from "@/config/config.types";
 import { checkChangeset } from "@/changeset/check-changeset";
-import { publishedDirs } from "@/changeset/published-dirs";
 import { readConfig } from "@/config/read-config";
 
 /**
@@ -22,8 +22,9 @@ import { readConfig } from "@/config/read-config";
  * ships, README and `llms.txt` included. The changesets the range adds are
  * then linted: no summary line the changelog would read as metadata and, with
  * `repoConfig.changeset.singlePackage`, exactly one package each, so every
- * changelog entry belongs to the package it describes. Returns the process
- * exit code.
+ * changelog entry belongs to the package it describes. With
+ * `repoConfig.changeset.includePrivate` a private package counts as one that
+ * needs a changeset too. Returns the process exit code.
  */
 export const checkChangesetCommand = (
   env: NodeJS.ProcessEnv = process.env,
@@ -46,7 +47,7 @@ export const checkChangesetCommand = (
     const config = readConfig(root, read).changeset ?? {};
     const changed = diff(base, head);
     const present = diff(base, head, { existing: true });
-    const dirs = published ?? publishedDirs(root);
+    const dirs = published ?? versionedDirs(root, config.includePrivate === true);
     const verdict = checkChangeset(
       changed,
       dirs,
