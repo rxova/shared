@@ -49,6 +49,49 @@ describe("checkChangesetCommand", () => {
     expect(checkChangesetCommand({ ...range, PR_TITLE: `[${SKIP_LABEL}] bump` }, options)).toBe(0);
   });
 
+  describe("with PR_NUMBER set", () => {
+    const changed = ["packages/example/src/index.ts"];
+
+    it("reads the current labels with gh, so a skip label added after the event counts", () => {
+      const tool = vi.fn(() => `x,${SKIP_LABEL}`);
+      const env = { ...range, PR_NUMBER: "7", PR_LABELS: "x" };
+      expect(checkChangesetCommand(env, { ...deps(changed), tool })).toBe(0);
+      expect(tool).toHaveBeenCalledWith("gh", expect.arrayContaining(["pr", "view", "7"]));
+    });
+
+    it("lets the current labels win when the skip label was removed", () => {
+      const env = { ...range, PR_NUMBER: "7", PR_LABELS: SKIP_LABEL };
+      expect(checkChangesetCommand(env, { ...deps(changed), tool: () => "x" })).toBe(1);
+      expect(error).toHaveBeenCalledWith(expect.stringContaining("adds no changeset"));
+    });
+
+    it("falls back to PR_LABELS with a notice when gh fails, and does not fail for it", () => {
+      const tool = () => {
+        throw new Error("gh: not authenticated");
+      };
+      const env = { ...range, PR_NUMBER: "7", PR_LABELS: SKIP_LABEL };
+      expect(checkChangesetCommand(env, { ...deps(changed), tool })).toBe(0);
+      expect(log).toHaveBeenCalledWith(
+        "check-changeset: could not read the current labels of #7; using PR_LABELS",
+      );
+    });
+
+    it("ignores a PR_NUMBER that is not a number and uses PR_LABELS", () => {
+      const tool = vi.fn(() => "x");
+      const env = { ...range, PR_NUMBER: "7; rm -rf", PR_LABELS: SKIP_LABEL };
+      expect(checkChangesetCommand(env, { ...deps(changed), tool })).toBe(0);
+      expect(tool).not.toHaveBeenCalled();
+    });
+  });
+
+  it("does not call gh when PR_NUMBER is unset", () => {
+    const tool = vi.fn(() => SKIP_LABEL);
+    const options = { ...deps(["packages/example/src/index.ts"]), tool };
+    expect(checkChangesetCommand(range, options)).toBe(1);
+    expect(checkChangesetCommand({ ...range, PR_LABELS: SKIP_LABEL }, options)).toBe(0);
+    expect(tool).not.toHaveBeenCalled();
+  });
+
   it("reads the published packages of the working directory when none are given", () => {
     const cwd = vi.spyOn(process, "cwd").mockReturnValue("/no/such/repo");
     const options = { diff: () => ["packages/example/src/index.ts"], read: () => undefined };
