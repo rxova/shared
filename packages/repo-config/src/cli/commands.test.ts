@@ -88,6 +88,13 @@ describe("commands", () => {
     expect(await call("fix-lockfile")).toBe(1);
   });
 
+  it("version-pr does nothing without pending changesets", async () => {
+    quiet();
+    vi.stubEnv("GITHUB_OUTPUT", "");
+    vi.spyOn(process, "cwd").mockReturnValue(empty);
+    expect(await call("version-pr")).toBe(0);
+  });
+
   it("check-exports refuses a bad profile before running anything", async () => {
     quiet();
     expect(await call("check-exports", ["--profile=x;y"])).toBe(1);

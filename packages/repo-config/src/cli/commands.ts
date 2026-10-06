@@ -48,6 +48,13 @@ export const commands = (): Record<string, CommandEntry> => ({
       return () => versionCommand();
     },
   },
+  "version-pr": {
+    summary: "open or update the version pull request; pull-request, changed to GITHUB_OUTPUT",
+    load: async () => {
+      const { versionPrCommand } = await import("@/changeset/version-pr-command");
+      return () => versionPrCommand();
+    },
+  },
   "fix-lockfile": {
     summary:
       "re-resolve and dedupe pnpm-lock.yaml after a bump; changed=true|false to GITHUB_OUTPUT",
