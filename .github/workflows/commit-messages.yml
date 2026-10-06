@@ -107,6 +107,8 @@ jobs:
       # On main this is the merged commit, already linted on its pull request,
       # plus the changesets `chore: version packages` commit. Cheap, and it is
       # what keeps this job unskippable.
+      # Not on the push that creates the branch: a repository created from a
+      # template starts with GitHub's own "Initial commit".
       - name: Lint the pushed commit
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && !github.event.created
         run: pnpm exec commitlint --last --verbose
