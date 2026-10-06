@@ -3,8 +3,12 @@ name: Dependabot
 # Reusable: keeps a Dependabot pull request mergeable without a human. Dependabot
 # can leave `pnpm-lock.yaml` stale or undeduped (workspace catalogs, overrides),
 # and `pnpm install --frozen-lockfile` then fails the pull request. `lockfile`
-# refreshes and dedupes it and pushes the result back to the branch;
-# `auto-merge` approves anything short of a major update and turns on auto-merge.
+# refreshes and dedupes it and pushes the result back to the branch, and reads
+# the update type from Dependabot's commit; `auto-merge` approves anything short
+# of a major update and turns on auto-merge.
+#
+# Uses only first-party actions (`actions/*`) and rxova/shared's own: the
+# update type comes from `rxova-repo-config dependabot-update-type`.
 #
 #   on:
 #     pull_request:
@@ -60,6 +64,8 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+    outputs:
+      update-type: ${{ steps.update.outputs.update-type }}
     env:
       # The lockfile commit would otherwise fire the commit hooks.
       HUSKY: "0"
@@ -67,10 +73,25 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          # The whole range, so the first commit (Dependabot's) can be read.
+          fetch-depth: 0
           persist-credentials: false
       - uses: rxova/shared/actions/setup-pnpm@main
         with:
           node-version: ${{ inputs.node-version }}
+      # Not frozen: the lockfile may be the stale part. `fix-lockfile` then
+      # decides `changed` against git, so a rewrite here still counts.
+      - run: pnpm install --no-frozen-lockfile --ignore-scripts
+
+      # The highest semver change in the pull request, from the metadata block
+      # Dependabot writes into its commit message.
+      - name: Read the update type
+        id: update
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: ${{ inputs.repo-config-command }} dependabot-update-type
+
       - name: Refresh and dedupe the lockfile
         id: fix
         run: ${{ inputs.repo-config-command }} fix-lockfile
@@ -111,6 +132,7 @@ jobs:
   # survives that push and waits for the required `all checks` on the new head.
   auto-merge:
     name: auto-merge
+    needs: [lockfile]
     if: >-
       github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.actor == 'dependabot[bot]'
@@ -120,19 +142,13 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Read the update's metadata
-        id: meta
-        uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ github.token }}
-
       # `update-type` is the highest semver change in the pull request, so a
       # grouped update with one major in it is left for a human. It is empty
-      # when fetch-metadata refuses the pull request, which is not a yes.
+      # when the commit carries no metadata, which is not a yes.
       - name: Approve and enable auto-merge
         if: >-
-          steps.meta.outputs.update-type != '' &&
-          steps.meta.outputs.update-type != 'version-update:semver-major'
+          needs.lockfile.outputs.update-type != '' &&
+          needs.lockfile.outputs.update-type != 'version-update:semver-major'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}

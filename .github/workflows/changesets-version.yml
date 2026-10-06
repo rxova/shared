@@ -1,9 +1,10 @@
 name: Changesets version
 
-# Reusable: versioning only. Opens and updates the `chore: version packages`
-# pull request, which bumps versions and writes changelogs, and never
-# publishes: no npm, no registry auth, no OIDC. For a repository whose packages
-# are private; one that publishes calls `changesets-release.yml` instead.
+# Reusable: versioning only. `rxova-repo-config version-pr` opens and updates
+# the `chore: version packages` pull request, which bumps versions and writes
+# changelogs, and never publishes: no npm, no registry auth, no OIDC. A
+# repository that publishes calls `changesets-release.yml` instead. Uses only
+# first-party actions (`actions/*`) and rxova/shared's own.
 #
 # The pull request is opened as the rxova GitHub App: one pushed with
 # GITHUB_TOKEN starts no workflow, so CI would never report on it and the
@@ -29,10 +30,15 @@ on:
   workflow_call:
     inputs:
       version-script:
-        description: What changesets/action runs to version the packages.
+        description: What `version-pr` runs to version the packages.
         type: string
         required: false
         default: pnpm exec changeset version
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
       node-version:
         description: Node.js version.
         type: string
@@ -85,8 +91,8 @@ jobs:
           permission-pull-requests: write
       - uses: actions/checkout@v7
         with:
-          # By name, not a workflow_run's detached SHA, so the action knows its
-          # base branch when it opens the version pull request.
+          # By name, not a workflow_run's detached SHA, so `version-pr` knows
+          # its base branch. The app token stays in the git config for the push.
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
@@ -95,11 +101,20 @@ jobs:
           node-version: ${{ inputs.node-version }}
       - run: pnpm install --frozen-lockfile
 
-      # No `publish-script`: changesets/action then only versions.
+      # Commits as the app's bot user, so the version commit is attributed to it.
+      - name: Commit as the app
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          id=$(gh api "/users/${SLUG}[bot]" --jq .id)
+          git config user.name "${SLUG}[bot]"
+          git config user.email "${id}+${SLUG}[bot]@users.noreply.github.com"
+
       - name: Create or update the version pull request
-        uses: changesets/action@v2
-        with:
-          github-token: ${{ steps.app-token.outputs.token }}
-          version-script: ${{ inputs.version-script }}
-          commit-message: ${{ inputs.commit-message }}
-          pr-title: ${{ inputs.pr-title }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION_SCRIPT: ${{ inputs.version-script }}
+          COMMIT_MESSAGE: ${{ inputs.commit-message }}
+          PR_TITLE: ${{ inputs.pr-title }}
+        run: ${{ inputs.repo-config-command }} version-pr

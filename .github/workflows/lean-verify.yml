@@ -1,9 +1,8 @@
 name: Lean verify
 
-# Reusable: the whole CI of a private repository in one job. Private
-# repositories pay for Actions minutes, and every job pays its own checkout,
-# pnpm setup and install (and rounds up to the minute) before it checks
-# anything. Here that setup is paid once: the commit lint and `check-scope`
+# Reusable: a repository's whole CI in one job. Every job pays its own
+# checkout, pnpm setup and install (and rounds up to the minute) before it
+# checks anything. Here that setup is paid once: the commit lint and `check-scope`
 # from `commit-messages.yml`, then `rxova-repo-config verify --keep-going`, which
 # runs every verify step and fails at the end listing every failure, so one red
 # run reports all of them instead of the first.
@@ -18,7 +17,9 @@ name: Lean verify
 #
 # Rule of thumb for outgrowing it: past about 10 packages, or once a warm run
 # takes more than 10 minutes, split the steps into parallel jobs (the public
-# repositories' graph) or shard the tests.
+# workflows' graph) or shard the tests.
+#
+# Uses only first-party actions (`actions/*`) and rxova/shared's own.
 
 on:
   workflow_call:
@@ -44,17 +45,10 @@ on:
         required: false
         default: true
       extra-command:
-        description: Runs after verify, before the workflow lint.
+        description: Runs after verify.
         type: string
         required: false
         default: ""
-      actionlint:
-        description: >-
-          Lint the workflows with actionlint (shellcheck included), from its official image
-          pinned by version.
-        type: boolean
-        required: false
-        default: true
     outputs:
       code-changed:
         description: "`true` unless the range is a release commit or documentation only."
@@ -89,7 +83,7 @@ jobs:
       - uses: rxova/shared/actions/setup-pnpm@main
         with:
           node-version: ${{ inputs.node-version }}
-      - uses: rxova/shared/actions/turbo-remote-cache@main
+      - uses: rxova/shared/actions/turbo-cache@main
       - run: pnpm install --frozen-lockfile
 
       - name: Decide what this range touched
@@ -130,14 +124,6 @@ jobs:
       - name: Extra checks
         if: inputs.extra-command != ''
         run: ${{ inputs.extra-command }}
-
-      # A typo in a workflow expression otherwise surfaces only when that
-      # workflow runs.
-      - name: Lint the workflows
-        if: inputs.actionlint
-        uses: docker://rhysd/actionlint:1.7.12
-        with:
-          args: -color
 
       # Turbo only runs suites it knows about: a package with a vitest config
       # but no `test` script would be skipped without a word.
