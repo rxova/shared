@@ -1,12 +1,14 @@
 import { changesetFiles } from "@/internal/changeset/changeset-files";
 import { changesetProblems } from "@/internal/changeset/changeset-problems";
 import { gitDiff } from "@/internal/changeset/git-diff";
-import { labelsOf } from "@/internal/changeset/labels-of";
+import { liveLabels } from "@/internal/changeset/live-labels";
 import { shippedChanges } from "@/internal/changeset/shipped-changes";
 import { versionedDirs } from "@/internal/changeset/versioned-dirs";
 import { readFile } from "@/internal/config/read-file";
+import { runTool } from "@/internal/init/run-tool";
 import type { Differ } from "@/changeset/changeset.types";
 import type { Reader } from "@/config/config.types";
+import type { Tool } from "@/init/init.types";
 import { checkChangeset } from "@/changeset/check-changeset";
 import { readConfig } from "@/config/read-config";
 
@@ -16,7 +18,9 @@ import { readConfig } from "@/config/read-config";
  * version.
  *
  * Run from the repository root with `BASE_SHA` and `HEAD_SHA` set. `PR_LABELS`
- * (comma-separated) and `PR_TITLE` carry the escape hatch. What counts as a
+ * (comma-separated) and `PR_TITLE` carry the escape hatch; with `PR_NUMBER`
+ * set, the pull request's current labels are read with `gh` instead of
+ * `PR_LABELS`, which stays the fallback. What counts as a
  * change is `repoConfig.changeset.scope`: `code` (the default) leaves a
  * package's markdown and tests out, `shipped` counts everything its tarball
  * ships, README and `llms.txt` included. The changesets the range adds are
@@ -32,8 +36,9 @@ export const checkChangesetCommand = (
     root = process.cwd(),
     diff = gitDiff,
     read = readFile,
+    tool = runTool,
     published,
-  }: { root?: string; diff?: Differ; read?: Reader; published?: string[] } = {},
+  }: { root?: string; diff?: Differ; read?: Reader; tool?: Tool; published?: string[] } = {},
 ): number => {
   const base = env.BASE_SHA;
   const head = env.HEAD_SHA;
@@ -51,7 +56,7 @@ export const checkChangesetCommand = (
     const verdict = checkChangeset(
       changed,
       dirs,
-      { labels: labelsOf(env.PR_LABELS), title: env.PR_TITLE ?? "" },
+      { labels: liveLabels(env, tool), title: env.PR_TITLE ?? "" },
       config.scope === "shipped"
         ? { present, shipped: shippedChanges(changed, dirs, root, read) }
         : { present },
