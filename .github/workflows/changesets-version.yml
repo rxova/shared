@@ -1,0 +1,105 @@
+name: Changesets version
+
+# Reusable: versioning only. Opens and updates the `chore: version packages`
+# pull request, which bumps versions and writes changelogs, and never
+# publishes: no npm, no registry auth, no OIDC. For a repository whose packages
+# are private; one that publishes calls `changesets-release.yml` instead.
+#
+# The pull request is opened as the rxova GitHub App: one pushed with
+# GITHUB_TOKEN starts no workflow, so CI would never report on it and the
+# required `all checks` would stay pending. Call it after CI has gone green on
+# main:
+#
+#   on:
+#     workflow_run: { workflows: [CI], types: [completed], branches: [main] }
+#     workflow_dispatch:
+#   jobs:
+#     version:
+#       if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+#       permissions: { contents: write, pull-requests: write }
+#       uses: rxova/shared/.github/workflows/changesets-version.yml@main
+#       secrets:
+#         RXOVA_APP_ID: ${{ secrets.RXOVA_APP_ID }}
+#         RXOVA_APP_PRIVATE_KEY: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
+#
+# Set `privatePackages: { version: true, tag: false }` in
+# `.changeset/config.json`, or changesets skips the private packages.
+
+on:
+  workflow_call:
+    inputs:
+      version-script:
+        description: What changesets/action runs to version the packages.
+        type: string
+        required: false
+        default: pnpm exec changeset version
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      commit-message:
+        description: The version commit's message.
+        type: string
+        required: false
+        default: "chore: version packages"
+      pr-title:
+        description: The version pull request's title.
+        type: string
+        required: false
+        default: "chore: version packages"
+    secrets:
+      RXOVA_APP_ID:
+        description: The rxova GitHub App's ID; its token opens the version pull request.
+        required: true
+      RXOVA_APP_PRIVATE_KEY:
+        description: The rxova GitHub App's private key.
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: version packages
+    if: ${{ !github.event.repository.is_template }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # The version commit would otherwise fire the pre-commit hook. CI already
+      # gated this code on the pull request.
+      HUSKY: "0"
+    permissions:
+      contents: write # the version commit
+      pull-requests: write # the version pull request
+    steps:
+      - name: Mint an app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RXOVA_APP_ID }}
+          private-key: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+      - uses: actions/checkout@v7
+        with:
+          # By name, not a workflow_run's detached SHA, so the action knows its
+          # base branch when it opens the version pull request.
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: pnpm install --frozen-lockfile
+
+      # No `publish-script`: changesets/action then only versions.
+      - name: Create or update the version pull request
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          version-script: ${{ inputs.version-script }}
+          commit-message: ${{ inputs.commit-message }}
+          pr-title: ${{ inputs.pr-title }}
