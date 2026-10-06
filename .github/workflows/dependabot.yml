@@ -1,0 +1,142 @@
+name: Dependabot
+
+# Reusable: keeps a Dependabot pull request mergeable without a human. Dependabot
+# can leave `pnpm-lock.yaml` stale or undeduped (workspace catalogs, overrides),
+# and `pnpm install --frozen-lockfile` then fails the pull request. `lockfile`
+# refreshes and dedupes it and pushes the result back to the branch;
+# `auto-merge` approves anything short of a major update and turns on auto-merge.
+#
+#   on:
+#     pull_request:
+#       types: [opened, synchronize, reopened]
+#   jobs:
+#     dependabot:
+#       if: github.event.pull_request.user.login == 'dependabot[bot]'
+#       permissions: { contents: write, pull-requests: write }
+#       uses: rxova/shared/.github/workflows/dependabot.yml@main
+#       secrets:
+#         RXOVA_APP_ID: ${{ secrets.RXOVA_APP_ID }}
+#         RXOVA_APP_PRIVATE_KEY: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
+#
+# A run Dependabot starts reads Dependabot secrets, not Actions secrets, so the
+# app's ID and key have to be Dependabot secrets as well. Approving needs
+# "Allow GitHub Actions to create and approve pull requests", and auto-merge has
+# to be enabled on the repository.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+      merge-method:
+        description: "How auto-merge merges: `squash`, `merge` or `rebase`."
+        type: string
+        required: false
+        default: squash
+    secrets:
+      RXOVA_APP_ID:
+        description: The rxova GitHub App's ID. Needed only when the lockfile has to be pushed.
+        required: false
+      RXOVA_APP_PRIVATE_KEY:
+        description: The rxova GitHub App's private key.
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    name: refresh lockfile
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      # The lockfile commit would otherwise fire the commit hooks.
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: false
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Refresh and dedupe the lockfile
+        id: fix
+        run: ${{ inputs.repo-config-command }} fix-lockfile
+
+      # Pushed with an app token, not GITHUB_TOKEN: a push made with
+      # GITHUB_TOKEN starts no workflow, so CI would never run on the new head
+      # and the required `all checks` would stay pending. The token is minted
+      # only when there is something to push, because the run the app's push
+      # starts is not a Dependabot run and cannot read Dependabot secrets; there
+      # the lockfile is already fresh, and this step is skipped.
+      - name: Mint an app token
+        id: app-token
+        if: steps.fix.outputs.changed == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RXOVA_APP_ID }}
+          private-key: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
+      - name: Push the lockfile as the app
+        if: steps.fix.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TOKEN: ${{ steps.app-token.outputs.token }}
+          SLUG: ${{ steps.app-token.outputs.app-slug }}
+          REPO: ${{ github.repository }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          id=$(gh api "/users/${SLUG}[bot]" --jq .id)
+          git -c user.name="${SLUG}[bot]" -c user.email="${id}+${SLUG}[bot]@users.noreply.github.com" \
+            commit -m "chore(deps): refresh the lockfile" -- pnpm-lock.yaml
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "HEAD:${HEAD_REF}"
+
+  # Only on Dependabot's own events: the app's lockfile push starts a run whose
+  # actor is the app, and there is nothing to do there. Auto-merge set here
+  # survives that push and waits for the required `all checks` on the new head.
+  auto-merge:
+    name: auto-merge
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Read the update's metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ github.token }}
+
+      # `update-type` is the highest semver change in the pull request, so a
+      # grouped update with one major in it is left for a human. It is empty
+      # when fetch-metadata refuses the pull request, which is not a yes.
+      - name: Approve and enable auto-merge
+        if: >-
+          steps.meta.outputs.update-type != '' &&
+          steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          MERGE_METHOD: ${{ inputs.merge-method }}
+        run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --auto "--$MERGE_METHOD" "$PR_URL"
