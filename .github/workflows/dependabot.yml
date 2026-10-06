@@ -41,10 +41,12 @@ on:
         required: false
         default: pnpm exec rxova-repo-config
       merge-method:
-        description: "How auto-merge merges: `squash`, `merge` or `rebase`."
+        description: >-
+          How auto-merge merges: `rebase`, `squash` or `merge`. It must be a method the
+          repository allows.
         type: string
         required: false
-        default: squash
+        default: rebase
     secrets:
       RXOVA_APP_ID:
         description: The rxova GitHub App's ID. Needed only when the lockfile has to be pushed.
