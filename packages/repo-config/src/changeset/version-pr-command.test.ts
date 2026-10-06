@@ -36,10 +36,12 @@ const setup = ({ status = " M packages/core/package.json", open = "" } = {}) => 
   const root = repo();
   const calls: string[] = [];
   const outputs: string[] = [];
+  const scriptEnvs: NodeJS.ProcessEnv[] = [];
   const deps = {
     root,
-    run: (command: string) => {
+    run: (command: string, scriptEnv?: NodeJS.ProcessEnv) => {
       calls.push(`run ${command}`);
+      if (scriptEnv !== undefined) scriptEnvs.push(scriptEnv);
       manifest(root, "packages/core", { name: "@rxova/core", version: "1.1.0" });
     },
     tool: (command: string, args: readonly string[]) => {
@@ -54,7 +56,7 @@ const setup = ({ status = " M packages/core/package.json", open = "" } = {}) => 
       outputs.push(contents);
     },
   };
-  return { root, calls, outputs, deps };
+  return { root, calls, outputs, scriptEnvs, deps };
 };
 
 const BODY = "Merging this pull request versions these packages:\n\n- @rxova/core: 1.0.0 → 1.1.0";
@@ -73,6 +75,13 @@ describe("versionPrCommand", () => {
   });
 
   const env = { GITHUB_OUTPUT: "/out" };
+
+  it("runs the version script with GITHUB_TOKEN taken from GH_TOKEN", () => {
+    const { scriptEnvs, deps } = setup();
+    expect(versionPrCommand({ ...env, GH_TOKEN: "app" }, deps)).toBe(0);
+    expect(scriptEnvs).toHaveLength(1);
+    expect(scriptEnvs[0]?.GITHUB_TOKEN).toBe("app");
+  });
 
   it("does nothing without pending changesets", () => {
     const { root, calls, outputs, deps } = setup();

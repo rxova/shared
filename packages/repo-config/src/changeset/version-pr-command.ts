@@ -2,6 +2,7 @@ import { appendFileSync } from "node:fs";
 import { nonEmpty } from "@/internal/changeset/non-empty";
 import { listChangesets } from "@/internal/changeset/list-changesets";
 import { versionPrBody } from "@/internal/changeset/version-pr-body";
+import { versionScriptEnv } from "@/internal/changeset/version-script-env";
 import { workspaceVersions } from "@/internal/changeset/workspace-versions";
 import { readFile } from "@/internal/config/read-file";
 import { runTool } from "@/internal/init/run-tool";
@@ -23,7 +24,8 @@ import { readConfig } from "@/config/read-config";
  * open pull request from it into the base or creates one, titled `PR_TITLE`
  * (default `chore: version packages`), with a body listing each workspace
  * package whose version moved. The base is `BASE_BRANCH`, else the branch
- * checked out. When `GITHUB_OUTPUT` is set it appends `pull-request=<number>`
+ * checked out. The version script gets `GITHUB_TOKEN` from `GH_TOKEN` when
+ * only that is set, for the changelog preset. When `GITHUB_OUTPUT` is set it appends `pull-request=<number>`
  * (empty when there is none) and `changed=true|false`. Returns the process
  * exit code: 1 when a command fails.
  */
@@ -68,7 +70,7 @@ export const versionPrCommand = (
 
     tool("git", ["switch", "-C", branch]);
     const before = workspaceVersions(root, read, roots);
-    run(nonEmpty(env.VERSION_SCRIPT) ?? "pnpm exec changeset version");
+    run(nonEmpty(env.VERSION_SCRIPT) ?? "pnpm exec changeset version", versionScriptEnv(env));
     const after = workspaceVersions(root, read, roots);
 
     if (tool("git", ["status", "--porcelain"]) === "") {

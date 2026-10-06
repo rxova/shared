@@ -8,6 +8,18 @@ describe("runCommand", () => {
     }).not.toThrow();
   });
 
+  it("runs the command in the given environment", () => {
+    expect(() => {
+      runCommand(
+        `"${process.execPath}" -e "process.exit(process.env.RUN_COMMAND_PROBE === 'yes' ? 0 : 3)"`,
+        {
+          ...process.env,
+          RUN_COMMAND_PROBE: "yes",
+        },
+      );
+    }).not.toThrow();
+  });
+
   it("throws when the command fails, which is what the gate catches", () => {
     expect(() => {
       runCommand(`"${process.execPath}" -e "process.exit(3)"`);
