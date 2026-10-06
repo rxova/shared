@@ -53,6 +53,7 @@ run after `astro build`.
 | `rxova-repo-config version`                            | `changeset version`, then the root version sync and a lockfile refresh                                        |
 | `rxova-repo-config version-pr`                         | Opens or updates the version pull request; writes `pull-request` and `changed=true\|false` to `GITHUB_OUTPUT` |
 | `rxova-repo-config fix-lockfile`                       | Re-resolves and dedupes `pnpm-lock.yaml` after a bump; writes `changed=true\|false` to `GITHUB_OUTPUT`        |
+| `rxova-repo-config dependabot-update-type`             | Writes the highest `update-type` and the `dependency-names` of a Dependabot commit to `GITHUB_OUTPUT`         |
 | `rxova-repo-config check-scope`                        | Reports `code-changed=false` for a release commit or a documentation-only range, per `repoConfig.scope`       |
 | `rxova-repo-config check-majors`                       | Requires the published packages to share one major version                                                    |
 | `rxova-repo-config node-floor`                         | Reads the one `engines.node` floor the packages share                                                         |

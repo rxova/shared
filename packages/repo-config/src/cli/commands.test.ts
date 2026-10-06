@@ -95,6 +95,12 @@ describe("commands", () => {
     expect(await call("version-pr")).toBe(0);
   });
 
+  it("dependabot-update-type needs a range", async () => {
+    quiet();
+    vi.stubEnv("BASE_SHA", "");
+    expect(await call("dependabot-update-type")).toBe(1);
+  });
+
   it("check-exports refuses a bad profile before running anything", async () => {
     quiet();
     expect(await call("check-exports", ["--profile=x;y"])).toBe(1);
