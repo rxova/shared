@@ -105,8 +105,10 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: pnpm exec commitlint --verbose --from "$BASE_SHA" --to "$HEAD_SHA"
 
+      # Not on the push that creates the branch: a repository created from a
+      # template starts with GitHub's own "Initial commit".
       - name: Lint the pushed commit
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && !github.event.created
         run: pnpm exec commitlint --last --verbose
 
       # Every step, then one failure listing all of them: a single run is the
