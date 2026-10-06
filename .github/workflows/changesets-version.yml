@@ -114,6 +114,9 @@ jobs:
       - name: Create or update the version pull request
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          # The changelog preset reads pull request and author links from the
+          # GitHub API, and looks for its token here.
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           VERSION_SCRIPT: ${{ inputs.version-script }}
           COMMIT_MESSAGE: ${{ inputs.commit-message }}
           PR_TITLE: ${{ inputs.pr-title }}
