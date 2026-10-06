@@ -8,6 +8,13 @@ import { initCommand } from "@/init/init-command";
 const ROOT = "/repo";
 const LOOKUP =
   'gh api /orgs/ada/installations --jq .installations[] | select(.app_slug == "rxova-bot") | [.id, .repository_selection] | @tsv';
+const RENOVATE_LOOKUP =
+  'gh api /orgs/ada/installations --jq .installations[] | select(.app_slug == "renovate") | [.id, .repository_selection] | @tsv';
+const RENOVATE_ADD = [
+  RENOVATE_LOOKUP,
+  "gh api repos/ada/idea --jq .id",
+  "gh api -X PUT /user/installations/77/repositories/123",
+];
 const SECRETS_JQ = '.secrets[] | select(.visibility == "all" or .visibility == "private") | .name';
 const PRIVATE_CHECKS = [
   `gh api --paginate orgs/ada/actions/secrets --jq ${SECRETS_JQ}`,
@@ -150,9 +157,12 @@ describe("initCommand", () => {
       `${PRETTIER} package.json README.md docs.md packages/idea/package.json packages/idea/index.ts`,
       "gh label clone rxova/template-oss --repo ada/idea --force",
       "gh api -X POST repos/ada/idea/pages -f build_type=workflow",
+      ...RENOVATE_ADD,
     ]);
     const output = log.join("\n");
     expect(output).toContain("init: ada/idea is public");
+    expect(output).toContain("init: added ada/idea to the renovate installation");
+    expect(output).not.toContain("Repository access");
     expect(output).toContain("repository ada/idea, workflow release.yml");
     expect(output).not.toContain("Settings → Pages");
     expect(output).not.toContain("RXOVA_APP_ID");
@@ -184,8 +194,10 @@ describe("initCommand", () => {
       'gh repo view --json owner,name --jq .owner.login + "/" + .name',
       "gh repo view --json visibility -q .visibility",
       "git -C /repo ls-files -z",
+      RENOVATE_LOOKUP,
     ]);
     expect(log.join("\n")).toContain("would move packages/example to packages/idea");
+    expect(log.join("\n")).toContain("init: would add ada/idea to the renovate installation");
     expect(log.join("\n")).toContain("would format 5 file(s)");
     expect(log.join("\n")).toContain("would turn GitHub Pages on");
   });
@@ -221,6 +233,7 @@ describe("initCommand", () => {
     expect(output).not.toContain("Pages");
     expect(output).not.toContain("trusted publisher");
     expect(output).not.toContain("Settings → General");
+    expect([...calls, ...log].join("\n")).not.toContain("renovate");
   });
 
   it("on a private repository only plans on a dry run", () => {
@@ -242,6 +255,7 @@ describe("initCommand", () => {
     expect(output).toContain("would add ada/idea to the rxova-bot installation");
     expect(output).toContain("RXOVA_APP_ID and RXOVA_APP_PRIVATE_KEY");
     expect(output).not.toContain("Pages");
+    expect([...calls, ...log].join("\n")).not.toContain("renovate");
   });
 
   it("leaves the private settings to the user when the API refuses them", () => {
@@ -393,6 +407,64 @@ describe("initCommand", () => {
     const output = log.join("\n");
     expect(output).toContain("could not turn Pages on");
     expect(output).toContain("Settings → Pages");
+  });
+
+  it("leaves a renovate installation on all repositories alone", () => {
+    const { calls, deps } = setup({ installation: () => "77\tall" });
+    expect(initCommand([], deps)).toBe(0);
+    expect(calls.at(-1)).toBe(RENOVATE_LOOKUP);
+    const output = log.join("\n");
+    expect(output).toContain("init: the renovate installation already covers every repository");
+    expect(output).not.toContain("Repository access");
+  });
+
+  it("asks to install renovate when the organisation has no installation", () => {
+    const { calls, deps } = setup({ installation: () => "" });
+    expect(initCommand([], deps)).toBe(0);
+    expect(calls.at(-1)).toBe(RENOVATE_LOOKUP);
+    const output = log.join("\n");
+    expect(output).toContain("init: renovate is not installed on ada");
+    expect(output).toContain(
+      '  2. install renovate on ada with "Only select repositories" and include ada/idea',
+    );
+    expect(output).toContain("  3. npm: publish the first version by hand");
+  });
+
+  it("numbers the renovate step among the public steps when GitHub refuses the change", () => {
+    const { calls, deps } = setup({
+      put: REFUSED,
+      pages: () => {
+        throw new Error("HTTP 422: plan does not support Pages");
+      },
+    });
+    expect(initCommand([], deps)).toBe(0);
+    const output = log.join("\n");
+    expect(output).toContain("could not add ada/idea to the renovate installation");
+    expect(output).toContain(
+      "  2. Pages: Settings → Pages → Source: GitHub Actions (the Docs workflow waits)",
+    );
+    expect(output).toContain(
+      `  3. add ada/idea to the renovate installation: ${PAGE} → Repository access → Select repositories`,
+    );
+    expect(output).toContain("  4. npm: publish the first version by hand");
+    expect(output).toContain("  5. optional: a CODECOV_TOKEN secret");
+    expect(output).not.toContain("init: opened");
+    expect(calls.some((call) => call.startsWith("open "))).toBe(false);
+  });
+
+  it("opens the renovate installation page at a terminal, but not in CI or on a dry run", () => {
+    const tty = setup({ put: REFUSED });
+    expect(initCommand([], { ...tty.deps, isTTY: true })).toBe(0);
+    expect(tty.calls.at(-1)).toBe(`open ${PAGE}`);
+    expect(log).toContain(`init: opened ${PAGE} — add ada/idea under Repository access`);
+    log.length = 0;
+    const ci = setup({ put: REFUSED });
+    expect(initCommand([], { ...ci.deps, isTTY: true, env: { CI: "1" } })).toBe(0);
+    expect(ci.calls.some((call) => call.startsWith("open "))).toBe(false);
+    const dry = setup({ put: REFUSED });
+    expect(initCommand(["--dry-run"], { ...dry.deps, isTTY: true })).toBe(0);
+    expect(dry.calls.some((call) => call.startsWith("open "))).toBe(false);
+    expect(log.join("\n")).not.toContain("init: opened");
   });
 
   it("refuses to run in the template itself", () => {

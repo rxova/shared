@@ -33,21 +33,21 @@ describe("addToAppInstallation", () => {
 
   it("asks for the install step when the app is not on the organisation", () => {
     const { calls, run } = fake();
-    expect(addToAppInstallation(run, TARGET, false)).toEqual({ step: "install" });
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", false)).toEqual({ step: "install" });
     expect(calls).toEqual([LOOKUP]);
     expect(log.join("\n")).toContain("rxova-bot is not installed on ada");
   });
 
   it("does nothing when the installation covers every repository", () => {
     const { calls, run } = fake({ installation: () => "77\tall" });
-    expect(addToAppInstallation(run, TARGET, false)).toEqual({ step: "done" });
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", false)).toEqual({ step: "done" });
     expect(calls).toEqual([LOOKUP]);
     expect(log.join("\n")).toContain("already covers every repository");
   });
 
   it("adds the repository to an installation on selected repositories", () => {
     const { calls, run } = fake({ installation: () => "77\tselected" });
-    expect(addToAppInstallation(run, TARGET, false)).toEqual({ step: "done" });
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", false)).toEqual({ step: "done" });
     expect(calls).toEqual([
       LOOKUP,
       "gh api repos/ada/idea --jq .id",
@@ -65,7 +65,7 @@ describe("addToAppInstallation", () => {
         );
       },
     });
-    expect(addToAppInstallation(run, TARGET, false)).toEqual({
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", false)).toEqual({
       step: "configure",
       installationId: "77",
     });
@@ -78,16 +78,27 @@ describe("addToAppInstallation", () => {
         throw new Error("HTTP 404: Not Found");
       },
     });
-    expect(addToAppInstallation(run, TARGET, false)).toEqual({
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", false)).toEqual({
       step: "configure",
       installationId: undefined,
     });
     expect(log.join("\n")).toContain("could not read the app installations of ada");
   });
 
+  it("looks up and names the app it is given", () => {
+    const { calls, run } = fake({ installation: () => "88\tselected" });
+    expect(addToAppInstallation(run, TARGET, "renovate", false)).toEqual({ step: "done" });
+    expect(calls).toEqual([
+      'gh api /orgs/ada/installations --jq .installations[] | select(.app_slug == "renovate") | [.id, .repository_selection] | @tsv',
+      "gh api repos/ada/idea --jq .id",
+      "gh api -X PUT /user/installations/88/repositories/123",
+    ]);
+    expect(log).toEqual(["init: added ada/idea to the renovate installation"]);
+  });
+
   it("only reads the installation on a dry run", () => {
     const { calls, run } = fake({ installation: () => "77\tselected" });
-    expect(addToAppInstallation(run, TARGET, true)).toEqual({ step: "done" });
+    expect(addToAppInstallation(run, TARGET, "rxova-bot", true)).toEqual({ step: "done" });
     expect(calls).toEqual([LOOKUP]);
     expect(log).toContain("init: would add ada/idea to the rxova-bot installation");
   });
