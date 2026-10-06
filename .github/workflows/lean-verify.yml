@@ -1,0 +1,150 @@
+name: Lean verify
+
+# Reusable: the whole CI of a private repository in one job. Private
+# repositories pay for Actions minutes, and every job pays its own checkout,
+# pnpm setup and install (and rounds up to the minute) before it checks
+# anything. Here that setup is paid once: the commit lint and `check-scope`
+# from `commit-messages.yml`, then `rxova-repo-config verify --keep-going`, which
+# runs every verify step and fails at the end listing every failure, so one red
+# run reports all of them instead of the first.
+#
+#   jobs:
+#     verify:
+#       if: github.event.pull_request.draft != true
+#       uses: rxova/shared/.github/workflows/lean-verify.yml@main
+#
+# It has the same outputs as `commit-messages.yml`, so later jobs can gate on
+# them the same way.
+#
+# Rule of thumb for outgrowing it: past about 10 packages, or once a warm run
+# takes more than 10 minutes, split the steps into parallel jobs (the public
+# repositories' graph) or shard the tests.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      timeout-minutes:
+        description: The job's timeout.
+        type: number
+        required: false
+        default: 15
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+      check-scope:
+        description: "`false` skips `check-scope` and always reports `code-changed: true`, `docs-only: false`."
+        type: boolean
+        required: false
+        default: true
+      extra-command:
+        description: Runs after verify, before the workflow lint.
+        type: string
+        required: false
+        default: ""
+      actionlint:
+        description: >-
+          Lint the workflows with actionlint (shellcheck included), from its official image
+          pinned by version.
+        type: boolean
+        required: false
+        default: true
+    outputs:
+      code-changed:
+        description: "`true` unless the range is a release commit or documentation only."
+        value: ${{ jobs.verify.outputs.code-changed }}
+      docs-only:
+        description: "`true` when the range changed documentation and nothing else but release bookkeeping."
+        value: ${{ jobs.verify.outputs.docs-only }}
+      docs-changed:
+        description: "`true` when the range touched the docs site (`repoConfig.scope.site`), or cannot tell."
+        value: ${{ jobs.verify.outputs.docs-changed }}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      contents: read
+    # The same fallbacks as `commit-messages.yml`: a bin that predates an
+    # output, or a skipped `check-scope`, runs everything and nothing extra.
+    outputs:
+      code-changed: ${{ steps.scope.outputs.code-changed || 'true' }}
+      docs-only: ${{ steps.scope.outputs.docs-only || 'false' }}
+      docs-changed: ${{ steps.scope.outputs.docs-changed || 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: rxova/shared/actions/turbo-remote-cache@main
+      - run: pnpm install --frozen-lockfile
+
+      - name: Decide what this range touched
+        id: scope
+        if: inputs.check-scope
+        env:
+          BASE_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.head.sha || github.sha }}
+        run: ${{ inputs.repo-config-command }} check-scope
+
+      - name: Lint the branch commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --verbose --from "$BASE_SHA" --to "$HEAD_SHA"
+
+      - name: Lint the pushed commit
+        if: github.event_name == 'push'
+        run: pnpm exec commitlint --last --verbose
+
+      # Every step, then one failure listing all of them: a single run is the
+      # whole answer, not the first problem of several.
+      - name: Verify
+        if: (steps.scope.outputs.code-changed || 'true') == 'true'
+        run: ${{ inputs.repo-config-command }} verify --keep-going
+
+      - name: Extra checks
+        if: inputs.extra-command != ''
+        run: ${{ inputs.extra-command }}
+
+      # A typo in a workflow expression otherwise surfaces only when that
+      # workflow runs.
+      - name: Lint the workflows
+        if: inputs.actionlint
+        uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color
+
+      # Turbo only runs suites it knows about: a package with a vitest config
+      # but no `test` script would be skipped without a word.
+      - name: Every package with tests is in the task graph
+        run: ${{ inputs.repo-config-command }} check-test-scripts
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: |
+            packages/*/coverage
+            apps/*/coverage
+          if-no-files-found: ignore
+          retention-days: 7
