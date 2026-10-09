@@ -1,5 +1,11 @@
 # @rxova/agent-kit
 
+## 0.3.0
+
+### Minor Changes
+
+- [#63](https://github.com/rxova/shared/pull/63) [`579fe8e`](https://github.com/rxova/shared/commit/579fe8e39064abeb3febbf7093a2dd61084a00e5) - Add `install --statusline`: ships a two-line status line script (model, context bar, git detail, session cost, lines changed, plan usage) and sets Claude Code's `statusLine` to it; `--no-statusline` and uninstall take it out again.
+
 ## 0.2.2
 
 ### Patch Changes
