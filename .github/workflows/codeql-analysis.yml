@@ -70,10 +70,10 @@ jobs:
 
       - name: Initialize CodeQL
         if: steps.scanning.outputs.enabled == 'true'
-        uses: github/codeql-action/init@v4.38.2
+        uses: github/codeql-action/init@v4.38.3
         with:
           languages: ${{ matrix.language }}
 
       - name: Perform CodeQL Analysis
         if: steps.scanning.outputs.enabled == 'true'
-        uses: github/codeql-action/analyze@v4.38.2
+        uses: github/codeql-action/analyze@v4.38.3
