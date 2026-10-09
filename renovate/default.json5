@@ -76,6 +76,12 @@
       platformAutomerge: true,
     },
     {
+      // Monthly lockfile maintenance follows the same path once CI is green.
+      matchUpdateTypes: ["lockFileMaintenance"],
+      automerge: true,
+      platformAutomerge: true,
+    },
+    {
       // TypeScript 7 is held, not skipped: typescript-eslint declares its peer
       // as `>=4.8.4 <6.1.0` and errors on sight of TS 7, which is the whole
       // `lint` job. Written as a ceiling rather than an ignore so 6.x patches

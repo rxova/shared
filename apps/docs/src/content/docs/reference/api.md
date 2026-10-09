@@ -295,5 +295,6 @@ Called at the job level as `uses: rxova/shared/.github/workflows/<file>@main`.
 
 `github>rxova/shared//renovate/default.json5`: `config:recommended`, one weekly non-major group,
 a minimum release age, `chore(deps)` semantic commits, majors behind the dashboard, `pnpm dedupe`
-after updates, patch and minor automerge through GitHub, and the TypeScript `<7` ceiling. A
-repository's `.github/renovate.json5` extends it and keeps only its own `packageRules`.
+after updates, patch, minor and lockfile-maintenance automerge through GitHub, and the TypeScript
+`<7` ceiling. A repository's `.github/renovate.json5` extends it and keeps only its own
+`packageRules`.
