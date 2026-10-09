@@ -18,7 +18,7 @@ const doc = (name: string, body: string) =>
 /**
  * A scratch home, project and built package. Two agents and two skills: `rx-planner` and
  * `rx-verify` are in the core profile, `rx-pitch` and `rx-demo` are not; `rx-verify` has a
- * supporting file. The io records what a command printed.
+ * supporting file. There is a status line script. The io records what a command printed.
  */
 export const scratchEnv = (version = "1.0.0") => {
   const root = mkdtempSync(join(tmpdir(), "rx-ai-install-"));
@@ -30,6 +30,7 @@ export const scratchEnv = (version = "1.0.0") => {
     "content/skills/rx-verify/SKILL.md": doc("rx-verify", "verifies"),
     "content/skills/rx-verify/notes/extra.md": "extra",
     "content/skills/rx-demo/SKILL.md": doc("rx-demo", "demos"),
+    "content/statusline/statusline.sh": "# status line",
     "dist/hooks.js": "// runner",
   });
   const env: InstallEnv = {

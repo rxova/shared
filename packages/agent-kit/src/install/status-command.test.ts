@@ -69,4 +69,13 @@ describe("statusCommand", () => {
     writeFileSync(join(target, "settings.json"), "nope");
     expect(statusCommand([], env)).toBe(1);
   });
+
+  it("checks the status line when one was installed", () => {
+    const { env, target } = scratch();
+    installCommand(["--statusline"], env);
+    expect(statusCommand([], env)).toBe(0);
+    writeTree(target, { "settings.json": "{}" });
+    expect(statusCommand([], env)).toBe(1);
+    expect(env.io.out).toHaveBeenCalledWith("  statusline  not set in settings.json");
+  });
 });

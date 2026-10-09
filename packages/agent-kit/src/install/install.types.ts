@@ -12,6 +12,8 @@ export interface Manifest {
   files: string[];
   /** Whether the first install created `settings.json`, so uninstall may remove it again. */
   createdSettings: boolean;
+  /** Whether the install set Claude Code's `statusLine` to the kit's script. */
+  statusline: boolean;
 }
 
 /** One file the install writes, to a path relative to the target: copied from the package, or generated. */
