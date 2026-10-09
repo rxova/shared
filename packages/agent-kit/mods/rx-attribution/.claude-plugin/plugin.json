@@ -1,0 +1,20 @@
+{
+  "name": "rx-attribution",
+  "version": "0.1.0",
+  "description": "Drops the Claude trailer and footer from commits and pull requests, then checks each opened or edited PR body and the new commit's author.",
+  "author": { "name": "Jonatan Kruszewski" },
+  "userConfig": {
+    "authorEmail": {
+      "type": "string",
+      "title": "Author email",
+      "description": "The email every commit's author and committer must carry. Empty skips the check.",
+      "default": ""
+    },
+    "fixPrBody": {
+      "type": "boolean",
+      "title": "Clean PR bodies",
+      "description": "Remove attribution lines from a PR body found carrying them, with gh pr edit. Off only reports them.",
+      "default": true
+    }
+  }
+}

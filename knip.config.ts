@@ -16,6 +16,8 @@ export default baseKnipConfig({
   docsApp: false,
   // `rxova-repo-config check-exports` runs `attw` from a shell command, where knip cannot see it.
   ignoreDependencies: ["@arethetypeswrong/cli"],
+  // Claude Code mods: Claude Code loads them from `hooks/hooks.json`, outside any package entry.
+  ignore: ["packages/agent-kit/mods/**"],
   // Scripts the composite actions run with `node`: an action.yml is their only caller.
   workspaces: {
     ".": { entry: ["actions/*/*.{js,cjs,mjs}"] },
