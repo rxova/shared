@@ -1,5 +1,11 @@
 # @rxova/agent-kit
 
+## 0.2.2
+
+### Patch Changes
+
+- [#62](https://github.com/rxova/shared/pull/62) [`818466a`](https://github.com/rxova/shared/commit/818466a8dc07a7617ffc652c96fffa4801330b29) - Document the rx-attribution, rx-worktrees and rx-handoff-band Claude Code mods, installed from the rxova/shared marketplace.
+
 ## 0.2.1
 
 ### Patch Changes
