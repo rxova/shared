@@ -1,0 +1,15 @@
+{
+  "name": "rx-handoff-band",
+  "version": "0.1.0",
+  "description": "A band above the prompt naming the newest handoff note in .claude/handoff/, with a button that fills the prompt to resume from it.",
+  "author": { "name": "Jonatan Kruszewski" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "maxDays": {
+      "type": "number",
+      "title": "Newest note age",
+      "description": "Show a note only when it is at most this many days old.",
+      "default": 7
+    }
+  }
+}

@@ -21,7 +21,8 @@
   <a href="#hooks">Hooks</a> ·
   <a href="#skills">Skills</a> ·
   <a href="#agents">Agents</a> ·
-  <a href="#commands">Commands</a>
+  <a href="#commands">Commands</a> ·
+  <a href="#mods">Mods</a>
 </p>
 
 Build fast without breaking things: a new product on a deadline, a React front end, a release
@@ -355,6 +356,32 @@ nothing unless asked.
 
 Each target records what the install wrote in `rx-ai/manifest.json`. The install refuses to
 overwrite a file it did not write, and reads and checks `settings.json` before writing anything.
+
+## Mods
+
+Three Claude Code mods live in [`mods/`](./mods). They are Claude Code plugins, separate from the
+`install` bin and from the npm package: install each one from the `rxova/shared` marketplace, at the
+prompt of a terminal session.
+
+```text
+/plugin install rx-attribution --marketplace rxova/shared
+/plugin install rx-worktrees --marketplace rxova/shared
+/plugin install rx-handoff-band --marketplace rxova/shared
+```
+
+Answer `y` to add the marketplace, then pick a scope.
+
+| Mod               | What it does                                                                                                                                                                                                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rx-attribution`  | Empties the commit trailer and the PR footer Claude Code asks the model to write. After `gh pr create` or `gh pr edit`, reads the PR body and removes any attribution line with `gh pr edit`. After `git commit`, flags an attribution trailer and, when `authorEmail` is set, a commit whose author or committer has another email. |
+| `rx-worktrees`    | `/worktrees` opens a pane listing every worktree of the repository with its branch and pull request state. Pressing a row copies its path; `Prune` runs `git worktree prune` when a worktree's folder is gone.                                                                                                                       |
+| `rx-handoff-band` | Shows the newest `.claude/handoff/yyyy-mm-dd*.md` note above the prompt until the first prompt. `Resume` (`h`) fills the prompt to read it and continue.                                                                                                                                                                             |
+
+Options are set in `/config`: `rx-attribution` takes `authorEmail` (empty skips the author check)
+and `fixPrBody` (off only reports); `rx-handoff-band` takes `maxDays` (7).
+
+Each mod is checked with `claude plugin validate packages/agent-kit/mods/<mod>` and
+`claude plugin test packages/agent-kit/mods/<mod>`.
 
 ## OpenCode
 

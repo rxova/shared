@@ -8,6 +8,10 @@ export default rxova({
   tests: true,
   // The scripts write to stdout: that is their output contract.
   consoleAllowed: ["packages/repo-config/**", "packages/agent-kit/src/internal/cli/console-io.ts"],
+  // Claude Code mods: each runs in Claude Code's hooks environment, imports its own files by
+  // relative path and is typed against the `claude-code` module the engine lays beside it, so
+  // `claude plugin validate` and `claude plugin test` check them instead.
+  ignores: ["packages/agent-kit/mods/**"],
   extends: [tseslint.configs.stylisticTypeChecked],
   rules: {
     // A module names its own package's files as `@/…`, so a file can move
