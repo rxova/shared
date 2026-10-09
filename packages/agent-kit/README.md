@@ -201,6 +201,22 @@ of its own failure.
 | `RX_AI_OFF`            | `RX_AI_OFF=config-lock` | Switches hooks off, e.g. for one session: `RX_AI_OFF=config-lock claude`. |
 | `RX_AI_CONTEXT_WINDOW` | `1000000`               | The window size `context-nudge` measures against (200,000 by default).    |
 
+### Status line
+
+`--statusline` also sets Claude Code's status line to the kit's script, so a new machine gets the
+same bar from the same install:
+
+```sh
+npx @rxova/agent-kit install --statusline      # add it (kept on later installs)
+npx @rxova/agent-kit install --no-statusline   # take it out again
+```
+
+Two lines: the model, a context bar, the project (and worktree) and git branch with staged,
+modified, untracked and ahead/behind counts; then session cost and time, lines changed, 5-hour
+and weekly plan usage, and the output style and Claude Code version. It needs `bash`, `jq` and
+`git`, and a Powerline or Nerd Font for the separators. A status line someone else set is left
+alone unless you add `--force`; uninstall removes only the kit's.
+
 ## Skills
 
 Each skill is a folder with a `SKILL.md`: when to use it, the steps, and an example.
@@ -328,9 +344,10 @@ nothing unless asked.
 | `--target <t>`  | `install`, `uninstall`, `status` | `claude` (default on a first install), `opencode` or `both`. Later: the installed ones. |
 | `--add a,b`     | `install`                        | Adds items on top of the profile.                                                       |
 | `--skip c`      | `install`                        | Leaves items out of the profile.                                                        |
+| `--statusline`  | `install`                        | Sets Claude Code's status line to the kit's script; `--no-statusline` takes it out.     |
 | `--project`     | `install`, `uninstall`, `status` | Works on `./.claude` or `./.opencode` instead of the user folder.                       |
 | `--dry-run`     | `install`, `uninstall`           | Prints the plan and writes nothing.                                                     |
-| `--force`       | `install`                        | Overwrites files the kit did not write.                                                 |
+| `--force`       | `install`                        | Overwrites files (and a status line) the kit did not write.                             |
 
 | Target     | User install                                          | With `--project` |
 | ---------- | ----------------------------------------------------- | ---------------- |

@@ -30,6 +30,7 @@ describe("readManifest", () => {
       items: ["x"],
       files: ["a", "b"],
       createdSettings: false,
+      statusline: false,
     });
   });
 
@@ -41,6 +42,7 @@ describe("readManifest", () => {
       items: [],
       files: ["a"],
       createdSettings: false,
+      statusline: false,
     });
   });
 });

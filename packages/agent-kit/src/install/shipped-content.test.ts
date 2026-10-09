@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -43,6 +44,14 @@ describe("the shipped skills", () => {
       expect(readFileSync(path, "utf8")).toContain("## When to use");
     },
   );
+});
+
+describe("the shipped status line", () => {
+  it("is a bash script that parses", () => {
+    const script = join(content, "statusline", "statusline.sh");
+    expect(readFileSync(script, "utf8")).toMatch(/^#!\/usr\/bin\/env bash\n/);
+    expect(() => execFileSync("bash", ["-n", script])).not.toThrow();
+  });
 });
 
 describe("the profiles over the real catalog", () => {

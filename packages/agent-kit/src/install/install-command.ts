@@ -7,9 +7,11 @@ import { installedTargets } from "@/install/installed-targets";
 import { planInstall } from "@/install/plan-install";
 import { selectItems } from "@/install/select-items";
 import { withOwnHooks } from "@/install/with-own-hooks";
+import { withOwnStatusLine } from "@/install/with-own-status-line";
 import { defaultEnv } from "@/internal/install/default-env";
 import { fromTarget } from "@/internal/install/from-target";
-import { MANIFEST, RUNNER } from "@/internal/install/install-paths";
+import { MANIFEST, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
+import { isOwnStatusLine } from "@/internal/install/is-own-status-line";
 import { packageVersionAt } from "@/internal/install/package-version-at";
 import { parseOptions } from "@/internal/install/parse-options";
 import { readManifest } from "@/internal/install/read-manifest";
@@ -19,9 +21,11 @@ import { writeJson } from "@/internal/install/write-json";
 
 /**
  * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|react|qa|marketing|full]
- * [--add a,b] [--skip c] [--project] [--dry-run] [--force]`: writes the chosen agents, skills and
- * hooks for Claude Code, OpenCode or both, and records what it wrote in each. Running it again
- * updates in place, keeping each target's last selection unless told otherwise; with no
+ * [--add a,b] [--skip c] [--statusline | --no-statusline] [--project] [--dry-run] [--force]`:
+ * writes the chosen agents, skills and hooks for Claude Code, OpenCode or both, and, with
+ * `--statusline`, sets Claude Code's status line to the kit's script. It records what it wrote in
+ * each. Running it again updates in place, keeping each target's last selection and status line
+ * choice unless told otherwise; with no
  * `--target`, it updates the targets already installed (Claude Code on a first install).
  */
 export const installCommand = (argv: readonly string[], env: InstallEnv = defaultEnv()): number => {
@@ -31,6 +35,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       "project",
       "dry-run",
       "force",
+      "statusline",
       "profile",
       "add",
       "skip",
@@ -51,6 +56,8 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         skip: options.skip ?? [],
         previous,
       });
+      const statusline =
+        target.kind === "claude" && (options.statusline ?? previous?.statusline ?? false);
       const plan = planInstall({
         packageDir: env.packageDir,
         items: selection.items,
@@ -58,6 +65,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         exists: (file) => existsSync(fromTarget(target.root, file)),
         target,
         withSkills: !(both && target.kind === "opencode"),
+        withStatusline: statusline,
       });
       const written = plan.copies.map(({ to }) => to);
       const counts = (["agent", "skill", "hook"] as const)
@@ -71,13 +79,17 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       const hookNames = selection.items.filter((item) =>
         items.some((entry) => entry.name === item && entry.kind === "hook"),
       );
+      const current = target.kind === "claude" ? readSettings(target.root) : {};
       const settings =
         target.kind === "claude"
-          ? withOwnHooks(
-              readSettings(target.root),
-              hookGroups(fromTarget(target.root, RUNNER), hookNames),
+          ? withOwnStatusLine(
+              withOwnHooks(current, hookGroups(fromTarget(target.root, RUNNER), hookNames)),
+              statusline ? fromTarget(target.root, STATUSLINE) : undefined,
             )
           : undefined;
+      // Claude Code has one status line: someone else's counts as a conflict, like a file.
+      const statusLineConflict =
+        statusline && current.statusLine !== undefined && !isOwnStatusLine(current.statusLine);
       return {
         target,
         previous,
@@ -87,19 +99,32 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         stale: (previous?.files ?? []).filter((file) => !written.includes(file)),
         counts,
         settings,
+        statusline,
+        statusLineConflict,
       };
     });
 
-    const conflicts = plans.flatMap(({ target, plan }) =>
-      plan.conflicts.map((file) => fromTarget(target.root, file)),
-    );
+    const conflicts = plans.flatMap(({ target, plan, statusLineConflict }) => [
+      ...plan.conflicts.map((file) => fromTarget(target.root, file)),
+      ...(statusLineConflict ? [`${join(target.root, "settings.json")} (statusLine)`] : []),
+    ]);
     if (conflicts.length > 0 && options.force !== true)
       throw new Error(
         `these already exist and were not written by rxova-agent-kit:\n${conflicts.map((file) => `  ${file}`).join("\n")}\n` +
           "Move them, or pass --force to overwrite.",
       );
 
-    for (const { target, previous, selection, plan, written, stale, counts, settings } of plans) {
+    for (const {
+      target,
+      previous,
+      selection,
+      plan,
+      written,
+      stale,
+      counts,
+      settings,
+      statusline,
+    } of plans) {
       const name = target.kind === "claude" ? "Claude Code" : "OpenCode";
       if (options["dry-run"] === true) {
         io.out(
@@ -107,7 +132,10 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         );
         for (const file of written) io.out(`  write   ${file}`);
         for (const file of stale) io.out(`  remove  ${file}`);
-        if (target.kind === "claude") io.out("  update  settings.json (the rx-ai hooks)");
+        if (target.kind === "claude")
+          io.out(
+            `  update  settings.json (the rx-ai hooks${statusline ? " and status line" : ""})`,
+          );
         continue;
       }
       for (const copy of plan.copies) {
@@ -127,6 +155,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         items: selection.items,
         files: written,
         createdSettings,
+        statusline,
       });
       io.out(`Installed rx-ai (${selection.profile}: ${counts}) for ${name} into ${target.root}.`);
     }

@@ -88,4 +88,21 @@ describe("uninstallCommand", () => {
     writeTree(target, { "settings.json": "{" });
     expect(uninstallCommand([], env)).toBe(1);
   });
+
+  it("takes its status line out and leaves someone else's", () => {
+    const { env, target } = scratch();
+    writeTree(target, { "settings.json": JSON.stringify({ model: "x" }) });
+    installCommand(["--statusline"], env);
+    expect(uninstallCommand(["--dry-run"], env)).toBe(0);
+    expect(env.io.out).toHaveBeenCalledWith(
+      "  update  settings.json (drop the rx-ai hooks and status line)",
+    );
+    expect(uninstallCommand([], env)).toBe(0);
+    expect(JSON.parse(readFileSync(join(target, "settings.json"), "utf8"))).toEqual({ model: "x" });
+    const theirs = { model: "x", statusLine: { type: "command", command: "mine.sh" } };
+    installCommand([], env);
+    writeTree(target, { "settings.json": JSON.stringify(theirs) });
+    uninstallCommand([], env);
+    expect(JSON.parse(readFileSync(join(target, "settings.json"), "utf8"))).toEqual(theirs);
+  });
 });

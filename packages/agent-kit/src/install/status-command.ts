@@ -5,6 +5,7 @@ import { installCopies } from "@/install/install-copies";
 import { installedTargets } from "@/install/installed-targets";
 import { countOwnHooks } from "@/internal/install/count-own-hooks";
 import { defaultEnv } from "@/internal/install/default-env";
+import { isOwnStatusLine } from "@/internal/install/is-own-status-line";
 import { fromTarget } from "@/internal/install/from-target";
 import { packageVersionAt } from "@/internal/install/package-version-at";
 import { parseOptions } from "@/internal/install/parse-options";
@@ -14,7 +15,8 @@ import { readSettings } from "@/internal/install/read-settings";
 /**
  * `rxova-agent-kit status [--target claude|opencode|both] [--project]`: for each installed
  * target, the installed profile and version against this one, files missing or different from
- * this version, and for Claude Code whether the hook entries are all there. Exits 1 when
+ * this version, and for Claude Code whether the hook entries (and the status line, when
+ * installed) are all there. Exits 1 when
  * anything is out of step or nothing is installed, so it can gate a script.
  */
 export const statusCommand = (argv: readonly string[], env: InstallEnv = defaultEnv()): number => {
@@ -39,10 +41,10 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
         target.kind === "opencode" && !manifest.files.some((file) => file.startsWith("skills/"))
       );
       const sources = new Map(
-        installCopies(env.packageDir, manifest.items, target, { withSkills }).map((copy) => [
-          copy.to,
-          copy,
-        ]),
+        installCopies(env.packageDir, manifest.items, target, {
+          withSkills,
+          withStatusline: manifest.statusline,
+        }).map((copy) => [copy.to, copy]),
       );
       const problems: string[] = [];
       for (const file of manifest.files) {
@@ -62,7 +64,8 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
       }
       let hooks = "";
       if (target.kind === "claude") {
-        const registered = countOwnHooks(readSettings(target.root));
+        const settings = readSettings(target.root);
+        const registered = countOwnHooks(settings);
         const expected = Object.values(hookGroups("rx-ai/hooks.js", manifest.items)).flatMap(
           (groups) => groups.flatMap((group) => group.hooks),
         ).length;
@@ -71,6 +74,8 @@ export const statusCommand = (argv: readonly string[], env: InstallEnv = default
           problems.push(
             `  hooks    ${String(registered)} registered, ${String(expected)} expected`,
           );
+        if (manifest.statusline && !isOwnStatusLine(settings.statusLine))
+          problems.push("  statusline  not set in settings.json");
       }
       io.out(
         `rx-ai ${manifest.version} (${manifest.profile}) for ${target.kind === "claude" ? "Claude Code" : "OpenCode"} in ${target.root} (this package is ${version})`,

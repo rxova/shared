@@ -12,6 +12,7 @@ export const planInstall = ({
   exists,
   target,
   withSkills = true,
+  withStatusline = false,
 }: {
   packageDir: string;
   items: readonly string[];
@@ -19,8 +20,9 @@ export const planInstall = ({
   exists: (relative: string) => boolean;
   target?: InstallTarget;
   withSkills?: boolean;
+  withStatusline?: boolean;
 }): InstallPlan => {
-  const copies = installCopies(packageDir, items, target, { withSkills });
+  const copies = installCopies(packageDir, items, target, { withSkills, withStatusline });
   const owned = new Set(previous?.files ?? []);
   return {
     copies,

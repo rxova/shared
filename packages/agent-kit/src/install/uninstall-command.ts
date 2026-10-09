@@ -3,8 +3,10 @@ import { join } from "node:path";
 import type { InstallEnv } from "@/install/install.types";
 import { installedTargets } from "@/install/installed-targets";
 import { withoutOwnHooks } from "@/install/without-own-hooks";
+import { withoutOwnStatusLine } from "@/install/without-own-status-line";
 import { defaultEnv } from "@/internal/install/default-env";
 import { MANIFEST } from "@/internal/install/install-paths";
+import { isOwnStatusLine } from "@/internal/install/is-own-status-line";
 import { parseOptions } from "@/internal/install/parse-options";
 import { readManifest } from "@/internal/install/read-manifest";
 import { readSettings } from "@/internal/install/read-settings";
@@ -13,7 +15,8 @@ import { writeJson } from "@/internal/install/write-json";
 
 /**
  * `rxova-agent-kit uninstall [--target claude|opencode|both] [--project] [--dry-run]`: removes
- * the files each target's manifest lists and, for Claude Code, the rx-ai hook entries, leaving
+ * the files each target's manifest lists and, for Claude Code, the rx-ai hook entries and status
+ * line, leaving
  * every other file and setting as it was. With no `--target`, every installed target.
  */
 export const uninstallCommand = (
@@ -27,7 +30,7 @@ export const uninstallCommand = (
     for (const target of installedTargets(options.target, options.project === true, env)) {
       const manifest = readManifest(target.root);
       const settings = target.kind === "claude" ? readSettings(target.root) : {};
-      const cleaned = withoutOwnHooks(settings);
+      const cleaned = withoutOwnStatusLine(withoutOwnHooks(settings));
       const hooksChanged = JSON.stringify(cleaned) !== JSON.stringify(settings);
       if (manifest === undefined && !hooksChanged) continue;
       removedAny = true;
@@ -35,7 +38,10 @@ export const uninstallCommand = (
       if (options["dry-run"] === true) {
         io.out(`Would remove from ${target.root}:`);
         for (const file of files) io.out(`  remove  ${file}`);
-        if (hooksChanged) io.out("  update  settings.json (drop the rx-ai hooks)");
+        if (hooksChanged)
+          io.out(
+            `  update  settings.json (drop the rx-ai hooks${isOwnStatusLine(settings.statusLine) ? " and status line" : ""})`,
+          );
         continue;
       }
       const dropSettings = manifest?.createdSettings === true && Object.keys(cleaned).length === 0;
