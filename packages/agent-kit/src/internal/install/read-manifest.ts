@@ -7,7 +7,7 @@ import { MANIFEST } from "@/internal/install/install-paths";
 /**
  * The manifest of the last install into `target`, or undefined when there is none. A manifest
  * from before profiles existed reads as the `core` profile with no items recorded, and
- * as not having created `settings.json`.
+ * as not having created `settings.json`. A manifest from before the status line reads as without one.
  */
 export const readManifest = (target: string): Manifest | undefined => {
   const value = readJson(fromTarget(target, MANIFEST));
@@ -21,5 +21,6 @@ export const readManifest = (target: string): Manifest | undefined => {
     items: strings(value.items),
     files: strings(value.files),
     createdSettings: value.createdSettings === true,
+    statusline: value.statusline === true,
   };
 };

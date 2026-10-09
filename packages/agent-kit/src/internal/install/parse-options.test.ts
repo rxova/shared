@@ -11,6 +11,11 @@ describe("parseOptions", () => {
     ).toEqual({ project: true, profile: "full", add: ["a", "b", "c"], skip: ["d"] });
   });
 
+  it("turns a boolean off with --no-<name>", () => {
+    expect(parseOptions(["--no-statusline"], ["statusline"])).toEqual({ statusline: false });
+    expect(parseOptions(["--statusline"], ["statusline"])).toEqual({ statusline: true });
+  });
+
   it("leaves out what was not given", () => {
     expect(parseOptions([], ["project", "add"])).toEqual({});
   });

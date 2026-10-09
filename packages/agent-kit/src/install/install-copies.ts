@@ -7,11 +7,12 @@ import { opencodeHooks } from "@/install/opencode-hooks";
 import { opencodePlugin } from "@/install/opencode-plugin";
 import { contentFiles } from "@/internal/install/content-files";
 import { fromTarget } from "@/internal/install/from-target";
-import { PLUGIN, RUNNER } from "@/internal/install/install-paths";
+import { PLUGIN, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
 
 /**
  * The files an install writes for the chosen items into one target. Claude Code: each chosen
- * agent's file and skill's folder from `content/` as they are, and the hook runner. OpenCode:
+ * agent's file and skill's folder from `content/` as they are, the hook runner, and the status
+ * line script when `withStatusline` is true. OpenCode:
  * the agents converted to its format, the skills (left out when `withSkills` is false, because
  * OpenCode already reads them from the Claude Code install), the runner, and the plugin that
  * calls it.
@@ -20,7 +21,10 @@ export const installCopies = (
   packageDir: string,
   items: readonly string[],
   target: InstallTarget = { kind: "claude", root: "/" },
-  { withSkills = true }: { withSkills?: boolean } = {},
+  {
+    withSkills = true,
+    withStatusline = false,
+  }: { withSkills?: boolean; withStatusline?: boolean } = {},
 ): Copy[] => {
   const content = join(packageDir, "content");
   const chosen = new Set(items);
@@ -30,7 +34,10 @@ export const installCopies = (
   });
   const copy = (file: string): Copy => ({ from: join(content, ...file.split("/")), to: file });
   const runner: Copy = { from: join(packageDir, "dist", "hooks.js"), to: RUNNER };
-  if (target.kind === "claude") return [...files.map(copy), runner];
+  const statusline: Copy[] = withStatusline
+    ? [{ from: join(content, "statusline", "statusline.sh"), to: STATUSLINE }]
+    : [];
+  if (target.kind === "claude") return [...files.map(copy), runner, ...statusline];
 
   const agents = files
     .filter((file) => file.startsWith("agents/"))
