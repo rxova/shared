@@ -1,0 +1,24 @@
+{
+  "name": "rxova",
+  "description": "Claude Code mods from @rxova/agent-kit.",
+  "owner": {
+    "name": "Jonatan Kruszewski"
+  },
+  "plugins": [
+    {
+      "name": "rx-attribution",
+      "source": "./packages/agent-kit/mods/rx-attribution",
+      "description": "Drops the Claude trailer and footer from commits and pull requests, then checks each opened or edited PR body and the new commit's author."
+    },
+    {
+      "name": "rx-worktrees",
+      "source": "./packages/agent-kit/mods/rx-worktrees",
+      "description": "A /worktrees pane: every git worktree of the repository with its branch and pull request state."
+    },
+    {
+      "name": "rx-handoff-band",
+      "source": "./packages/agent-kit/mods/rx-handoff-band",
+      "description": "A band above the prompt naming the newest handoff note, with a button that resumes from it."
+    }
+  ]
+}

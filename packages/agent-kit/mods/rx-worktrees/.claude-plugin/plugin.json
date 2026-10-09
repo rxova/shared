@@ -1,0 +1,7 @@
+{
+  "name": "rx-worktrees",
+  "version": "0.1.0",
+  "description": "A /worktrees pane: every git worktree of the repository with its branch and pull request state, a copy-path press per row and a prune button.",
+  "author": { "name": "Jonatan Kruszewski" },
+  "types": "./types/index.d.ts"
+}
