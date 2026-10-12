@@ -8,6 +8,20 @@ export interface Step {
    * or a pack smoke there repeats what the merge before it already proved.
    */
   skipOnRelease?: boolean;
+  /**
+   * Steps sharing a group run in one job of `verify --plan`'s fan-out, in list
+   * order: cheap checks share a runner's setup instead of paying one each.
+   * Local `verify` ignores it.
+   */
+  group?: string;
+  /**
+   * Splits a step whose command runs `turbo run <task…>` into per-package jobs
+   * of `verify --plan`'s fan-out, at most `max` of them (default 8); `true` in
+   * the JSON reads as `{}`. The command should end with the `turbo run`, since
+   * the plan appends `--dry=json` and each job `--filter=<package>`. Never with
+   * `group`. Local `verify` ignores it.
+   */
+  split?: { max?: number };
 }
 
 /** How `check-llms` compares a package's `llms.txt` with its source. */

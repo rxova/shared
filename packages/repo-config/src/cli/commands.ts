@@ -7,7 +7,7 @@ import type { CommandEntry } from "@/cli/cli.types";
 export const commands = (): Record<string, CommandEntry> => ({
   verify: {
     summary:
-      "run the pre-push gate (package.json#repoConfig.verify.steps; --only a,b, --keep-going)",
+      "run the pre-push gate (package.json#repoConfig.verify.steps; --only a,b, --filter a,b, --keep-going; --plan prints the fan-out matrix)",
     load: async () => {
       const { verifyCommand } = await import("@/verify/verify-command");
       return (argv) => verifyCommand(argv);
