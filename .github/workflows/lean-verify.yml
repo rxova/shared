@@ -1,25 +1,22 @@
 name: Lean verify
 
-# Reusable: a repository's whole CI in one job. Every job pays its own
-# checkout, pnpm setup and install (and rounds up to the minute) before it
-# checks anything. Here that setup is paid once: the commit lint and `check-scope`
-# from `commit-messages.yml`, then `rxova-repo-config verify --keep-going`, which
-# runs every verify step and fails at the end listing every failure, so one red
-# run reports all of them instead of the first.
+# The old name of `verify.yml`'s lean shape (`fan-out: false`), kept for the
+# repositories that already call it: same inputs, same outputs, the same one
+# job. New repositories call `verify.yml`, which can also fan out.
 #
 #   jobs:
 #     verify:
 #       if: github.event.pull_request.draft != true
 #       uses: rxova/shared/.github/workflows/lean-verify.yml@main
 #
-# It has the same outputs as `commit-messages.yml`, so later jobs can gate on
-# them the same way.
-#
 # Rule of thumb for outgrowing it: past about 10 packages, or once a warm run
-# takes more than 10 minutes, split the steps into parallel jobs (the public
-# workflows' graph) or shard the tests.
+# takes more than 10 minutes, call `verify.yml` with `fan-out: true`, which runs
+# the steps as parallel jobs and needs a Turbo remote cache (the Vercel Remote
+# Cache through the `TURBO_TOKEN` and `TURBO_TEAM` secrets, else the Actions
+# cache fallback).
 #
-# Uses only first-party actions (`actions/*`) and rxova/shared's own.
+# It calls `verify.yml` by its full name: a nested `./` path would resolve in
+# the caller's repository.
 
 on:
   workflow_call:
@@ -65,80 +62,14 @@ permissions:
 
 jobs:
   verify:
-    name: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: ${{ inputs.timeout-minutes }}
+    uses: rxova/shared/.github/workflows/verify.yml@main
     permissions:
       contents: read
-    # The same fallbacks as `commit-messages.yml`: a bin that predates an
-    # output, or a skipped `check-scope`, runs everything and nothing extra.
-    outputs:
-      code-changed: ${{ steps.scope.outputs.code-changed || 'true' }}
-      docs-only: ${{ steps.scope.outputs.docs-only || 'false' }}
-      docs-changed: ${{ steps.scope.outputs.docs-changed || 'true' }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: rxova/shared/actions/setup-pnpm@main
-        with:
-          node-version: ${{ inputs.node-version }}
-      - uses: rxova/shared/actions/turbo-cache@main
-      - run: pnpm install --frozen-lockfile
-
-      - name: Decide what this range touched
-        id: scope
-        if: inputs.check-scope
-        env:
-          BASE_SHA: >-
-            ${{ github.event_name == 'pull_request'
-            && github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: >-
-            ${{ github.event_name == 'pull_request'
-            && github.event.pull_request.head.sha || github.sha }}
-        run: ${{ inputs.repo-config-command }} check-scope
-
-      - name: Lint the branch commits
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: pnpm exec commitlint --verbose --from "$BASE_SHA" --to "$HEAD_SHA"
-
-      # Not on the push that creates the branch: a repository created from a
-      # template starts with GitHub's own "Initial commit".
-      - name: Lint the pushed commit
-        if: github.event_name == 'push' && !github.event.created
-        run: pnpm exec commitlint --last --verbose
-
-      # Every step, then one failure listing all of them: a single run is the
-      # whole answer, not the first problem of several.
-      - name: Verify
-        if: (steps.scope.outputs.code-changed || 'true') == 'true'
-        run: ${{ inputs.repo-config-command }} verify --keep-going
-
-      # A documentation-only range skips verify, but prose still gets the
-      # prettier gate the public repositories run in `docs-checks.yml`.
-      - name: Check formatting
-        if: steps.scope.outputs.docs-only == 'true'
-        run: pnpm format:check
-
-      - name: Extra checks
-        if: inputs.extra-command != ''
-        run: ${{ inputs.extra-command }}
-
-      # Turbo only runs suites it knows about: a package with a vitest config
-      # but no `test` script would be skipped without a word.
-      - name: Every package with tests is in the task graph
-        run: ${{ inputs.repo-config-command }} check-test-scripts
-
-      - name: Upload coverage
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage
-          path: |
-            packages/*/coverage
-            apps/*/coverage
-          if-no-files-found: ignore
-          retention-days: 7
+    with:
+      node-version: ${{ inputs.node-version }}
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      repo-config-command: ${{ inputs.repo-config-command }}
+      check-scope: ${{ inputs.check-scope }}
+      extra-command: ${{ inputs.extra-command }}
+      fan-out: false
+    secrets: inherit

@@ -1,0 +1,283 @@
+name: Verify
+
+# Reusable: a repository's whole CI, in one of two shapes.
+#
+# `fan-out: false` (default), the lean shape: one job. Every job pays its own
+# checkout, pnpm setup and install (and rounds up to the minute) before it
+# checks anything. Here that setup is paid once: the commit lint and
+# `check-scope` from `commit-messages.yml`, then `rxova-repo-config verify
+# --keep-going`, which runs every verify step and fails at the end listing every
+# failure, so one red run reports all of them instead of the first.
+#
+# `fan-out: true`: the same `plan` job lints and decides the scope, then
+# `verify --plan` turns `repoConfig.verify.steps` into a matrix: a step per job,
+# a `group` of cheap steps per job, and a `split` turbo step dealt into
+# per-package jobs by what misses the cache. Each job pays a setup, so it costs
+# more minutes and finishes sooner. Jobs share build artifacts through a Turbo
+# remote cache, so it needs one: the Vercel Remote Cache when `TURBO_TOKEN` and
+# `TURBO_TEAM` are passed, else `actions/turbo-remote-cache` over this
+# repository's Actions cache.
+#
+#   jobs:
+#     verify:
+#       if: github.event.pull_request.draft != true
+#       uses: rxova/shared/.github/workflows/verify.yml@main
+#       with:
+#         fan-out: true
+#       secrets:
+#         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+#         TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+#
+# It has the same outputs as `commit-messages.yml`, so later jobs can gate on
+# them the same way.
+#
+# Rule of thumb for switching to `fan-out: true`: past about 10 packages, or
+# once a warm run takes more than 10 minutes.
+#
+# Uses only first-party actions (`actions/*`) and rxova/shared's own.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version.
+        type: string
+        required: false
+        default: "24"
+      timeout-minutes:
+        description: Each job's timeout.
+        type: number
+        required: false
+        default: 15
+      repo-config-command:
+        description: How to run the rxova-repo-config bin.
+        type: string
+        required: false
+        default: pnpm exec rxova-repo-config
+      check-scope:
+        description: "`false` skips `check-scope` and always reports `code-changed: true`, `docs-only: false`."
+        type: boolean
+        required: false
+        default: true
+      extra-command:
+        description: Runs after verify (in its own job with `fan-out`).
+        type: string
+        required: false
+        default: ""
+      fan-out:
+        description: "`true` runs `verify --plan`'s matrix, one job per step, group or split; needs a Turbo remote cache."
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      TURBO_TOKEN:
+        description: A Vercel Remote Cache token; without it Turbo caches in this repository's Actions cache.
+        required: false
+      TURBO_TEAM:
+        description: The Vercel team the token belongs to.
+        required: false
+    outputs:
+      code-changed:
+        description: "`true` unless the range is a release commit or documentation only."
+        value: ${{ jobs.plan.outputs.code-changed }}
+      docs-only:
+        description: "`true` when the range changed documentation and nothing else but release bookkeeping."
+        value: ${{ jobs.plan.outputs.docs-only }}
+      docs-changed:
+        description: "`true` when the range touched the docs site (`repoConfig.scope.site`), or cannot tell."
+        value: ${{ jobs.plan.outputs.docs-changed }}
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    # The lean shape's one job keeps the name `verify`, so its check does not move.
+    name: ${{ inputs.fan-out && 'plan' || 'verify' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      contents: read
+    # Under other names than Turbo's: an empty job-level `TURBO_TOKEN` could
+    # shadow the one `turbo-remote-cache` writes to GITHUB_ENV. The step below
+    # exports Turbo's names only when the caller passed the secrets.
+    env:
+      REMOTE_CACHE_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      REMOTE_CACHE_TEAM: ${{ secrets.TURBO_TEAM }}
+    # The same fallbacks as `commit-messages.yml`: a bin that predates an
+    # output, or a skipped `check-scope`, runs everything and nothing extra.
+    outputs:
+      code-changed: ${{ steps.scope.outputs.code-changed || 'true' }}
+      docs-only: ${{ steps.scope.outputs.docs-only || 'false' }}
+      docs-changed: ${{ steps.scope.outputs.docs-changed || 'true' }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Use the Vercel Remote Cache
+        if: env.REMOTE_CACHE_TOKEN != ''
+        run: |
+          echo "TURBO_TOKEN=$REMOTE_CACHE_TOKEN" >> "$GITHUB_ENV"
+          echo "TURBO_TEAM=$REMOTE_CACHE_TEAM" >> "$GITHUB_ENV"
+      # One job reads and writes its own `.turbo` snapshot; matrix jobs would
+      # collide on its key, so fan-out shares a remote cache instead.
+      - if: ${{ !inputs.fan-out && env.REMOTE_CACHE_TOKEN == '' }}
+        uses: rxova/shared/actions/turbo-cache@main
+      - if: inputs.fan-out && env.REMOTE_CACHE_TOKEN == ''
+        uses: rxova/shared/actions/turbo-remote-cache@main
+      - run: pnpm install --frozen-lockfile
+
+      - name: Decide what this range touched
+        id: scope
+        if: inputs.check-scope
+        env:
+          BASE_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: >-
+            ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.head.sha || github.sha }}
+        run: ${{ inputs.repo-config-command }} check-scope
+
+      - name: Lint the branch commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --verbose --from "$BASE_SHA" --to "$HEAD_SHA"
+
+      # Not on the push that creates the branch: a repository created from a
+      # template starts with GitHub's own "Initial commit".
+      - name: Lint the pushed commit
+        if: github.event_name == 'push' && !github.event.created
+        run: pnpm exec commitlint --last --verbose
+
+      # Every step, then one failure listing all of them: a single run is the
+      # whole answer, not the first problem of several.
+      - name: Verify
+        if: ${{ !inputs.fan-out && (steps.scope.outputs.code-changed || 'true') == 'true' }}
+        run: ${{ inputs.repo-config-command }} verify --keep-going
+
+      # Turbo's dry run reads the cache, so a split step only fans out the
+      # packages that would actually run.
+      - name: Plan the jobs
+        id: plan
+        if: inputs.fan-out && (steps.scope.outputs.code-changed || 'true') == 'true'
+        run: |
+          matrix="$(${{ inputs.repo-config-command }} verify --plan)"
+          echo "$matrix"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+      # A documentation-only range skips verify, but prose still gets the
+      # prettier gate the public repositories run in `docs-checks.yml`.
+      - name: Check formatting
+        if: steps.scope.outputs.docs-only == 'true'
+        run: pnpm format:check
+
+      - name: Extra checks
+        if: ${{ !inputs.fan-out && inputs.extra-command != '' }}
+        run: ${{ inputs.extra-command }}
+
+      # Turbo only runs suites it knows about: a package with a vitest config
+      # but no `test` script would be skipped without a word.
+      - name: Every package with tests is in the task graph
+        run: ${{ inputs.repo-config-command }} check-test-scripts
+
+      - name: Upload coverage
+        if: ${{ always() && !inputs.fan-out }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: |
+            packages/*/coverage
+            apps/*/coverage
+          if-no-files-found: ignore
+          retention-days: 7
+
+  verify:
+    name: ${{ matrix.name }}
+    needs: [plan]
+    # An empty plan (no steps at all) would fail the matrix expansion.
+    if: >-
+      inputs.fan-out && needs.plan.outputs.code-changed == 'true' &&
+      needs.plan.outputs.matrix != '{"include":[]}'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      contents: read
+    env:
+      REMOTE_CACHE_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      REMOTE_CACHE_TEAM: ${{ secrets.TURBO_TEAM }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Use the Vercel Remote Cache
+        if: env.REMOTE_CACHE_TOKEN != ''
+        run: |
+          echo "TURBO_TOKEN=$REMOTE_CACHE_TOKEN" >> "$GITHUB_ENV"
+          echo "TURBO_TEAM=$REMOTE_CACHE_TEAM" >> "$GITHUB_ENV"
+      - if: env.REMOTE_CACHE_TOKEN == ''
+        uses: rxova/shared/actions/turbo-remote-cache@main
+      - run: pnpm install --frozen-lockfile
+
+      # The leg comes in through the environment, never into the script:
+      # step and package names are the repository's text, not shell.
+      - name: Verify
+        env:
+          ONLY: ${{ matrix.only }}
+          FILTER: ${{ matrix.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            ${{ inputs.repo-config-command }} verify --keep-going --only "$ONLY" --filter "$FILTER"
+          else
+            ${{ inputs.repo-config-command }} verify --keep-going --only "$ONLY"
+          fi
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-${{ strategy.job-index }}
+          path: |
+            packages/*/coverage
+            apps/*/coverage
+          if-no-files-found: ignore
+          retention-days: 7
+
+  extra:
+    name: extra checks
+    needs: [plan]
+    if: inputs.fan-out && inputs.extra-command != '' && needs.plan.outputs.code-changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      contents: read
+    env:
+      REMOTE_CACHE_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      REMOTE_CACHE_TEAM: ${{ secrets.TURBO_TEAM }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rxova/shared/actions/setup-pnpm@main
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Use the Vercel Remote Cache
+        if: env.REMOTE_CACHE_TOKEN != ''
+        run: |
+          echo "TURBO_TOKEN=$REMOTE_CACHE_TOKEN" >> "$GITHUB_ENV"
+          echo "TURBO_TEAM=$REMOTE_CACHE_TEAM" >> "$GITHUB_ENV"
+      - if: env.REMOTE_CACHE_TOKEN == ''
+        uses: rxova/shared/actions/turbo-remote-cache@main
+      - run: pnpm install --frozen-lockfile
+      - name: Extra checks
+        run: ${{ inputs.extra-command }}
