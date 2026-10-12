@@ -54,6 +54,12 @@
   // says what is actually installed.
   rangeStrategy: "bump",
 
+  // Hold the pull request until `renovate/stability-days` passes. A major
+  // approved on the Dependency Dashboard gets its branch straight away, and
+  // pnpm's own `minimumReleaseAge` then fails `pnpm install` in every job of
+  // a pull request opened on a release less than a day old.
+  prCreation: "not-pending",
+
   // Run `pnpm dedupe` after updating, so what lands already satisfies the
   // `audit · sherif · knip · dedupe` job.
   postUpdateOptions: ["pnpmDedupe"],
