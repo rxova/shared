@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.9.0
+
+### Minor Changes
+
+- [#70](https://github.com/rxova/shared/pull/70) [`485c27e`](https://github.com/rxova/shared/commit/485c27e033218f920bedef184d65ddaafe28eafa) - Add `verify --plan` and `verify --filter`, and the `group` and `split` keys on `verify.steps`, to run the gate as parallel jobs with per-package splits of turbo steps.
+
 ## 0.8.0
 
 ### Minor Changes
