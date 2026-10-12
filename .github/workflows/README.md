@@ -107,7 +107,7 @@ jobs:
       typecheck-command: pnpm --filter @rxova/journey-react typecheck
   gate:
     name: all checks
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [commitlint, changeset, compat, docs-checks, react-minimum]
     runs-on: ubuntu-latest
     steps:
@@ -197,7 +197,7 @@ jobs:
     uses: rxova/shared/.github/workflows/changeset-gate.yml@main
   gate:
     name: all checks
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [verify, changeset]
     runs-on: ubuntu-latest
     steps:

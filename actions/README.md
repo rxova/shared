@@ -56,7 +56,7 @@ a range resolves to the newest 18). The reusable
 ```yaml
 gate:
   name: all checks
-  if: always()
+  if: ${{ !cancelled() }}
   needs: [commitlint, checks, test]
   runs-on: ubuntu-latest
   steps:

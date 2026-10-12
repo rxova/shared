@@ -74,7 +74,7 @@ jobs:
     uses: rxova/shared/.github/workflows/changeset-gate.yml@main
   gate:
     name: all checks
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [commitlint, changeset]
     runs-on: ubuntu-latest
     steps:

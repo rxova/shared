@@ -138,10 +138,13 @@ jobs:
   # so requiring the jobs one by one does not work. `skipped` is an answer this
   # workflow gives deliberately (a release commit, a documentation-only range,
   # a push with no pull request), so the gate accepts it; `cancelled` and
-  # `failure` it does not.
+  # `failure` it does not. `!cancelled()` rather than `always()`: Renovate
+  # labels a pull request as it opens it, so `opened` and `labeled` start two
+  # runs at once and the concurrency group cancels the first. A gate in that
+  # run would report a red `all checks` for a verdict the second run gives.
   gate:
     name: all checks
-    if: always()
+    if: ${{ !cancelled() }}
     needs:
       - commitlint
       - checks

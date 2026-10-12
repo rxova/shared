@@ -1,11 +1,11 @@
 name: Require jobs
 description: Fail unless every job in `needs` passed or was skipped — the single check branch protection requires.
 
-# Use it in a job with `if: always()` and every other job in `needs`:
+# Use it in a job with `if: ${{ !cancelled() }}` and every other job in `needs`:
 #
 #   gate:
 #     name: all checks
-#     if: always()
+#     if: ${{ !cancelled() }}
 #     needs: [commitlint, checks, test]
 #     runs-on: ubuntu-latest
 #     steps:
