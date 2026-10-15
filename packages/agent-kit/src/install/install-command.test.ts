@@ -140,6 +140,19 @@ describe("installCommand", () => {
     expect(existsSync(script)).toBe(false);
   });
 
+  it("writes no runner and no hook entries when no hook is chosen", () => {
+    const { env, target } = scratch();
+    expect(installCommand(["--profile", "none", "--statusline"], env)).toBe(0);
+    expect(existsSync(join(target, "rx-ai/hooks.js"))).toBe(false);
+    expect(existsSync(join(target, "agents"))).toBe(false);
+    expect(json(join(target, "settings.json")).hooks).toBeUndefined();
+    expect(json(join(target, "rx-ai/manifest.json"))).toMatchObject({
+      profile: "none",
+      items: [],
+      files: ["rx-ai/statusline.js"],
+    });
+  });
+
   it("upgrades the older bash status line in place", () => {
     const { env, target } = scratch();
     const old = join(target, "rx-ai", "statusline.sh");
@@ -147,9 +160,9 @@ describe("installCommand", () => {
       "rx-ai/statusline.sh": "# old",
       "rx-ai/manifest.json": JSON.stringify({
         version: "0.3.0",
-        profile: "core",
-        items: ["rx-planner"],
-        files: ["agents/rx-planner.md", "rx-ai/hooks.js", "rx-ai/statusline.sh"],
+        profile: "none",
+        items: [],
+        files: ["rx-ai/statusline.sh"],
         createdSettings: true,
         statusline: true,
       }),

@@ -11,8 +11,8 @@ import { PLUGIN, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
 
 /**
  * The files an install writes for the chosen items into one target. Claude Code: each chosen
- * agent's file and skill's folder from `content/` as they are, the hook runner, and the status
- * line script when `withStatusline` is true. OpenCode:
+ * agent's file and skill's folder from `content/` as they are, the hook runner when a hook is
+ * chosen, and the status line script when `withStatusline` is true. OpenCode:
  * the agents converted to its format, the skills (left out when `withSkills` is false, because
  * OpenCode already reads them from the Claude Code install), the runner, and the plugin that
  * calls it.
@@ -33,11 +33,14 @@ export const installCopies = (
     return chosen.has(kind === "agents" ? name.replace(/\.md$/, "") : name);
   });
   const copy = (file: string): Copy => ({ from: join(content, ...file.split("/")), to: file });
-  const runner: Copy = { from: join(packageDir, "dist", "hooks.js"), to: RUNNER };
+  const hookNames = items.filter((name) => Object.hasOwn(hooks, name));
+  // The runner only earns its place when a hook will call it.
+  const runner: Copy[] =
+    hookNames.length === 0 ? [] : [{ from: join(packageDir, "dist", "hooks.js"), to: RUNNER }];
   const statusline: Copy[] = withStatusline
     ? [{ from: join(packageDir, "dist", "statusline.js"), to: STATUSLINE }]
     : [];
-  if (target.kind === "claude") return [...files.map(copy), runner, ...statusline];
+  if (target.kind === "claude") return [...files.map(copy), ...runner, ...statusline];
 
   const agents = files
     .filter((file) => file.startsWith("agents/"))
@@ -46,7 +49,6 @@ export const installCopies = (
       text: opencodeAgent(readFileSync(join(content, ...file.split("/")), "utf8")),
     }));
   const skills = withSkills ? files.filter((file) => file.startsWith("skills/")).map(copy) : [];
-  const hookNames = items.filter((name) => Object.hasOwn(hooks, name));
   const plugin: Copy[] =
     hookNames.length === 0
       ? []
@@ -56,5 +58,5 @@ export const installCopies = (
             text: opencodePlugin(fromTarget(target.root, RUNNER), opencodeHooks(hookNames)),
           },
         ];
-  return [...agents, ...skills, runner, ...plugin];
+  return [...agents, ...skills, ...runner, ...plugin];
 };

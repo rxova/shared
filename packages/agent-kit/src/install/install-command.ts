@@ -20,7 +20,7 @@ import { removeFiles } from "@/internal/install/remove-files";
 import { writeJson } from "@/internal/install/write-json";
 
 /**
- * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|react|qa|marketing|full]
+ * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|react|qa|marketing|full|none]
  * [--add a,b] [--skip c] [--statusline | --no-statusline] [--project] [--dry-run] [--force]`:
  * writes the chosen agents, skills and hooks for Claude Code, OpenCode or both, and, with
  * `--statusline`, sets Claude Code's status line to the kit's script. It records what it wrote in

@@ -52,7 +52,7 @@ describe("listCommand", () => {
     expect(listCommand([], env)).toBe(0);
     const out = printed(env.io.out);
     expect(out).toMatch(/agents \(2\)/);
-    expect(out).toMatch(/rx-planner +chdrqmf +rx-planner does a thing/);
+    expect(out).toMatch(/rx-planner +chdrqmf· +rx-planner does a thing/);
     expect(out).toMatch(/rx-pitch +·h···mf/);
     expect(out).toContain("profiles: c = core");
   });
