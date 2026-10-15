@@ -1,6 +1,7 @@
 import { programName } from "@/internal/shell/program-name";
 import { unwrapRunner } from "@/internal/shell/unwrap-runner";
 import { DROP_SQL, SQL_CLIENTS } from "@/internal/hooks/sql-danger";
+import { vercelRemoval } from "@/internal/hooks/vercel-removal";
 
 /**
  * A short description of what the words would destroy, or undefined when they are safe: SQL that
@@ -36,8 +37,7 @@ export const destructiveCommand = (words: readonly string[]): string | undefined
   if ((program === "fly" || program === "flyctl") && args.includes("destroy"))
     return "destroys a Fly app";
   if (program === "railway" && args.includes("delete")) return "deletes a Railway resource";
-  if (program === "vercel" && (args.includes("remove") || args.includes("rm")))
-    return "removes a Vercel deployment";
+  if (program === "vercel") return vercelRemoval(args);
   if (program === "wrangler" && args.includes("delete")) return "deletes a Cloudflare resource";
   if (
     program === "mkfs" ||
