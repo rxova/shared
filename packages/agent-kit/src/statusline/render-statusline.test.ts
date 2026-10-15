@@ -40,9 +40,9 @@ const full = readStatusInput(
 describe("renderStatusline", () => {
   it("renders identity, context and limits as three rows", () => {
     expect(renderStatusline(full, facts())).toEqual([
-      "◆ Opus 4.7  │  rxova/shared  │  ⎇ main ✓  │  ⟲ 2m",
-      "CTX ████──────────── 25% 50k/200k  │  $1.50 $3.00/h  │  ◷ 30m api 50%",
-      "5H ███▌────── 35% ↺ 2h30m 0.7×  │  v2.1.0",
+      "◆ Opus 4.7 ┃ rxova/shared ┃ ⎇ main ✓ ┃ ⟲ 2m",
+      "CTX ████──────────── 25% 50k/200k ┃ $1.50 $3.00/h ┃ ◷ 30m api 50%",
+      "5H ███▌────── 35% ↺ 2h30m 0.7× ┃ v2.1.0",
     ]);
   });
 
@@ -53,10 +53,10 @@ describe("renderStatusline", () => {
   });
 
   it("drops the least important segments of each row to fit a narrow terminal", () => {
-    const columns = visibleWidth("◆ Opus 4.7  │  ⎇ main ✓");
+    const columns = visibleWidth("◆ Opus 4.7 ┃ ⎇ main ✓");
     const rows = renderStatusline(full, facts({ columns }));
     expect(rows).toEqual([
-      "◆ Opus 4.7  │  ⎇ main ✓",
+      "◆ Opus 4.7 ┃ ⎇ main ✓",
       "CTX ████──────────── 25% 50k/200k",
       "5H ███▌────── 35% ↺ 2h30m 0.7×",
     ]);
@@ -72,6 +72,6 @@ describe("renderStatusline", () => {
 
   it("paints the separator in colour mode", () => {
     const [identity] = renderStatusline(full, facts({ mode: "truecolor" }));
-    expect(identity).toContain("\u001b[38;2;69;71;90m  │  \u001b[0m");
+    expect(identity).toContain("\u001b[38;2;88;91;112m ┃ \u001b[0m");
   });
 });

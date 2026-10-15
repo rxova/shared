@@ -214,9 +214,9 @@ On a machine that already has the kit, `statusline` keeps that install as it is 
 status line on; `install --statusline` and `--no-statusline` do the same as part of an install.
 
 ```text
-◆ Opus 5.5 1M ↯fast ●●●○○ ∴  │  rxova/shared›packages/agent-kit  │  ⎇ feat/x +1 ~3 ?2 ⇡1 ≡1  │  PR #78 ◷  │  +412 −97  │  ⟲ 8m
-CTX ██████▏───────── 38% 382k/1M  │  $4.87 $4.00/h  │  CACHE 94% ⏲ 41m  │  ▁▃▅▆█ ≈13 turns  │  ◷ 1h13m api 38%
-5H ███████▏── 71% ↺ 1h29m ⚠ out in 1h25m  │  7D ███▍────── 33% ↺ 3d11h 0.7×  │  INSERT “revamp” v2.1.290
+◆ Opus 5.5 1M ↯fast ●●●○○ ∴ ┃ rxova/shared›packages/agent-kit ┃ ⎇ feat/x +1 ~3 ?2 ⇡1 ≡1 ┃ PR #78 ◷ ┃ +412 −97 ┃ ⟲ 8m
+CTX ██████▏───────── 38% 382k/1M ┃ $4.87 $4.00/h ┃ CACHE 94% ⏲ 41m ┃ ▁▃▅▆█ ≈13 turns ┃ ◷ 1h13m api 38%
+5H ███████▏── 71% ↺ 1h29m ⚠ out in 1h25m ┃ 7D ███▍────── 33% ↺ 3d11h 0.7× ┃ INSERT “revamp” v2.1.290
 ```
 
 - **Who and where:** the model with its context size, fast mode, effort and thinking; the
