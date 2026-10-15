@@ -211,11 +211,30 @@ npx @rxova/agent-kit install --statusline      # add it (kept on later installs)
 npx @rxova/agent-kit install --no-statusline   # take it out again
 ```
 
-Two lines: the model, a context bar, the project (and worktree) and git branch with staged,
-modified, untracked and ahead/behind counts; then session cost and time, lines changed, 5-hour
-and weekly plan usage, and the output style and Claude Code version. It needs `bash`, `jq` and
-`git`, and a Powerline or Nerd Font for the separators. A status line someone else set is left
-alone unless you add `--force`; uninstall removes only the kit's.
+```text
+◆ Opus 5.5 1M ↯fast ●●●○○ ∴  │  rxova/shared›packages/agent-kit  │  ⎇ feat/x +1 ~3 ?2 ⇡1 ≡1  │  PR #78 ◷  │  +412 −97  │  ⟲ 8m
+CTX ██████▏───────── 38% 382k/1M  │  $4.87 $4.00/h  │  CACHE 94% ⏲ 41m  │  ▁▃▅▆█ ≈13 turns  │  ◷ 1h13m api 38%
+5H ███████▏── 71% ↺ 1h29m ⚠ out in 1h25m  │  7D ███▍────── 33% ↺ 3d11h 0.7×  │  INSERT “revamp” v2.1.290
+```
+
+- **Who and where:** the model with its context size, fast mode, effort and thinking; the
+  repository and the folder inside it, or the worktree; the branch with staged, modified,
+  untracked and conflicted files, ahead and behind, stashes and no upstream (`⊘`); the open pull
+  request as a link, with its review state; lines changed this session; time since the last
+  commit.
+- **Context and spend:** a context gauge that turns from green to red, tokens used out of the
+  window, a sparkline of the context across the session and about how many turns are left at
+  that rate; session cost and its hourly rate; the prompt cache hit ratio and when it goes cold;
+  wall time and the share spent waiting on the API.
+- **Limits:** the 5-hour and weekly plan limits with their resets and pace (`0.7×` is on track,
+  `⚠ out in 1h25m` runs out before the reset), the spend limit when there is one, then agent, vim
+  mode, output style, extra directories, session name and Claude Code version.
+
+Each row drops its least important pieces to fit the terminal width. It is one Node file with no
+dependencies and needs no special font. Colours are 24-bit when `COLORTERM` says the terminal
+takes them and 256-colour otherwise; set `RX_STATUSLINE_COLOR` to `truecolor`, `256` or `none`, or
+`NO_COLOR`, to choose. A status line someone else set is left alone unless you add `--force`;
+uninstall removes only the kit's.
 
 ## Skills
 

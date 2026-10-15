@@ -6,11 +6,11 @@ describe("withOwnStatusLine", () => {
     expect(
       withOwnStatusLine(
         { model: "x", statusLine: { command: "mine.sh" } },
-        "/h/rx-ai/statusline.sh",
+        "/h/rx-ai/statusline.js",
       ),
     ).toEqual({
       model: "x",
-      statusLine: { type: "command", command: 'bash "/h/rx-ai/statusline.sh"' },
+      statusLine: { type: "command", command: 'node "/h/rx-ai/statusline.js"', padding: 0 },
     });
   });
 
