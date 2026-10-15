@@ -359,7 +359,7 @@ nothing unless asked.
 
 | Flag            | Commands                         | Effect                                                                                  |
 | --------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
-| `--profile <p>` | `install`, `list`                | `core` (default on a first install), `hackathon`, `dotnet`, `full`.                     |
+| `--profile <p>` | `install`, `list`                | `core` (default on a first install), `hackathon`, `dotnet`, `full`, `none`.             |
 | `--target <t>`  | `install`, `uninstall`, `status` | `claude` (default on a first install), `opencode` or `both`. Later: the installed ones. |
 | `--add a,b`     | `install`                        | Adds items on top of the profile.                                                       |
 | `--skip c`      | `install`                        | Leaves items out of the profile.                                                        |

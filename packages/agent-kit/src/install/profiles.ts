@@ -14,7 +14,8 @@ import { isSetItem } from "@/internal/install/is-set-item";
  * skills used on every change. `hackathon` is everything useful in a sprint, without the .NET,
  * Datadog, React (`rx-fe-*`), QA (`rx-qa-*`) and marketing (`rx-mkt-*`) sets. `dotnet`, `react`,
  * `qa` and `marketing` are core plus one set and the general items that suit it. `full` is all of
- * it. Each is a function of the catalog's names, so new content joins the wider profiles on its
+ * it. `none` is nothing, for a machine that only wants the status line or a hand-picked `--add`.
+ * Each is a function of the catalog's names, so new content joins the wider profiles on its
  * own.
  */
 export const profiles: Record<string, (names: readonly string[]) => string[]> = {
@@ -33,4 +34,5 @@ export const profiles: Record<string, (names: readonly string[]) => string[]> = 
   qa: coreWith(QA_EXTRAS, (name) => isSetItem(name, "qa")),
   marketing: coreWith(MARKETING_EXTRAS, (name) => isSetItem(name, "mkt")),
   full: (names) => [...names],
+  none: () => [],
 };
