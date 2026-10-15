@@ -111,8 +111,8 @@ describe("the built status line as a process", () => {
       expect(result.status).toBe(0);
       expect(result.stdout).toBe(
         [
-          `◆ Opus 4.7  │  ${basename(repo)}  │  ⎇ main ?1 ⊘`,
-          `CTX ████${"─".repeat(12)} 25% 50k/200k  │  $1.50`,
+          `◆ Opus 4.7 ┃ ${basename(repo)} ┃ ⎇ main ?1 ⊘`,
+          `CTX ████${"─".repeat(12)} 25% 50k/200k ┃ $1.50`,
           "",
         ].join("\n"),
       );

@@ -4,7 +4,6 @@ import type { Rgb } from "@/internal/statusline/statusline.types";
 export const THEME = {
   label: [108, 112, 134],
   dim: [88, 91, 112],
-  rule: [69, 71, 90],
   text: [205, 214, 244],
   model: [203, 166, 247],
   project: [137, 180, 250],

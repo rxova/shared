@@ -12,7 +12,7 @@ import { THEME } from "@/internal/statusline/theme";
  * costs, and the rate limits with session details. An empty row is left out.
  */
 export const renderStatusline = (input: StatusInput, facts: StatusFacts): string[] => {
-  const separator = paint(THEME.rule, "  │  ", facts.mode);
+  const separator = paint(THEME.dim, " ┃ ", facts.mode);
   return [identitySegments, contextSegments, limitSegments]
     .map((segments) => fitSegments(segments(input, facts), separator, facts.columns))
     .filter((line) => line !== "");
