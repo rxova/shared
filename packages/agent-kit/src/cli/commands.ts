@@ -11,10 +11,18 @@ export const commands = (): Record<string, CommandEntry> => ({
   },
   install: {
     summary:
-      "install a profile (core, hackathon, dotnet, react, qa, marketing, full) for Claude Code, OpenCode or both [--target claude|opencode|both] [--profile p] [--add a,b] [--skip c] [--statusline | --no-statusline] [--project] [--dry-run] [--force]",
+      "install a profile (core, hackathon, dotnet, react, qa, marketing, full, none) for Claude Code, OpenCode or both [--target claude|opencode|both] [--profile p] [--add a,b] [--skip c] [--statusline | --no-statusline] [--project] [--dry-run] [--force]",
     load: async () => {
       const { installCommand } = await import("@/install/install-command");
       return (argv) => installCommand(argv);
+    },
+  },
+  statusline: {
+    summary:
+      "install only the status line, with no agent, skill or hook; keeps an existing install as it is [--project] [--remove] [--dry-run] [--force]",
+    load: async () => {
+      const { statuslineCommand } = await import("@/install/statusline-command");
+      return (argv) => statuslineCommand(argv);
     },
   },
   uninstall: {
