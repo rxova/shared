@@ -203,13 +203,15 @@ of its own failure.
 
 ### Status line
 
-`--statusline` also sets Claude Code's status line to the kit's script, so a new machine gets the
-same bar from the same install:
+The status line installs on its own, with no agent, skill or hook:
 
 ```sh
-npx @rxova/agent-kit install --statusline      # add it (kept on later installs)
-npx @rxova/agent-kit install --no-statusline   # take it out again
+npx @rxova/agent-kit statusline            # only the status line
+npx @rxova/agent-kit statusline --remove   # take it out again
 ```
+
+On a machine that already has the kit, `statusline` keeps that install as it is and switches the
+status line on; `install --statusline` and `--no-statusline` do the same as part of an install.
 
 ```text
 ◆ Opus 5.5 1M ↯fast ●●●○○ ∴  │  rxova/shared›packages/agent-kit  │  ⎇ feat/x +1 ~3 ?2 ⇡1 ≡1  │  PR #78 ◷  │  +412 −97  │  ⟲ 8m
@@ -350,12 +352,13 @@ nothing unless asked.
 
 ## Commands
 
-| Command                     | What it does                                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `rxova-agent-kit list`      | Every agent, skill and hook, the profiles that include it, and what it is for.                         |
-| `rxova-agent-kit install`   | Installs a profile, or updates an existing install.                                                    |
-| `rxova-agent-kit uninstall` | Removes the files each install wrote and its hook entries in `settings.json`. Nothing else is touched. |
-| `rxova-agent-kit status`    | Each installed target's profile and version, and anything missing or edited. Exits 1 when out of step. |
+| Command                      | What it does                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `rxova-agent-kit list`       | Every agent, skill and hook, the profiles that include it, and what it is for.                         |
+| `rxova-agent-kit install`    | Installs a profile, or updates an existing install.                                                    |
+| `rxova-agent-kit statusline` | Installs only the status line, or switches it on in an existing install; `--remove` takes it out.      |
+| `rxova-agent-kit uninstall`  | Removes the files each install wrote and its hook entries in `settings.json`. Nothing else is touched. |
+| `rxova-agent-kit status`     | Each installed target's profile and version, and anything missing or edited. Exits 1 when out of step. |
 
 | Flag            | Commands                         | Effect                                                                                  |
 | --------------- | -------------------------------- | --------------------------------------------------------------------------------------- |

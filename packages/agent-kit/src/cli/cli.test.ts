@@ -52,8 +52,14 @@ describe("cli", () => {
 });
 
 describe("commands", () => {
-  it("has list, install, uninstall and status", () => {
-    expect(Object.keys(commands())).toEqual(["list", "install", "uninstall", "status"]);
+  it("has list, install, statusline, uninstall and status", () => {
+    expect(Object.keys(commands())).toEqual([
+      "list",
+      "install",
+      "statusline",
+      "uninstall",
+      "status",
+    ]);
   });
 
   it("loads each command, which reports an unknown option", async () => {

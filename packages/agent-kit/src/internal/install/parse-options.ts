@@ -6,6 +6,7 @@ export interface Options {
   "dry-run"?: boolean;
   force?: boolean;
   statusline?: boolean;
+  remove?: boolean;
   profile?: string;
   target?: string;
   add?: string[];
@@ -24,6 +25,7 @@ export const parseOptions = (argv: readonly string[], allowed: readonly Name[]):
     "dry-run": { type: "boolean" },
     force: { type: "boolean" },
     statusline: { type: "boolean" },
+    remove: { type: "boolean" },
     profile: { type: "string" },
     target: { type: "string" },
     add: { type: "string", multiple: true },
