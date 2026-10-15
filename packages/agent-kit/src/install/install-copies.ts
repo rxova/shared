@@ -35,7 +35,7 @@ export const installCopies = (
   const copy = (file: string): Copy => ({ from: join(content, ...file.split("/")), to: file });
   const runner: Copy = { from: join(packageDir, "dist", "hooks.js"), to: RUNNER };
   const statusline: Copy[] = withStatusline
-    ? [{ from: join(content, "statusline", "statusline.sh"), to: STATUSLINE }]
+    ? [{ from: join(packageDir, "dist", "statusline.js"), to: STATUSLINE }]
     : [];
   if (target.kind === "claude") return [...files.map(copy), runner, ...statusline];
 

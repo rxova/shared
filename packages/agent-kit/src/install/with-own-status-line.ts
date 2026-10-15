@@ -11,4 +11,4 @@ export const withOwnStatusLine = (
 ): Record<string, unknown> =>
   script === undefined
     ? withoutOwnStatusLine(settings)
-    : { ...settings, statusLine: { type: "command", command: `bash "${script}"` } };
+    : { ...settings, statusLine: { type: "command", command: `node "${script}"`, padding: 0 } };

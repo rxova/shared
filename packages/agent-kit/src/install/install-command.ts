@@ -41,8 +41,9 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       "skip",
       "target",
     ]);
-    if (!existsSync(join(env.packageDir, "dist", "hooks.js")))
-      throw new Error("dist/hooks.js is missing; build the package first");
+    for (const built of ["hooks.js", "statusline.js"])
+      if (!existsSync(join(env.packageDir, "dist", built)))
+        throw new Error(`dist/${built} is missing; build the package first`);
     const targets = installedTargets(options.target, options.project === true, env);
     const items = catalog(env.packageDir);
     const both = targets.length > 1;

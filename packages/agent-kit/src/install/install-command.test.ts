@@ -125,11 +125,12 @@ describe("installCommand", () => {
   it("sets the status line with --statusline, keeps it on a rerun, and drops it with --no-statusline", () => {
     const { env, target } = scratch();
     expect(installCommand(["--statusline"], env)).toBe(0);
-    expect(readFileSync(join(target, "rx-ai/statusline.sh"), "utf8")).toBe("# status line");
-    const script = join(target, "rx-ai", "statusline.sh");
+    expect(readFileSync(join(target, "rx-ai/statusline.js"), "utf8")).toBe("// status line");
+    const script = join(target, "rx-ai", "statusline.js");
     expect(json(join(target, "settings.json")).statusLine).toEqual({
       type: "command",
-      command: `bash "${script}"`,
+      command: `node "${script}"`,
+      padding: 0,
     });
     expect(json(join(target, "rx-ai/manifest.json")).statusline).toBe(true);
     installCommand([], env);
@@ -139,11 +140,35 @@ describe("installCommand", () => {
     expect(existsSync(script)).toBe(false);
   });
 
+  it("upgrades the older bash status line in place", () => {
+    const { env, target } = scratch();
+    const old = join(target, "rx-ai", "statusline.sh");
+    writeTree(target, {
+      "rx-ai/statusline.sh": "# old",
+      "rx-ai/manifest.json": JSON.stringify({
+        version: "0.3.0",
+        profile: "core",
+        items: ["rx-planner"],
+        files: ["agents/rx-planner.md", "rx-ai/hooks.js", "rx-ai/statusline.sh"],
+        createdSettings: true,
+        statusline: true,
+      }),
+      "settings.json": JSON.stringify({
+        statusLine: { type: "command", command: `bash "${old}"` },
+      }),
+    });
+    expect(installCommand([], env)).toBe(0);
+    expect(existsSync(old)).toBe(false);
+    expect(JSON.stringify(json(join(target, "settings.json")).statusLine)).toContain(
+      "statusline.js",
+    );
+  });
+
   it("leaves the status line alone without --statusline", () => {
     const { env, target } = scratch();
     installCommand([], env);
     expect(json(join(target, "settings.json")).statusLine).toBeUndefined();
-    expect(existsSync(join(target, "rx-ai/statusline.sh"))).toBe(false);
+    expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(false);
   });
 
   it("refuses to replace someone else's status line, unless forced", () => {
@@ -157,14 +182,14 @@ describe("installCommand", () => {
     expect(json(join(target, "settings.json")).statusLine).toEqual(theirs);
     expect(installCommand(["--statusline", "--force"], env)).toBe(0);
     expect(JSON.stringify(json(join(target, "settings.json")).statusLine)).toContain(
-      "statusline.sh",
+      "statusline.js",
     );
   });
 
   it("says it will set the status line in a dry run", () => {
     const { env } = scratch();
     expect(installCommand(["--statusline", "--dry-run"], env)).toBe(0);
-    expect(env.io.out).toHaveBeenCalledWith("  write   rx-ai/statusline.sh");
+    expect(env.io.out).toHaveBeenCalledWith("  write   rx-ai/statusline.js");
     expect(env.io.out).toHaveBeenCalledWith(
       "  update  settings.json (the rx-ai hooks and status line)",
     );

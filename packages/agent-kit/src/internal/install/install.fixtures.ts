@@ -30,8 +30,8 @@ export const scratchEnv = (version = "1.0.0") => {
     "content/skills/rx-verify/SKILL.md": doc("rx-verify", "verifies"),
     "content/skills/rx-verify/notes/extra.md": "extra",
     "content/skills/rx-demo/SKILL.md": doc("rx-demo", "demos"),
-    "content/statusline/statusline.sh": "# status line",
     "dist/hooks.js": "// runner",
+    "dist/statusline.js": "// status line",
   });
   const env: InstallEnv = {
     home: join(root, "home"),

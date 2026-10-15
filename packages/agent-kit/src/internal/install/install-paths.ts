@@ -8,4 +8,4 @@ export const MANIFEST = "rx-ai/manifest.json";
 export const PLUGIN = "plugins/rx-kit.js";
 
 /** Where the status line script goes, relative to a Claude Code target. */
-export const STATUSLINE = "rx-ai/statusline.sh";
+export const STATUSLINE = "rx-ai/statusline.js";

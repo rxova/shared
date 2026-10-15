@@ -4,6 +4,7 @@ import { isOwnStatusLine } from "@/internal/install/is-own-status-line";
 describe("isOwnStatusLine", () => {
   it("knows the script on any platform, quoted or not", () => {
     expect(isOwnStatusLine({ command: 'bash "/home/a/.claude/rx-ai/statusline.sh"' })).toBe(true);
+    expect(isOwnStatusLine({ command: 'node "/home/a/.claude/rx-ai/statusline.js"' })).toBe(true);
     expect(isOwnStatusLine({ command: "bash C:\\Users\\a\\.claude\\rx-ai\\statusline.sh" })).toBe(
       true,
     );
