@@ -123,6 +123,7 @@ describe("dangerZone", () => {
     "aws s3 ls",
     "aws s3 rm s3://bucket/one-file",
     "fly deploy",
+    "vercel env rm OWNER_KEY production --yes --project agent-war --scope team",
     "dd if=a.img of=b.img",
     "echo drop table",
   ])("allows %s", (command) => {
