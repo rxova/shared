@@ -3,6 +3,7 @@ import type { EngineInterface, Register } from "claude-code";
 import { attributionLines } from "./attribution-lines";
 import { commits } from "./commits";
 import { gitDir } from "./git-dir";
+import { newCommit } from "./new-commit";
 import { opensOrEditsPr } from "./opens-or-edits-pr";
 import { prUrl } from "./pr-url";
 import { withoutAttribution } from "./without-attribution";
@@ -43,16 +44,18 @@ const checkPr = async (
 };
 
 /**
- * Reads the newest commit and answers a note for the model when its author or committer is not
- * `email` (an empty `email` skips that) or its message credits Claude.
+ * Reads `commit` (a hash, or HEAD) in `cwd` and answers a note for the model when its author or
+ * committer is not `email` (an empty `email` skips that) or its message credits Claude. Nothing
+ * when git can't find it there: a wrong guess at the directory reads nothing, not another commit.
  */
 const checkCommit = async (
   $: EngineInterface,
   cwd: string | undefined,
+  commit: string,
   email: string,
 ): Promise<string | undefined> => {
   const log = await $.process.run(
-    ["git", "log", "-1", "--pretty=%an <%ae>%n%cn <%ce>%n%B"],
+    ["git", "log", "-1", "--pretty=%an <%ae>%n%cn <%ce>%n%B", commit, "--"],
     cwd === undefined ? undefined : { cwd },
   );
   if (log.exitCode !== 0) {
@@ -96,11 +99,15 @@ export const register: Register = (on, options) => {
       const note = url === undefined ? undefined : await checkPr($, url, isFixing);
       if (note !== undefined) notes.push(note);
     }
-    // Only where the commit ran can be told: reading the session's own HEAD instead would judge
-    // some other commit (a rebase merge on main, say) and ask to amend a correct one.
+    // Judges only the commit this command made: the hash git commit printed, looked up where the
+    // command ran. Reading some other HEAD (a rebase merge on main, say) would ask to amend a
+    // correct commit. Without a hash (`-q`), HEAD only when the command never left the session's
+    // own directory.
     const dir = commits(e.command) ? gitDir(e.command) : null;
-    if (dir !== null) {
-      const note = await checkCommit($, dir, email);
+    const hash = newCommit(ran.text ?? "");
+    const commit = hash ?? (dir === undefined ? "HEAD" : undefined);
+    if (dir !== null && commit !== undefined) {
+      const note = await checkCommit($, dir, commit, email);
       if (note !== undefined) notes.push(note);
     }
 

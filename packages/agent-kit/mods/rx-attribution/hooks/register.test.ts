@@ -186,3 +186,68 @@ test("a long run of repeated options does not hang the check", async ($, on) => 
   expect(dirs).toEqual([undefined]);
   expect(Date.now() - started).toBeLessThan(1000);
 });
+
+/** Answers a commit printing `output`; git log answers `log` (or fails); returns its argvs. */
+const answerCommitOutput = (on: On, output: string, log?: string): string[][] => {
+  const argvs: string[][] = [];
+  on("tool.call", { tool: "Bash" }, () => ({
+    result: { stdout: output, stderr: "", interrupted: false },
+    text: output,
+  }));
+  on("process.run", ($, e) => {
+    argvs.push([...e.argv]);
+    return log === undefined
+      ? { value: { ...ran("").value, exitCode: 128, stderr: "fatal: bad object" } }
+      : ran(log);
+  });
+  return argvs;
+};
+
+test(
+  "the commit git commit printed is the one read, not HEAD",
+  { options: { authorEmail: "me@example.com" } },
+  async ($, on) => {
+    const argvs = answerCommitOutput(on, "[feat/x 1a2b3c4] feat: x", COMMITTED);
+
+    await $.tool.call({ tool: "Bash", command: "cd /repo && git commit -m x" });
+
+    expect(argvs.map((argv) => argv.slice(-2))).toEqual([["1a2b3c4", "--"]]);
+  },
+);
+
+test(
+  "a guessed directory without that commit says nothing",
+  { options: { authorEmail: "me@example.com" } },
+  async ($, on) => {
+    answerCommitOutput(on, "[feat/x 1a2b3c4] feat: x");
+
+    const call = await $.tool.call({ tool: "Bash", command: "cd /wrong && git commit -m x" });
+
+    expect(call.context).toBeUndefined();
+  },
+);
+
+test(
+  "a quiet commit after a cd is not read: no hash to check it by",
+  { options: { authorEmail: "me@example.com" } },
+  async ($, on) => {
+    const argvs = answerCommitOutput(on, "", COMMITTED);
+
+    await $.tool.call({ tool: "Bash", command: "cd /repo && git commit -qm x" });
+
+    expect(argvs).toEqual([]);
+  },
+);
+
+test(
+  "a quiet commit in the session's own directory reads HEAD",
+  { options: { authorEmail: "me@example.com" } },
+  async ($, on) => {
+    const argvs = answerCommitOutput(on, "", "Bot <bot@example.com>\nMe <me@example.com>\nx");
+
+    const call = await $.tool.call({ tool: "Bash", command: "git commit -qm x" });
+
+    expect(argvs.map((argv) => argv.slice(-2))).toEqual([["HEAD", "--"]]);
+    expect(call.context?.join("\n")).toContain("author is Bot <bot@example.com>");
+  },
+);
