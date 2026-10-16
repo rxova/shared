@@ -1,3 +1,4 @@
+import type { On } from "claude-code";
 import { expect, test } from "claude-code/testing";
 
 const URL = "https://github.com/rxova/shared/pull/42";
@@ -94,3 +95,81 @@ test("other commands pass untouched", async ($, on) => {
 
   expect(call.context).toBeUndefined();
 });
+
+const COMMITTED = "Me <me@example.com>\nMe <me@example.com>\nfeat: x";
+
+/** Answers a commit and its git log with `log`; returns the directories git log ran in. */
+const answerCommit = (on: On, log = COMMITTED): (string | undefined)[] => {
+  const dirs: (string | undefined)[] = [];
+  on("tool.call", { tool: "Bash" }, () => ({
+    result: { stdout: "", stderr: "", interrupted: false },
+    text: "[main abc123] feat: x",
+  }));
+  on("process.run", ($, e) => {
+    dirs.push(e.init?.cwd);
+    return ran(log);
+  });
+  return dirs;
+};
+
+test(
+  "a commit after `cd <dir>;` is read in that directory, not the session's",
+  { options: { authorEmail: "me@example.com" } },
+  async ($, on) => {
+    const dirs = answerCommit(on);
+
+    const call = await $.tool.call({
+      tool: "Bash",
+      command: "cd /work/tree; git add -A; git commit -qm x",
+    });
+
+    expect(dirs).toEqual(["/work/tree"]);
+    expect(call.context).toBeUndefined();
+  },
+);
+
+test("every cd before the commit counts, relative ones onto the one before", async ($, on) => {
+  const dirs = answerCommit(on);
+
+  await $.tool.call({
+    tool: "Bash",
+    command: 'cd /repo && pnpm install; cd "packages/a" && git -C sub commit -m x && cd /elsewhere',
+  });
+
+  expect(dirs).toEqual(["/repo/packages/a/sub"]);
+});
+
+test("a git -C on its own is the directory", async ($, on) => {
+  const dirs = answerCommit(on);
+
+  await $.tool.call({ tool: "Bash", command: "git -C /other commit -m x" });
+
+  expect(dirs).toEqual(["/other"]);
+});
+
+test("without any cd the session's own directory is read", async ($, on) => {
+  const dirs = answerCommit(on);
+
+  await $.tool.call({ tool: "Bash", command: 'git commit -m "feat: x"' });
+
+  expect(dirs).toEqual([undefined]);
+});
+
+for (const command of [
+  'cd "$W" && git commit -m x',
+  "cd ~/repo; git commit -m x",
+  "cd - && git commit -m x",
+]) {
+  test(
+    `a directory only the shell knows skips the check: ${command}`,
+    { options: { authorEmail: "me@example.com" } },
+    async ($, on) => {
+      const dirs = answerCommit(on, "Bot <bot@example.com>\nBot <bot@example.com>\nx");
+
+      const call = await $.tool.call({ tool: "Bash", command });
+
+      expect(dirs).toEqual([]);
+      expect(call.context).toBeUndefined();
+    },
+  );
+}
