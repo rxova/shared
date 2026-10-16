@@ -1,11 +1,12 @@
 import { programName } from "@/internal/shell/program-name";
 import { unwrapRunner } from "@/internal/shell/unwrap-runner";
 import { DROP_SQL, SQL_CLIENTS } from "@/internal/hooks/sql-danger";
-import { vercelRemoval } from "@/internal/hooks/vercel-removal";
 
 /**
  * A short description of what the words would destroy, or undefined when they are safe: SQL that
- * drops or truncates, database resets, cloud teardown, and disk-level commands.
+ * drops or truncates, database resets, `terraform destroy`, and disk-level commands.
+ * Hosting and cloud CLIs are left alone, so the guard stays the same whichever platform a
+ * project deploys to.
  */
 export const destructiveCommand = (words: readonly string[]): string | undefined => {
   const [first = "", ...args] = unwrapRunner(words);
@@ -25,20 +26,6 @@ export const destructiveCommand = (words: readonly string[]): string | undefined
   if (program === "dotnet" && has("ef", "database", "update") && args.at(-1) === "0")
     return "reverts every migration";
   if (program === "terraform" && has("destroy")) return "destroys infrastructure";
-  if (program === "aws" && has("s3", "rb") && args.includes("--force"))
-    return "deletes an S3 bucket and its contents";
-  if (program === "aws" && has("s3", "rm") && args.includes("--recursive"))
-    return "deletes S3 objects recursively";
-  if (
-    program === "aws" &&
-    args.some((arg) => /^delete-(stack|db-instance|db-cluster|table|function|bucket)$/.test(arg))
-  )
-    return "deletes AWS resources";
-  if ((program === "fly" || program === "flyctl") && args.includes("destroy"))
-    return "destroys a Fly app";
-  if (program === "railway" && args.includes("delete")) return "deletes a Railway resource";
-  if (program === "vercel") return vercelRemoval(args);
-  if (program === "wrangler" && args.includes("delete")) return "deletes a Cloudflare resource";
   if (
     program === "mkfs" ||
     program.startsWith("mkfs.") ||

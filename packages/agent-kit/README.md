@@ -176,14 +176,14 @@ of its own failure.
 
 **🛡️ Guards** — in every profile
 
-| Hook             | Blocks                                                                                                                                                                    |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-bypass`      | Git calls that skip the repository's hooks: `--no-verify`, `commit -n`, `HUSKY=0`, changing `core.hooksPath`.                                                             |
-| `no-attribution` | Commit messages and `gh pr` bodies that credit an AI assistant: `Co-Authored-By: Claude`, session trailers, "Generated with Claude", 🤖. Message and body files included. |
-| `danger-zone`    | `rm -r` outside the project, force pushes to `main`, `reset --hard` on a dirty tree, SQL `DROP`/`TRUNCATE`, database resets, `terraform destroy` and other teardown.      |
-| `dev-server`     | Dev servers and watchers in the foreground (`pnpm dev`, `vite`, `uvicorn`, `dotnet watch`, `docker compose up`, …); says to use `run_in_background`.                      |
-| `config-lock`    | Edits to an existing lint, format, type, commit or coverage config. Creating one is fine; `Directory.Build.props` and `Directory.Packages.props` stay editable.           |
-| `secret-guard`   | API keys, tokens and private keys written into source files (AWS, Anthropic, OpenAI, Stripe, GitHub, Slack, Google, Datadog, Azure, Supabase). `.env` files pass.         |
+| Hook             | Blocks                                                                                                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-bypass`      | Git calls that skip the repository's hooks: `--no-verify`, `commit -n`, `HUSKY=0`, changing `core.hooksPath`.                                                                                            |
+| `no-attribution` | Commit messages and `gh pr` bodies that credit an AI assistant: `Co-Authored-By: Claude`, session trailers, "Generated with Claude", 🤖. Message and body files included.                                |
+| `danger-zone`    | `rm -r` outside the project, force pushes to `main`, `reset --hard` on a dirty tree, SQL `DROP`/`TRUNCATE`, database resets, `terraform destroy` and disk writes; hosting and cloud CLIs are left alone. |
+| `dev-server`     | Dev servers and watchers in the foreground (`pnpm dev`, `vite`, `uvicorn`, `dotnet watch`, `docker compose up`, …); says to use `run_in_background`.                                                     |
+| `config-lock`    | Edits to an existing lint, format, type, commit or coverage config. Creating one is fine; `Directory.Build.props` and `Directory.Packages.props` stay editable.                                          |
+| `secret-guard`   | API keys, tokens and private keys written into source files (AWS, Anthropic, OpenAI, Stripe, GitHub, Slack, Google, Datadog, Azure, Supabase). `.env` files pass.                                        |
 
 **🔧 Helpers** — in `hackathon`, `dotnet` and `full`
 
