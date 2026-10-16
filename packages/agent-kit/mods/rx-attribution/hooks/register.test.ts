@@ -173,3 +173,16 @@ for (const command of [
     },
   );
 }
+
+test("a long run of repeated options does not hang the check", async ($, on) => {
+  const dirs = answerCommit(on);
+  const started = Date.now();
+
+  await $.tool.call({
+    tool: "Bash",
+    command: `git ${'-C "!" '.repeat(5000)}status && git commit -m x`,
+  });
+
+  expect(dirs).toEqual([undefined]);
+  expect(Date.now() - started).toBeLessThan(1000);
+});

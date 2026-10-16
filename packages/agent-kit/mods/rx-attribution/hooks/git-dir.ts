@@ -1,6 +1,8 @@
-const COMMIT = /\bgit\s+((?:-[cC]\s+("[^"]+"|'[^']+'|\S+)\s+)*)commit\b/;
-const CD = /(?:^|[;&|(\n])\s*cd\s+("[^"]+"|'[^']+'|[^\s;&|)]+)/g;
-const GIT_C = /-C\s+("[^"]+"|'[^']+'|\S+)/g;
+// Each word is quoted or has no quote at all, so no word can be read two ways: a word that could
+// (`\S+` also matching `"a"`) backtracks exponentially over a repeated `-C <dir>`.
+const COMMIT = /\bgit\s+((?:-[cC]\s+(?:"[^"]+"|'[^']+'|[^\s"']+)\s+)*)commit\b/;
+const CD = /(?:^|[;&|(\n])\s*cd\s+("[^"]+"|'[^']+'|[^\s;&|)"']+)/g;
+const GIT_C = /-C\s+("[^"]+"|'[^']+'|[^\s"']+)/g;
 
 const unquote = (word: string): string => word.replace(/^["']|["']$/g, "");
 
