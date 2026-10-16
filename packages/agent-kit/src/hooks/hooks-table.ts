@@ -30,7 +30,7 @@ export const hooks = {
     on: BASH_TRIGGERS,
     timeout: 5,
     summary:
-      "block rm -r outside the project, force pushes to main, discarding work, dropping data, cloud teardown",
+      "block rm -r outside the project, force pushes to main, discarding work, dropping data, terraform destroy",
     run: asHook("danger-zone", dangerZone),
   },
   "dev-server": {

@@ -129,18 +129,18 @@ how it works, two worked examples, and what differs in OpenCode.
 
 ### Hooks
 
-| Hook               | What it does                                                                                                                |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `no-bypass`        | Blocks git calls that skip the repository's hooks (`--no-verify`, `HUSKY=0`, …)                                             |
-| `no-attribution`   | Blocks commit messages and PR bodies that credit an AI assistant                                                            |
-| `danger-zone`      | Blocks `rm -r` outside the project, force pushes to main, discarding work, dropping data (SQL, `dotnet ef`), cloud teardown |
-| `dev-server`       | Blocks dev servers and watchers started in the foreground                                                                   |
-| `config-lock`      | Blocks edits to existing lint, format, type, commit and coverage configs                                                    |
-| `secret-guard`     | Blocks writing API keys, tokens and private keys into source files                                                          |
-| `quick-check`      | Formats and lints each edited file with the project's tools, and reports problems back                                      |
-| `memory-snapshot`  | Saves a snapshot note before compaction and at session end                                                                  |
-| `handoff-reminder` | Points a new session at the latest handoff note or snapshot                                                                 |
-| `context-nudge`    | Asks for a handoff note and a compact at 60% and 80% of the context window                                                  |
+| Hook               | What it does                                                                                                                                                          |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-bypass`        | Blocks git calls that skip the repository's hooks (`--no-verify`, `HUSKY=0`, …)                                                                                       |
+| `no-attribution`   | Blocks commit messages and PR bodies that credit an AI assistant                                                                                                      |
+| `danger-zone`      | Blocks `rm -r` outside the project, force pushes to main, discarding work, dropping data (SQL, `dotnet ef`), `terraform destroy`; leaves hosting and cloud CLIs alone |
+| `dev-server`       | Blocks dev servers and watchers started in the foreground                                                                                                             |
+| `config-lock`      | Blocks edits to existing lint, format, type, commit and coverage configs                                                                                              |
+| `secret-guard`     | Blocks writing API keys, tokens and private keys into source files                                                                                                    |
+| `quick-check`      | Formats and lints each edited file with the project's tools, and reports problems back                                                                                |
+| `memory-snapshot`  | Saves a snapshot note before compaction and at session end                                                                                                            |
+| `handoff-reminder` | Points a new session at the latest handoff note or snapshot                                                                                                           |
+| `context-nudge`    | Asks for a handoff note and a compact at 60% and 80% of the context window                                                                                            |
 
 ### Skills
 
