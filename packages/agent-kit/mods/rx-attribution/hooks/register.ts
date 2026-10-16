@@ -96,8 +96,11 @@ export const register: Register = (on, options) => {
       const note = url === undefined ? undefined : await checkPr($, url, isFixing);
       if (note !== undefined) notes.push(note);
     }
-    if (commits(e.command)) {
-      const note = await checkCommit($, gitDir(e.command), email);
+    // Only where the commit ran can be told: reading the session's own HEAD instead would judge
+    // some other commit (a rebase merge on main, say) and ask to amend a correct one.
+    const dir = commits(e.command) ? gitDir(e.command) : null;
+    if (dir !== null) {
+      const note = await checkCommit($, dir, email);
       if (note !== undefined) notes.push(note);
     }
 
