@@ -13,7 +13,7 @@ export const repositoryOf = (repository: unknown): Repository => {
         ? String(repository.url)
         : "";
   const match =
-    /github\.com[/:]([^/]+)\/([^/]+?)(?:\.git)?\/?$/.exec(url) ??
+    /github\.com[/:]([^/:]+)\/([^/]+?)(?:\.git)?\/?$/.exec(url) ??
     /^(?:github:)?([\w.-]+)\/([\w.-]+)$/.exec(url);
   if (!match?.[1] || !match[2]) {
     throw new Error(`package.json#repository does not name a GitHub repository: "${url}"`);

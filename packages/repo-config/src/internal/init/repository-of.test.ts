@@ -18,4 +18,13 @@ describe("repositoryOf", () => {
       expect(() => repositoryOf(repository)).toThrow(/does not name a GitHub repository/);
     },
   );
+
+  it("reads a long run of hosts in linear time", () => {
+    const started = Date.now();
+
+    expect(() => repositoryOf("github.com:".repeat(20_000))).toThrow(
+      /does not name a GitHub repository/,
+    );
+    expect(Date.now() - started).toBeLessThan(500);
+  });
 });
