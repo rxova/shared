@@ -19,6 +19,7 @@ name: Changesets version
 #       if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
 #       permissions: { contents: write, pull-requests: write }
 #       uses: rxova/shared/.github/workflows/changesets-version.yml@main
+#       with: { auto-merge: rebase } # optional: the pull request merges itself once green
 #       secrets:
 #         RXOVA_APP_ID: ${{ secrets.RXOVA_APP_ID }}
 #         RXOVA_APP_PRIVATE_KEY: ${{ secrets.RXOVA_APP_PRIVATE_KEY }}
@@ -54,6 +55,18 @@ on:
         type: string
         required: false
         default: "chore: version packages"
+      auto-merge:
+        description: >-
+          Turns on auto-merge for the version pull request with this method
+          (`rebase`, `squash` or `merge`), so it merges itself once its checks
+          pass. Empty leaves it to be merged by hand.
+        type: string
+        required: false
+        default: ""
+    outputs:
+      pull-request:
+        description: The version pull request's number, empty when there is none.
+        value: ${{ jobs.version.outputs.pull-request }}
     secrets:
       RXOVA_APP_ID:
         description: The rxova GitHub App's ID; its token opens the version pull request.
@@ -78,6 +91,8 @@ jobs:
     permissions:
       contents: write # the version commit
       pull-requests: write # the version pull request
+    outputs:
+      pull-request: ${{ steps.version-pr.outputs.pull-request }}
     steps:
       - name: Mint an app token
         id: app-token
@@ -112,9 +127,26 @@ jobs:
           git config user.email "${id}+${SLUG}[bot]@users.noreply.github.com"
 
       - name: Create or update the version pull request
+        id: version-pr
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           VERSION_SCRIPT: ${{ inputs.version-script }}
           COMMIT_MESSAGE: ${{ inputs.commit-message }}
           PR_TITLE: ${{ inputs.pr-title }}
         run: ${{ inputs.repo-config-command }} version-pr
+
+      # As the app, so the merge into the base starts its workflows; a merge
+      # made with GITHUB_TOKEN starts none. By the number `version-pr` reports,
+      # never by the branch's name.
+      - name: Turn on auto-merge
+        if: inputs.auto-merge != '' && steps.version-pr.outputs.pull-request != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          METHOD: ${{ inputs.auto-merge }}
+          PR: ${{ steps.version-pr.outputs.pull-request }}
+        run: |
+          case "$METHOD" in
+            rebase | squash | merge) ;;
+            *) echo "::error::auto-merge must be rebase, squash or merge, not '$METHOD'."; exit 1 ;;
+          esac
+          gh pr merge "$PR" --auto "--$METHOD"
