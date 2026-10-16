@@ -1,5 +1,21 @@
 # @rxova/agent-kit
 
+## 0.4.0
+
+### Minor Changes
+
+- [#84](https://github.com/rxova/shared/pull/84) [`31232f4`](https://github.com/rxova/shared/commit/31232f434fe5d7622871acf2e6d9cd95cfdeb680) - danger-zone no longer judges hosting and cloud CLIs (Vercel, Fly, Railway, Cloudflare `wrangler`, AWS), so it behaves the same whichever platform a project deploys to. It still blocks `rm -r` outside the project, force pushes to `main`, discarding uncommitted work, SQL drops, database resets, `terraform destroy` and disk writes.
+
+- [#79](https://github.com/rxova/shared/pull/79) [`c50e756`](https://github.com/rxova/shared/commit/c50e7562590200ebf1da3ea144ede8a60e435370) - The status line is rewritten as one dependency-free Node script: no `jq`, no Powerline font, rows that fit the terminal width, and far more data (prompt cache, pull request, effort, rate-limit pace, context trend). An install with `--statusline` replaces the older bash script in place.
+
+- [#80](https://github.com/rxova/shared/pull/80) [`ba66937`](https://github.com/rxova/shared/commit/ba66937bc78f8b025a5f32bf6b1bbf6bd5d6d59e) - A `none` profile installs nothing on its own, for a machine that only wants the status line (`install --profile none --statusline`) or a hand-picked `--add`. The hook runner is now written only when a hook is chosen.
+
+- [#81](https://github.com/rxova/shared/pull/81) [`ffa7782`](https://github.com/rxova/shared/commit/ffa77822f747cbf5ef8fb824af9d793e6591b4fb) - `rxova-agent-kit statusline` installs the status line on its own, with no agent, skill or hook; on a machine that already has the kit it keeps that install and switches the status line on. `--remove` takes it out again, and removes the kit when the status line was all there was.
+
+### Patch Changes
+
+- [#82](https://github.com/rxova/shared/pull/82) [`be01eef`](https://github.com/rxova/shared/commit/be01eefd3376ff805072e21577e747ae5e1bc7db) - The status line separates its segments with a heavy `┃` and single spaces instead of a padded `│`.
+
 ## 0.3.0
 
 ### Minor Changes
