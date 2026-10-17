@@ -1,5 +1,11 @@
 # @rxova/repo-config
 
+## 0.9.1
+
+### Patch Changes
+
+- [#88](https://github.com/rxova/shared/pull/88) [`f951a8c`](https://github.com/rxova/shared/commit/f951a8c818fcb8ab7ec3d80dd88d558d7089e2cb) - Reading `package.json#repository` takes linear time: the owner in `github.com[/:]<owner>/<name>` no longer matches `:`, so a long run of hosts can't make the pattern retry from every position.
+
 ## 0.9.0
 
 ### Minor Changes

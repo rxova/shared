@@ -1,5 +1,11 @@
 # @rxova/agent-kit
 
+## 0.4.1
+
+### Patch Changes
+
+- [#86](https://github.com/rxova/shared/pull/86) [`5bc6205`](https://github.com/rxova/shared/commit/5bc620568138def10baf6d402ddedf3ed4ed1fd5) - rx-attribution judges only the commit `git commit` just made: it looks up the hash git printed where the command ran (every `cd` before the commit, then its `git -C`), and says nothing when that commit isn't there. A quiet commit (`-q`, no hash) is read from `HEAD` only when the command never left the session's own directory. It used to read the session's own `HEAD` and could ask to amend a correct commit.
+
 ## 0.4.0
 
 ### Minor Changes
