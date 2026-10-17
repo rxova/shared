@@ -402,6 +402,11 @@ Answer `y` to add the marketplace, then pick a scope.
 Options are set in `/config`: `rx-attribution` takes `authorEmail` (empty skips the author check)
 and `fixPrBody` (off only reports); `rx-handoff-band` takes `maxDays` (7).
 
+Each mod carries agent-kit's version: the version pull request sets it in every
+`.claude-plugin/plugin.json` (`pnpm --filter @rxova/agent-kit sync:mod-versions`), and a test fails
+when one differs. Claude Code keeps an installed mod while its version stays the same, so
+`claude plugin marketplace update rxova` then `claude plugin update <mod>@rxova` takes each release.
+
 Each mod is checked with `claude plugin validate packages/agent-kit/mods/<mod>` and
 `claude plugin test packages/agent-kit/mods/<mod>`.
 
