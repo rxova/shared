@@ -1,6 +1,6 @@
 {
   "name": "rx-attribution",
-  "version": "0.1.0",
+  "version": "0.4.1",
   "description": "Drops the Claude trailer and footer from commits and pull requests, then checks each opened or edited PR body and the new commit's author.",
   "author": { "name": "Jonatan Kruszewski" },
   "userConfig": {

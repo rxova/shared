@@ -41,7 +41,8 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
-    "pack:smoke": "rxova-repo-config pack-smoke"
+    "pack:smoke": "rxova-repo-config pack-smoke",
+    "sync:mod-versions": "node --import tsx src/mods/sync-mod-versions.ts"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
