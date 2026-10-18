@@ -83,10 +83,59 @@ export type Rgb = readonly [number, number, number];
 /** How many colours the terminal takes. */
 export type ColorMode = "truecolor" | "256" | "none";
 
+/**
+ * A stretch of text in one colour. Runs carry the colour rather than the escape codes, so the
+ * same segment can be painted as ANSI for Claude Code or handed to OpenCode's OpenTUI renderer.
+ */
+export interface Run {
+  text: string;
+  rgb: Rgb;
+  bold: boolean;
+  /** Wraps the run in a terminal hyperlink where the host draws one. */
+  href?: string | undefined;
+}
+
+/**
+ * One drawn cell: a run with its colour as hex, for a host that styles text itself rather than
+ * taking escape codes. OpenCode's OpenTUI renderer takes rows of these.
+ */
+export interface TuiCell {
+  text: string;
+  fg: string;
+  bold: boolean;
+  href?: string | undefined;
+}
+
 /** A piece of a line; when the line is too wide, the lowest `priority` goes first. */
 export interface Segment {
-  text: string;
+  runs: readonly Run[];
   priority: number;
+}
+
+/**
+ * What OpenCode's plugin can read cheaply from its host and hand over. Every field may be
+ * missing: a slot renders before a session exists, and the host fills usage in as it learns it.
+ */
+export interface OpencodeSession {
+  sessionId?: string | undefined;
+  model?: string | undefined;
+  version?: string | undefined;
+  cwd?: string | undefined;
+  projectDir?: string | undefined;
+  /** What the model read back, as OpenCode counts it. */
+  tokens?:
+    | {
+        input?: number | undefined;
+        output?: number | undefined;
+        reasoning?: number | undefined;
+        cache?: { read?: number | undefined; write?: number | undefined } | undefined;
+      }
+    | undefined;
+  contextSize?: number | undefined;
+  costUsd?: number | undefined;
+  /** Unix epoch seconds the session started, for the elapsed clock. */
+  startedAt?: number | undefined;
+  columns?: number | undefined;
 }
 
 /** Everything the renderer needs beside the input; gathered by the entry, faked in tests. */
