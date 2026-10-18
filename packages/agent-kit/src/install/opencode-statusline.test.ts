@@ -155,11 +155,12 @@ describe("opencodeStatusline", () => {
   });
   it("imports the rows as a file URL, the only absolute specifier Windows also accepts", () => {
     const source = opencodeStatusline(rows, "prompt.footer.status");
-    const specifier = /from "([^"]*statusline-rows[^"]*|[^"]*rows\.js)"/.exec(source)?.[1] ?? "";
-    expect(opencodeStatusline("/w/rx-ai/rows.js", "app")).toContain(
-      'from "file:///w/rx-ai/rows.js"',
-    );
-    expect(specifier.startsWith("file:")).toBe(true);
-    expect(source).not.toContain("\\\\");
+    const specifier = /^import \{ opencodeFacts, opencodeRows \} from "([^"]+)";$/m.exec(
+      source,
+    )?.[1];
+    expect(specifier).toBe(pathToFileURL(rows).href);
+    expect(specifier?.startsWith("file:")).toBe(true);
+    // A raw path would carry the platform's separator into a specifier Node cannot resolve.
+    expect(specifier).not.toContain("\\");
   });
 });
