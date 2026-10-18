@@ -60,8 +60,11 @@ jobs:
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # Then each mod takes agent-kit's new version, so `claude plugin update` sees it.
-          version-script: pnpm exec changeset version && pnpm --filter @rxova/agent-kit sync:mod-versions
+          # One script, because changesets/action execs this without a shell: an `&&` here
+          # would be passed to `changeset version` as an argument. The chain lives in the
+          # script, where each mod takes agent-kit's new version so `claude plugin update`
+          # sees it.
+          version-script: pnpm run version:packages
           # Builds only the published packages, then `changeset publish`.
           publish-script: pnpm run release
           commit-message: "chore: version packages"
