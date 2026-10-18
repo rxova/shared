@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { GitState, StatusFacts, StatusInput } from "@/internal/statusline/statusline.types";
 import { identitySegments } from "@/internal/statusline/identity-segments";
+import { paintRuns } from "@/internal/statusline/paint-runs";
 import { readStatusInput } from "@/internal/statusline/read-status-input";
 
 const NOW = 1_800_000_000;
@@ -35,7 +36,7 @@ const segments = (inputOverrides: Partial<StatusInput> = {}, git?: GitState) => 
   const [model, project, branch, pr, lines, age] = identitySegments(
     input(inputOverrides),
     facts({ git }),
-  ).map(({ text }) => text);
+  ).map(({ runs }) => paintRuns(runs, "none"));
   return { model, project, branch, pr, lines, age };
 };
 const link = (url: string, text: string) => `\u001b]8;;${url}\u0007${text}\u001b]8;;\u0007`;
@@ -123,8 +124,9 @@ describe("identitySegments", () => {
       input(),
       facts({ git: { ...clean, conflicts: 2 }, mode: "truecolor" }),
     );
-    expect(branch?.text).toContain("\u001b[1;38;2;249;226;175m⎇ main\u001b[0m");
-    expect(branch?.text).toContain("\u001b[1;38;2;243;139;168m✗2\u001b[0m");
+    const painted = paintRuns(branch?.runs ?? [], "truecolor");
+    expect(painted).toContain("\u001b[1;38;2;249;226;175m⎇ main\u001b[0m");
+    expect(painted).toContain("\u001b[1;38;2;243;139;168m✗2\u001b[0m");
   });
 
   it("shows how long ago the last commit was", () => {
@@ -159,7 +161,7 @@ describe("identitySegments", () => {
       facts({ git: { ...clean, lastCommitAt: NOW } }),
     )
       .toSorted((a, b) => b.priority - a.priority)
-      .map(({ text }) => text.split(" ")[0]);
+      .map(({ runs }) => paintRuns(runs, "none").split(" ")[0]);
     expect(ranked).toEqual(["◆", "⎇", "app", "PR", "+1", "⟲"]);
   });
 });

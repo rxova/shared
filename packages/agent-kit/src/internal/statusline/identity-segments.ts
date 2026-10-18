@@ -1,67 +1,70 @@
 import { basename, relative } from "node:path";
-import type { Segment, StatusFacts, StatusInput } from "@/internal/statusline/statusline.types";
+import type {
+  Run,
+  Segment,
+  StatusFacts,
+  StatusInput,
+} from "@/internal/statusline/statusline.types";
 import { formatDuration } from "@/internal/statusline/format-duration";
-import { hyperlink } from "@/internal/statusline/hyperlink";
-import { paint } from "@/internal/statusline/paint";
+import { joinRuns } from "@/internal/statusline/join-runs";
+import { run } from "@/internal/statusline/run";
 import { THEME } from "@/internal/statusline/theme";
+
+const SPACE = run(THEME.dim, " ");
 
 /** The first line: model and effort, project and worktree, git state, pull request, lines changed. */
 export const identitySegments = (input: StatusInput, facts: StatusFacts): Segment[] => {
-  const { mode, git } = facts;
-  const dim = (text: string) => paint(THEME.dim, text, mode);
+  const { git } = facts;
+  const dim = (text: string) => run(THEME.dim, text);
   const levels = ["low", "medium", "high", "xhigh", "max"];
   const effort = levels.indexOf(input.effort ?? "") + 1;
-  const model = [
-    paint(THEME.model, `◆ ${input.model}`, mode, true),
-    input.contextSize >= 1_000_000 ? dim("1M") : "",
-    input.fastMode ? paint(THEME.cost, "↯fast", mode) : "",
-    effort > 0
-      ? paint(THEME.model, "●".repeat(effort), mode) +
-        paint(THEME.track, "○".repeat(5 - effort), mode)
-      : "",
-    input.thinking ? dim("∴") : "",
-  ]
-    .filter((part) => part !== "")
-    .join(" ");
+  const model = joinRuns(
+    [
+      [run(THEME.model, `◆ ${input.model}`, true)],
+      input.contextSize >= 1_000_000 ? [dim("1M")] : [],
+      input.fastMode ? [run(THEME.cost, "↯fast")] : [],
+      effort > 0
+        ? [run(THEME.model, "●".repeat(effort)), run(THEME.track, "○".repeat(5 - effort))]
+        : [],
+      input.thinking ? [dim("∴")] : [],
+    ],
+    SPACE,
+  );
 
   const sub = relative(input.projectDir, input.cwd);
   const project = [
-    paint(THEME.project, input.repo ?? basename(input.projectDir), mode, true),
-    sub !== "" && !sub.startsWith("..") ? dim(`›${sub}`) : "",
-    input.worktree === undefined ? "" : dim(` ◫ ${input.worktree}`),
-  ].join("");
+    run(THEME.project, input.repo ?? basename(input.projectDir), true),
+    ...(sub !== "" && !sub.startsWith("..") ? [dim(`›${sub}`)] : []),
+    ...(input.worktree === undefined ? [] : [dim(` ◫ ${input.worktree}`)]),
+  ];
 
-  let branch = "";
-  let age = "";
+  let branch: Run[] = [];
+  let age: Run[] = [];
   if (git !== undefined) {
     const dirty = git.staged + git.modified + git.untracked + git.conflicts > 0;
-    const counts = [
-      git.staged > 0 ? paint(THEME.clean, `+${String(git.staged)}`, mode) : "",
-      git.modified > 0 ? paint(THEME.dirty, `~${String(git.modified)}`, mode) : "",
-      git.untracked > 0 ? dim(`?${String(git.untracked)}`) : "",
-      git.conflicts > 0 ? paint(THEME.warn, `✗${String(git.conflicts)}`, mode, true) : "",
-      git.ahead > 0 ? paint(THEME.text, `⇡${String(git.ahead)}`, mode) : "",
-      git.behind > 0 ? paint(THEME.warn, `⇣${String(git.behind)}`, mode) : "",
-      git.stashes > 0 ? dim(`≡${String(git.stashes)}`) : "",
-      git.hasUpstream || git.detached ? "" : dim("⊘"),
-    ].filter((part) => part !== "");
-    branch = [
-      paint(
-        dirty ? THEME.dirty : THEME.clean,
-        `${git.detached ? "@" : "⎇ "}${git.branch}`,
-        mode,
-        true,
-      ),
-      dirty ? "" : paint(THEME.clean, "✓", mode),
-      ...counts,
-    ]
-      .filter((part) => part !== "")
-      .join(" ");
+    const counts: Run[][] = [
+      git.staged > 0 ? [run(THEME.clean, `+${String(git.staged)}`)] : [],
+      git.modified > 0 ? [run(THEME.dirty, `~${String(git.modified)}`)] : [],
+      git.untracked > 0 ? [dim(`?${String(git.untracked)}`)] : [],
+      git.conflicts > 0 ? [run(THEME.warn, `✗${String(git.conflicts)}`, true)] : [],
+      git.ahead > 0 ? [run(THEME.text, `⇡${String(git.ahead)}`)] : [],
+      git.behind > 0 ? [run(THEME.warn, `⇣${String(git.behind)}`)] : [],
+      git.stashes > 0 ? [dim(`≡${String(git.stashes)}`)] : [],
+      git.hasUpstream || git.detached ? [] : [dim("⊘")],
+    ];
+    branch = joinRuns(
+      [
+        [run(dirty ? THEME.dirty : THEME.clean, `${git.detached ? "@" : "⎇ "}${git.branch}`, true)],
+        dirty ? [] : [run(THEME.clean, "✓")],
+        ...counts,
+      ],
+      SPACE,
+    );
     if (git.lastCommitAt !== undefined)
-      age = dim(`⟲ ${formatDuration(facts.now - git.lastCommitAt)}`);
+      age = [dim(`⟲ ${formatDuration(facts.now - git.lastCommitAt)}`)];
   }
 
-  let pr = "";
+  let pr: Run[] = [];
   if (input.pr !== undefined) {
     const states: Record<string, readonly [string, (typeof THEME)[keyof typeof THEME]]> = {
       approved: ["✓", THEME.clean],
@@ -72,22 +75,27 @@ export const identitySegments = (input: StatusInput, facts: StatusFacts): Segmen
     const [mark, color] = states[input.pr.reviewState ?? ""] ?? ["", THEME.link];
     const name =
       input.pr.kind === "mr" ? `MR !${String(input.pr.number)}` : `PR #${String(input.pr.number)}`;
-    pr =
-      hyperlink(input.pr.url, paint(THEME.link, name, mode, true)) +
-      (mark === "" ? "" : ` ${paint(color, mark, mode)}`);
+    pr = [
+      run(THEME.link, name, true, input.pr.url),
+      ...(mark === "" ? [] : [SPACE, run(color, mark)]),
+    ];
   }
 
   const lines =
     input.linesAdded + input.linesRemoved === 0
-      ? ""
-      : `${paint(THEME.added, `+${String(input.linesAdded)}`, mode)} ${paint(THEME.removed, `−${String(input.linesRemoved)}`, mode)}`;
+      ? []
+      : [
+          run(THEME.added, `+${String(input.linesAdded)}`),
+          SPACE,
+          run(THEME.removed, `−${String(input.linesRemoved)}`),
+        ];
 
   return [
-    { text: model, priority: 10 },
-    { text: project, priority: 8 },
-    { text: branch, priority: 9 },
-    { text: pr, priority: 7 },
-    { text: lines, priority: 6 },
-    { text: age, priority: 3 },
+    { runs: model, priority: 10 },
+    { runs: project, priority: 8 },
+    { runs: branch, priority: 9 },
+    { runs: pr, priority: 7 },
+    { runs: lines, priority: 6 },
+    { runs: age, priority: 3 },
   ];
 };

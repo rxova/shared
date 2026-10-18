@@ -7,8 +7,8 @@ import { readManifest } from "@/internal/install/read-manifest";
 import { targetDir } from "@/internal/install/target-dir";
 
 /**
- * `rxova-agent-kit statusline [--project] [--remove] [--dry-run] [--force]`: the status line on its
- * own. Where the kit is not installed, it installs the `none` profile with the status line, so no
+ * `rxova-agent-kit statusline [--target claude|opencode|both] [--project] [--remove] [--dry-run]
+ * [--force]`: the status line on its own, for Claude Code unless another target is named. Where the kit is not installed, it installs the `none` profile with the status line, so no
  * agent, skill or hook comes with it; where the kit is installed, it keeps that selection and
  * switches the status line on. `--remove` switches it off again, and removes the kit entirely
  * when the status line was all there was.
@@ -18,11 +18,11 @@ export const statuslineCommand = (
   env: InstallEnv = defaultEnv(),
 ): number => {
   try {
-    const options = parseOptions(argv, ["project", "dry-run", "force", "remove"]);
+    const options = parseOptions(argv, ["project", "dry-run", "force", "remove", "target"]);
     const previous = readManifest(targetDir(options.project === true, env));
     const shared = [
       "--target",
-      "claude",
+      typeof options.target === "string" ? options.target : "claude",
       ...(options.project === true ? ["--project"] : []),
       ...(options["dry-run"] === true ? ["--dry-run"] : []),
     ];

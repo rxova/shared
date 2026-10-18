@@ -224,4 +224,40 @@ describe("installCommand", () => {
     expect(installCommand([], env)).toBe(1);
     expect(env.io.err).toHaveBeenLastCalledWith(expect.stringContaining("build the package"));
   });
+  it("installs the status line for OpenCode as a plugin cli.json loads", () => {
+    const { env, opencode } = scratch();
+    expect(installCommand(["--target", "opencode", "--statusline"], env)).toBe(0);
+    expect(readFileSync(join(opencode, "rx-ai/statusline-rows.js"), "utf8")).toBe("// rows");
+    const plugin = readFileSync(join(opencode, "plugin/rx-statusline/index.js"), "utf8");
+    expect(plugin).toContain("@opencode/plugin/tui");
+    expect(plugin).toContain(join(opencode, "rx-ai/statusline-rows.js"));
+    expect(json(join(opencode, "cli.json")).plugins).toEqual([
+      `file://${join(opencode, "plugin", "rx-statusline")}`,
+    ]);
+  });
+
+  it("leaves OpenCode's cli.json alone when the status line is not asked for", () => {
+    const { env, opencode } = scratch();
+    expect(installCommand(["--target", "opencode"], env)).toBe(0);
+    expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(false);
+    expect(existsSync(join(opencode, "cli.json"))).toBe(false);
+  });
+
+  it("keeps another plugin in cli.json when it adds its own", () => {
+    const { env, opencode } = scratch();
+    writeTree(opencode, { "cli.json": JSON.stringify({ plugins: ["@someone/else"] }) });
+    expect(installCommand(["--target", "opencode", "--statusline"], env)).toBe(0);
+    expect(json(join(opencode, "cli.json")).plugins).toEqual([
+      "@someone/else",
+      `file://${join(opencode, "plugin", "rx-statusline")}`,
+    ]);
+  });
+
+  it("says it would update cli.json on a dry run for OpenCode", () => {
+    const { env } = scratch();
+    expect(installCommand(["--target", "opencode", "--statusline", "--dry-run"], env)).toBe(0);
+    expect(env.io.out).toHaveBeenCalledWith(
+      expect.stringContaining("cli.json (the rx-ai status line)"),
+    );
+  });
 });

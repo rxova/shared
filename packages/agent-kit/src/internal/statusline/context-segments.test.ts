@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { StatusFacts, StatusInput } from "@/internal/statusline/statusline.types";
 import { contextSegments } from "@/internal/statusline/context-segments";
+import { paintRuns } from "@/internal/statusline/paint-runs";
 import { readStatusInput } from "@/internal/statusline/read-status-input";
 
 const NOW = 1_800_000_000;
@@ -19,7 +20,7 @@ const segments = (inputOverrides: Partial<StatusInput> = {}, factOverrides = {})
   const [context, cost, cache, trend, time] = contextSegments(
     input(inputOverrides),
     facts(factOverrides),
-  ).map(({ text }) => text);
+  ).map(({ runs }) => paintRuns(runs, "none"));
   return { context, cost, cache, trend, time };
 };
 
@@ -63,7 +64,9 @@ describe("contextSegments", () => {
       input({ contextTokens: 190_000 }),
       facts({ mode: "truecolor" }),
     );
-    expect(context?.text).toContain("\u001b[1;38;2;243;139;168m95%\u001b[0m");
+    expect(paintRuns(context?.runs ?? [], "truecolor")).toContain(
+      "\u001b[1;38;2;243;139;168m95%\u001b[0m",
+    );
   });
 
   it("draws the trend and the turns left from the history", () => {
@@ -98,12 +101,16 @@ describe("contextSegments", () => {
     const cache = { warm: true, expiresAt: NOW + 45 };
     expect(segments({ cache }).cache).toBe("CACHE ⏲ 45s");
     const [, , painted] = contextSegments(input({ cache }), facts({ mode: "truecolor" }));
-    expect(painted?.text).toContain("\u001b[38;2;243;139;168m⏲ 45s\u001b[0m");
+    expect(paintRuns(painted?.runs ?? [], "truecolor")).toContain(
+      "\u001b[38;2;243;139;168m⏲ 45s\u001b[0m",
+    );
     const [, , calm] = contextSegments(
       input({ cache: { warm: true, expiresAt: NOW + 60 } }),
       facts({ mode: "truecolor" }),
     );
-    expect(calm?.text).toContain("\u001b[38;2;148;226;213m⏲ 1m\u001b[0m");
+    expect(paintRuns(calm?.runs ?? [], "truecolor")).toContain(
+      "\u001b[38;2;148;226;213m⏲ 1m\u001b[0m",
+    );
   });
 
   it("says warm, with its ttl, without a future expiry", () => {
@@ -132,7 +139,7 @@ describe("contextSegments", () => {
       facts({ history: [1, 2] }),
     )
       .toSorted((a, b) => b.priority - a.priority)
-      .map(({ text }) => text.split(" ")[0]);
+      .map(({ runs }) => paintRuns(runs, "none").split(" ")[0]);
     expect(ranked).toEqual(["CTX", "$1.00", "CACHE", "▁█", "◷"]);
   });
 });

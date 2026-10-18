@@ -8,22 +8,26 @@ import { planInstall } from "@/install/plan-install";
 import { selectItems } from "@/install/select-items";
 import { withOwnHooks } from "@/install/with-own-hooks";
 import { withOwnStatusLine } from "@/install/with-own-status-line";
+import { withOwnTuiPlugin } from "@/install/with-own-tui-plugin";
 import { defaultEnv } from "@/internal/install/default-env";
 import { fromTarget } from "@/internal/install/from-target";
 import { MANIFEST, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
 import { isOwnStatusLine } from "@/internal/install/is-own-status-line";
 import { packageVersionAt } from "@/internal/install/package-version-at";
 import { parseOptions } from "@/internal/install/parse-options";
+import { readCli } from "@/internal/install/read-cli";
 import { readManifest } from "@/internal/install/read-manifest";
 import { readSettings } from "@/internal/install/read-settings";
 import { removeFiles } from "@/internal/install/remove-files";
+import { tuiPluginDir } from "@/internal/install/tui-plugin-dir";
 import { writeJson } from "@/internal/install/write-json";
 
 /**
  * `rxova-agent-kit install [--target claude|opencode|both] [--profile core|hackathon|dotnet|react|qa|marketing|full|none]
  * [--add a,b] [--skip c] [--statusline | --no-statusline] [--project] [--dry-run] [--force]`:
  * writes the chosen agents, skills and hooks for Claude Code, OpenCode or both, and, with
- * `--statusline`, sets Claude Code's status line to the kit's script. It records what it wrote in
+ * `--statusline`, draws the kit's status line: Claude Code runs the script, OpenCode loads the
+ * plugin. It records what it wrote in
  * each. Running it again updates in place, keeping each target's last selection and status line
  * choice unless told otherwise; with no
  * `--target`, it updates the targets already installed (Claude Code on a first install).
@@ -41,7 +45,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       "skip",
       "target",
     ]);
-    for (const built of ["hooks.js", "statusline.js"])
+    for (const built of ["hooks.js", "statusline.js", "statusline-rows.js"])
       if (!existsSync(join(env.packageDir, "dist", built)))
         throw new Error(`dist/${built} is missing; build the package first`);
     const targets = installedTargets(options.target, options.project === true, env);
@@ -57,8 +61,9 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         skip: options.skip ?? [],
         previous,
       });
-      const statusline =
-        target.kind === "claude" && (options.statusline ?? previous?.statusline ?? false);
+      // Both hosts can draw it: Claude Code runs the script from settings.json, OpenCode loads
+      // the plugin from cli.json.
+      const statusline = options.statusline ?? previous?.statusline ?? false;
       const plan = planInstall({
         packageDir: env.packageDir,
         items: selection.items,
@@ -88,6 +93,18 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
               statusline ? fromTarget(target.root, STATUSLINE) : undefined,
             )
           : undefined;
+      // OpenCode loads its status line from cli.json, and several plugins may sit there, so the
+      // kit's entry is added beside them rather than replacing the list.
+      const currentCli = target.kind === "opencode" ? readCli(target.root) : undefined;
+      const nextCli =
+        currentCli &&
+        withOwnTuiPlugin(currentCli, statusline ? tuiPluginDir(target.root) : undefined);
+      // Only written when it actually changes, so an OpenCode install without the status line
+      // leaves no cli.json behind.
+      const cli =
+        nextCli !== undefined && JSON.stringify(nextCli) !== JSON.stringify(currentCli)
+          ? nextCli
+          : undefined;
       // Claude Code has one status line: someone else's counts as a conflict, like a file.
       const statusLineConflict =
         statusline && current.statusLine !== undefined && !isOwnStatusLine(current.statusLine);
@@ -100,6 +117,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         stale: (previous?.files ?? []).filter((file) => !written.includes(file)),
         counts,
         settings,
+        cli,
         statusline,
         statusLineConflict,
       };
@@ -124,6 +142,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
       stale,
       counts,
       settings,
+      cli,
       statusline,
     } of plans) {
       const name = target.kind === "claude" ? "Claude Code" : "OpenCode";
@@ -137,6 +156,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
           io.out(
             `  update  settings.json (the rx-ai hooks${statusline ? " and status line" : ""})`,
           );
+        else if (statusline) io.out("  update  cli.json (the rx-ai status line)");
         continue;
       }
       for (const copy of plan.copies) {
@@ -150,6 +170,7 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         target.kind === "claude" &&
         (previous?.createdSettings ?? !existsSync(join(target.root, "settings.json")));
       if (settings !== undefined) writeJson(join(target.root, "settings.json"), settings);
+      if (cli !== undefined) writeJson(join(target.root, "cli.json"), cli);
       writeJson(fromTarget(target.root, MANIFEST), {
         version: packageVersionAt(env.packageDir),
         profile: selection.profile,

@@ -5,9 +5,10 @@ import type { Copy, InstallTarget } from "@/install/install.types";
 import { opencodeAgent } from "@/install/opencode-agent";
 import { opencodeHooks } from "@/install/opencode-hooks";
 import { opencodePlugin } from "@/install/opencode-plugin";
+import { opencodeStatusline } from "@/install/opencode-statusline";
 import { contentFiles } from "@/internal/install/content-files";
 import { fromTarget } from "@/internal/install/from-target";
-import { PLUGIN, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
+import { PLUGIN, ROWS, RUNNER, STATUSLINE, TUI_PLUGIN } from "@/internal/install/install-paths";
 
 /**
  * The files an install writes for the chosen items into one target. Claude Code: each chosen
@@ -15,7 +16,7 @@ import { PLUGIN, RUNNER, STATUSLINE } from "@/internal/install/install-paths";
  * chosen, and the status line script when `withStatusline` is true. OpenCode:
  * the agents converted to its format, the skills (left out when `withSkills` is false, because
  * OpenCode already reads them from the Claude Code install), the runner, and the plugin that
- * calls it.
+ * calls it, and, with `withStatusline`, the status line plugin and the rows it draws.
  */
 export const installCopies = (
   packageDir: string,
@@ -58,5 +59,16 @@ export const installCopies = (
             text: opencodePlugin(fromTarget(target.root, RUNNER), opencodeHooks(hookNames)),
           },
         ];
-  return [...agents, ...skills, ...runner, ...plugin];
+  // The status line is a TUI plugin of its own: the rows build beside it, and a loader that
+  // imports it by path, because the plugin sits in the config directory rather than the package.
+  const tuiPlugin: Copy[] = withStatusline
+    ? [
+        { from: join(packageDir, "dist", "statusline-rows.js"), to: ROWS },
+        {
+          to: TUI_PLUGIN,
+          text: opencodeStatusline(fromTarget(target.root, ROWS), "prompt.footer.status"),
+        },
+      ]
+    : [];
+  return [...agents, ...skills, ...runner, ...plugin, ...tuiPlugin];
 };

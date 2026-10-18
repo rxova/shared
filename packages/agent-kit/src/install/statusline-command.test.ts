@@ -79,4 +79,13 @@ describe("statuslineCommand", () => {
     expect(statuslineCommand(["--profile", "core"], env)).toBe(1);
     expect(env.io.err).toHaveBeenCalledWith(expect.stringContaining("rxova-agent-kit statusline:"));
   });
+  it("draws it in OpenCode when that target is named", () => {
+    const { env, opencode, target } = scratch();
+    expect(statuslineCommand(["--target", "opencode"], env)).toBe(0);
+    expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(true);
+    expect(json(join(opencode, "cli.json")).plugins).toEqual([
+      `file://${join(opencode, "plugin", "rx-statusline")}`,
+    ]);
+    expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(false);
+  });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Limit, StatusFacts, StatusInput } from "@/internal/statusline/statusline.types";
 import { limitSegments } from "@/internal/statusline/limit-segments";
+import { paintRuns } from "@/internal/statusline/paint-runs";
 import { readStatusInput } from "@/internal/statusline/read-status-input";
 
 const NOW = 1_800_000_000;
@@ -17,7 +18,7 @@ const facts = (overrides: Partial<StatusFacts> = {}): StatusFacts => ({
   ...overrides,
 });
 const texts = (overrides: Partial<StatusInput> = {}) =>
-  limitSegments(input(overrides), facts()).map(({ text }) => text);
+  limitSegments(input(overrides), facts()).map(({ runs }) => paintRuns(runs, "none"));
 const fiveHour = (usedPercentage: number, resetsIn?: number): Limit => ({
   label: "5h",
   usedPercentage,
@@ -44,7 +45,9 @@ describe("limitSegments", () => {
       input({ limits: [fiveHour(80, FIVE_HOURS / 2)] }),
       facts({ mode: "truecolor" }),
     );
-    expect(painted?.text).toContain("\u001b[1;38;2;243;139;168m⚠ out in 37m\u001b[0m");
+    expect(paintRuns(painted?.runs ?? [], "truecolor")).toContain(
+      "\u001b[1;38;2;243;139;168m⚠ out in 37m\u001b[0m",
+    );
   });
 
   it("leaves out the reset and pace when the reset is unknown or past", () => {
@@ -63,8 +66,8 @@ describe("limitSegments", () => {
       }),
       facts(),
     );
-    expect(five?.text.startsWith("5H")).toBe(true);
-    expect(week?.text.startsWith("7D")).toBe(true);
+    expect(paintRuns(five?.runs ?? [], "none").startsWith("5H")).toBe(true);
+    expect(paintRuns(week?.runs ?? [], "none").startsWith("7D")).toBe(true);
     expect(five?.priority).toBeGreaterThan(week?.priority ?? Infinity);
   });
 
@@ -97,7 +100,7 @@ describe("limitSegments", () => {
       facts(),
     )
       .toSorted((a, b) => b.priority - a.priority)
-      .map(({ text }) => text.split(" ")[0]);
+      .map(({ runs }) => paintRuns(runs, "none").split(" ")[0]);
     expect(ranked).toEqual(["5H", "SPEND", "v2"]);
   });
 });
