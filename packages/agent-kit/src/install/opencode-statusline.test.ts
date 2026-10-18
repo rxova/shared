@@ -153,4 +153,13 @@ describe("opencodeStatusline", () => {
     cleanup();
     expect(host.stopped()).toBe(6);
   });
+  it("imports the rows as a file URL, the only absolute specifier Windows also accepts", () => {
+    const source = opencodeStatusline(rows, "prompt.footer.status");
+    const specifier = /from "([^"]*statusline-rows[^"]*|[^"]*rows\.js)"/.exec(source)?.[1] ?? "";
+    expect(opencodeStatusline("/w/rx-ai/rows.js", "app")).toContain(
+      'from "file:///w/rx-ai/rows.js"',
+    );
+    expect(specifier.startsWith("file:")).toBe(true);
+    expect(source).not.toContain("\\\\");
+  });
 });

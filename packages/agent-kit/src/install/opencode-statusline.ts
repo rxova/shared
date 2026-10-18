@@ -1,3 +1,5 @@
+import { pathToFileURL } from "node:url";
+
 /**
  * The OpenCode status line plugin the installer writes to `plugin/rx-statusline/index.js`: plain
  * ES module JavaScript, so nothing has to compile it on the way in. It holds no layout of its
@@ -6,7 +8,8 @@
  *
  * OpenCode resolves `@opencode/plugin/tui`, `@opentui/solid` and `solid-js` itself, which is why
  * this package depends on none of them. The rows module is imported by absolute path because the
- * plugin sits in the user's config directory rather than beside the package.
+ * plugin sits in the user's config directory rather than beside the package, and as a `file:`
+ * URL because a bare Windows path is not a valid module specifier.
  *
  * `rows` is a pure function of the facts, so the plugin re-reads them on the host's own events
  * rather than on a timer: a usage update, a finished turn, or a model change repaints, and
@@ -17,7 +20,7 @@ export const opencodeStatusline = (rowsModule: string, slot: string): string =>
 import { Plugin } from '@opencode/plugin/tui';
 import { jsx } from '@opentui/solid/jsx-runtime';
 import { createSignal } from 'solid-js';
-import { opencodeFacts, opencodeRows } from ${JSON.stringify(rowsModule)};
+import { opencodeFacts, opencodeRows } from ${JSON.stringify(pathToFileURL(rowsModule).href)};
 
 const REPAINT_ON = [
   'session.usage.updated',

@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { installCommand } from "@/install/install-command";
 import { statuslineCommand } from "@/install/statusline-command";
@@ -84,7 +85,7 @@ describe("statuslineCommand", () => {
     expect(statuslineCommand(["--target", "opencode"], env)).toBe(0);
     expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(true);
     expect(json(join(opencode, "cli.json")).plugins).toEqual([
-      `file://${join(opencode, "plugin", "rx-statusline")}`,
+      pathToFileURL(join(opencode, "plugin", "rx-statusline")).href,
     ]);
     expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(false);
   });
