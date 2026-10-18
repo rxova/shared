@@ -31,7 +31,9 @@ on:
         required: false
         default: true
       version-script:
-        description: What changesets/action runs to version the packages.
+        description: >-
+          What changesets/action runs to version the packages. One command: the action execs it
+          without a shell, so `a && b` passes `&&` to `a` as an argument. Chain in a script.
         type: string
         required: false
         default: pnpm exec changeset version
