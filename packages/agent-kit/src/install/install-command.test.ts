@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { installCommand } from "@/install/install-command";
 import { scratchEnv, writeTree } from "@/internal/install/install.fixtures";
@@ -230,9 +231,9 @@ describe("installCommand", () => {
     expect(readFileSync(join(opencode, "rx-ai/statusline-rows.js"), "utf8")).toBe("// rows");
     const plugin = readFileSync(join(opencode, "plugin/rx-statusline/index.js"), "utf8");
     expect(plugin).toContain("@opencode/plugin/tui");
-    expect(plugin).toContain(join(opencode, "rx-ai/statusline-rows.js"));
+    expect(plugin).toContain(pathToFileURL(join(opencode, "rx-ai/statusline-rows.js")).href);
     expect(json(join(opencode, "cli.json")).plugins).toEqual([
-      `file://${join(opencode, "plugin", "rx-statusline")}`,
+      pathToFileURL(join(opencode, "plugin", "rx-statusline")).href,
     ]);
   });
 
@@ -249,7 +250,7 @@ describe("installCommand", () => {
     expect(installCommand(["--target", "opencode", "--statusline"], env)).toBe(0);
     expect(json(join(opencode, "cli.json")).plugins).toEqual([
       "@someone/else",
-      `file://${join(opencode, "plugin", "rx-statusline")}`,
+      pathToFileURL(join(opencode, "plugin", "rx-statusline")).href,
     ]);
   });
 
