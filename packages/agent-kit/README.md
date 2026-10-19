@@ -206,12 +206,19 @@ of its own failure.
 The status line installs on its own, with no agent, skill or hook:
 
 ```sh
-npx @rxova/agent-kit statusline            # only the status line
-npx @rxova/agent-kit statusline --remove   # take it out again
+npx @rxova/agent-kit statusline                    # wherever the kit already is
+npx @rxova/agent-kit statusline --target opencode  # OpenCode only
+npx @rxova/agent-kit statusline --target claude    # Claude Code only
+npx @rxova/agent-kit statusline --remove           # take it out again
 ```
 
-On a machine that already has the kit, `statusline` keeps that install as it is and switches the
-status line on; `install --statusline` and `--no-statusline` do the same as part of an install.
+Without `--target` it works on every target that already holds the kit, like `install` and
+`status` do, and falls back to Claude Code on a machine with neither. Name a target to pick one:
+on a machine with both, `--target opencode` leaves the Claude Code install untouched.
+
+Each target is decided on its own. Where the kit is already installed, `statusline` keeps that
+selection and switches the status line on; where it has never been, it gets the status line and
+nothing else. `install --statusline` and `--no-statusline` do the same as part of an install.
 
 ```text
 ◆ Opus 5.5 1M ↯fast ●●●○○ ∴ ┃ rxova/shared›packages/agent-kit ┃ ⎇ feat/x +1 ~3 ?2 ⇡1 ≡1 ┃ PR #78 ◷ ┃ +412 −97 ┃ ⟲ 8m
@@ -231,6 +238,10 @@ CTX ██████▏───────── 38% 382k/1M ┃ $4.87 $4.00
 - **Limits:** the 5-hour and weekly plan limits with their resets and pace (`0.7×` is on track,
   `⚠ out in 1h25m` runs out before the reset), the spend limit when there is one, then agent, vim
   mode, output style, extra directories, session name and Claude Code version.
+
+In OpenCode it is a TUI plugin under `plugin/rx-statusline/`, registered in `cli.json` beside any
+plugins already listed and drawn below the prompt. The rows are built by the same code, so they
+say the same things in the same order, minus the plan limits, which OpenCode does not report.
 
 Each row drops its least important pieces to fit the terminal width. It is one Node file with no
 dependencies and needs no special font. Colours are 24-bit when `COLORTERM` says the terminal
@@ -352,24 +363,24 @@ nothing unless asked.
 
 ## Commands
 
-| Command                      | What it does                                                                                           |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `rxova-agent-kit list`       | Every agent, skill and hook, the profiles that include it, and what it is for.                         |
-| `rxova-agent-kit install`    | Installs a profile, or updates an existing install.                                                    |
-| `rxova-agent-kit statusline` | Installs only the status line, or switches it on in an existing install; `--remove` takes it out.      |
-| `rxova-agent-kit uninstall`  | Removes the files each install wrote and its hook entries in `settings.json`. Nothing else is touched. |
-| `rxova-agent-kit status`     | Each installed target's profile and version, and anything missing or edited. Exits 1 when out of step. |
+| Command                      | What it does                                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `rxova-agent-kit list`       | Every agent, skill and hook, the profiles that include it, and what it is for.                                   |
+| `rxova-agent-kit install`    | Installs a profile, or updates an existing install.                                                              |
+| `rxova-agent-kit statusline` | Installs only the status line for `--target`, or switches it on in an existing install; `--remove` takes it out. |
+| `rxova-agent-kit uninstall`  | Removes the files each install wrote and its hook entries in `settings.json`. Nothing else is touched.           |
+| `rxova-agent-kit status`     | Each installed target's profile and version, and anything missing or edited. Exits 1 when out of step.           |
 
-| Flag            | Commands                         | Effect                                                                                  |
-| --------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
-| `--profile <p>` | `install`, `list`                | `core` (default on a first install), `hackathon`, `dotnet`, `full`, `none`.             |
-| `--target <t>`  | `install`, `uninstall`, `status` | `claude` (default on a first install), `opencode` or `both`. Later: the installed ones. |
-| `--add a,b`     | `install`                        | Adds items on top of the profile.                                                       |
-| `--skip c`      | `install`                        | Leaves items out of the profile.                                                        |
-| `--statusline`  | `install`                        | Sets Claude Code's status line to the kit's script; `--no-statusline` takes it out.     |
-| `--project`     | `install`, `uninstall`, `status` | Works on `./.claude` or `./.opencode` instead of the user folder.                       |
-| `--dry-run`     | `install`, `uninstall`           | Prints the plan and writes nothing.                                                     |
-| `--force`       | `install`                        | Overwrites files (and a status line) the kit did not write.                             |
+| Flag            | Commands                                       | Effect                                                                                                         |
+| --------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `--profile <p>` | `install`, `list`                              | `core` (default on a first install), `hackathon`, `dotnet`, `full`, `none`.                                    |
+| `--target <t>`  | `install`, `statusline`, `uninstall`, `status` | `claude` (default on a first install), `opencode` or `both`. Later: the installed ones.                        |
+| `--add a,b`     | `install`                                      | Adds items on top of the profile.                                                                              |
+| `--skip c`      | `install`                                      | Leaves items out of the profile.                                                                               |
+| `--statusline`  | `install`                                      | Draws the status line: Claude Code runs the script, OpenCode loads the plugin; `--no-statusline` takes it out. |
+| `--project`     | `install`, `uninstall`, `status`               | Works on `./.claude` or `./.opencode` instead of the user folder.                                              |
+| `--dry-run`     | `install`, `uninstall`                         | Prints the plan and writes nothing.                                                                            |
+| `--force`       | `install`                                      | Overwrites files (and a status line) the kit did not write.                                                    |
 
 | Target     | User install                                          | With `--project` |
 | ---------- | ----------------------------------------------------- | ---------------- |

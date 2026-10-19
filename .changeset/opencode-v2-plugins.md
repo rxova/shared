@@ -18,3 +18,8 @@ registers through domains. The generated file now carries both shapes, so either
 `RxKit` stays a named function, and the definition is exported by default. Each loader ignores the
 other's shape. The session-start reminder rides the session's first context rather than being
 stashed on an event and injected later.
+
+**`statusline` picks its targets like every other command.** It defaulted to Claude Code whatever
+else was installed; without `--target` it now works on each target that already holds the kit, and
+falls back to Claude Code on a machine with neither. `--target opencode` on a machine with both
+leaves the Claude Code install alone. The README covers all of it.

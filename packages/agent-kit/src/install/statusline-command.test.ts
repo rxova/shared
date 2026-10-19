@@ -118,4 +118,28 @@ describe("statuslineCommand", () => {
     expect(statuslineCommand([], env)).toBe(0);
     expect(env.io.out).toHaveBeenCalledWith(expect.stringContaining("with the status line"));
   });
+  it("touches only the target it is given, on a machine that has both", () => {
+    const { env, opencode, target } = scratch();
+    expect(installCommand(["--target", "both", "--profile", "full"], env)).toBe(0);
+    expect(statuslineCommand(["--target", "opencode"], env)).toBe(0);
+    expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(true);
+    expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(false);
+    // Each keeps what it had; only the status line moved.
+    expect(json(join(opencode, "rx-ai/manifest.json")).profile).toBe("full");
+    expect(json(join(target, "rx-ai/manifest.json")).profile).toBe("full");
+  });
+
+  it("switches it on everywhere the kit lives when no target is named", () => {
+    const { env, opencode, target } = scratch();
+    expect(installCommand(["--target", "both", "--profile", "full"], env)).toBe(0);
+    expect(statuslineCommand([], env)).toBe(0);
+    expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(true);
+    expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(true);
+  });
+
+  it("still installs for Claude Code on a machine with neither", () => {
+    const { env, target } = scratch();
+    expect(statuslineCommand([], env)).toBe(0);
+    expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(true);
+  });
 });
