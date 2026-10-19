@@ -229,6 +229,13 @@ describe("installCommand", () => {
     const { env, opencode } = scratch();
     expect(installCommand(["--target", "opencode", "--statusline"], env)).toBe(0);
     expect(readFileSync(join(opencode, "rx-ai/statusline-rows.js"), "utf8")).toBe("// rows");
+    // A whole plugin directory: the manifest makes the host install what the TUI entry imports,
+    // and the server entry keeps the server load off it.
+    const pkg = json(join(opencode, "plugin/rx-statusline/package.json"));
+    expect(pkg.exports).toEqual({ ".": "./server.js", "./tui": "./index.js" });
+    expect(readFileSync(join(opencode, "plugin/rx-statusline/server.js"), "utf8")).toContain(
+      "setup()",
+    );
     const plugin = readFileSync(join(opencode, "plugin/rx-statusline/index.js"), "utf8");
     expect(plugin).toContain("@opentui/solid/jsx-runtime");
     // Nothing from `@opencode/plugin`: a plugin in the config directory has no node_modules to

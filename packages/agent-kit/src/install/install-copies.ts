@@ -6,9 +6,19 @@ import { opencodeAgent } from "@/install/opencode-agent";
 import { opencodeHooks } from "@/install/opencode-hooks";
 import { opencodePlugin } from "@/install/opencode-plugin";
 import { opencodeStatusline } from "@/install/opencode-statusline";
+import { opencodeStatuslineManifest } from "@/install/opencode-statusline-manifest";
+import { opencodeStatuslineServer } from "@/install/opencode-statusline-server";
 import { contentFiles } from "@/internal/install/content-files";
 import { fromTarget } from "@/internal/install/from-target";
-import { PLUGIN, ROWS, RUNNER, STATUSLINE, TUI_PLUGIN } from "@/internal/install/install-paths";
+import {
+  PLUGIN,
+  ROWS,
+  RUNNER,
+  STATUSLINE,
+  TUI_MANIFEST,
+  TUI_PLUGIN,
+  TUI_SERVER,
+} from "@/internal/install/install-paths";
 
 /**
  * The files an install writes for the chosen items into one target. Claude Code: each chosen
@@ -61,9 +71,13 @@ export const installCopies = (
         ];
   // The status line is a TUI plugin of its own: the rows build beside it, and a loader that
   // imports it by path, because the plugin sits in the config directory rather than the package.
+  // A plugin directory, not a loose file: the manifest is what makes OpenCode install the
+  // rendering modules the TUI entry imports, and what keeps the server load off that entry.
   const tuiPlugin: Copy[] = withStatusline
     ? [
         { from: join(packageDir, "dist", "statusline-rows.js"), to: ROWS },
+        { to: TUI_MANIFEST, text: opencodeStatuslineManifest() },
+        { to: TUI_SERVER, text: opencodeStatuslineServer() },
         {
           to: TUI_PLUGIN,
           text: opencodeStatusline(fromTarget(target.root, ROWS), "prompt.footer.status"),
