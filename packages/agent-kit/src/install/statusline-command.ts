@@ -1,6 +1,6 @@
 import type { InstallEnv } from "@/install/install.types";
 import { installCommand } from "@/install/install-command";
-import { resolveTargets } from "@/install/resolve-targets";
+import { installedTargets } from "@/install/installed-targets";
 import { uninstallCommand } from "@/install/uninstall-command";
 import { defaultEnv } from "@/internal/install/default-env";
 import { parseOptions } from "@/internal/install/parse-options";
@@ -8,7 +8,8 @@ import { readManifest } from "@/internal/install/read-manifest";
 
 /**
  * `rxova-agent-kit statusline [--target claude|opencode|both] [--project] [--remove] [--dry-run]
- * [--force]`: the status line on its own, for Claude Code unless another target is named.
+ * [--force]`: the status line on its own. With `--target`, that one; without it, every target
+ * that already holds the kit, or Claude Code on a machine with neither.
  *
  * Each target is decided on its own manifest: where the kit is not installed there, it installs
  * the `none` profile with the status line, so no agent, skill or hook comes with it; where it is
@@ -26,11 +27,9 @@ export const statuslineCommand = (
   try {
     const options = parseOptions(argv, ["project", "dry-run", "force", "remove", "target"]);
     const project = options.project === true;
-    const targets = resolveTargets(
-      typeof options.target === "string" ? options.target : "claude",
-      project,
-      env,
-    );
+    // The same targets the other commands work on: the named one, or every target that already
+    // holds the kit, falling back to Claude Code on a machine with neither.
+    const targets = installedTargets(options.target, project, env);
     let code = 0;
     for (const target of targets) {
       const previous = readManifest(target.root);
