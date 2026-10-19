@@ -1,5 +1,52 @@
 # @rxova/agent-kit
 
+## 0.5.1
+
+### Patch Changes
+
+- [#95](https://github.com/rxova/shared/pull/95) [`40a9119`](https://github.com/rxova/shared/commit/40a9119ddd1f87af1561a66003a5dd5282f54cc0) - Make both OpenCode plugins load on version 2.
+  
+  **The status line was not a plugin directory.** It was a lone `index.js` with no manifest, so
+  nothing installed what it imports. It is now a directory: a `package.json` that makes OpenCode
+  install the rendering modules, a server-safe entry at `.`, and the TUI entry at `./tui` — the host
+  loads a plugin in both runtimes, and only the TUI one has `context.ui` to draw into, so a single
+  entry holding the component failed the server load every time. OpenTUI is pinned to a line rather
+  than an open range: the host bundles its own copy, and two copies in one process both register
+  `OPENTUI_FORCE_UNICODE`, which is fatal on import.
+  
+  **The hooks plugin was written for version 1**, which takes every exported function as a plugin
+  and returns a map of hooks. Version 2 reads the default export, wants `{ id, setup }`, and
+  registers through domains. The generated file now carries both shapes, so either major loads it:
+  `RxKit` stays a named function, and the definition is exported by default. Each loader ignores the
+  other's shape. The session-start reminder rides the session's first context rather than being
+  stashed on an event and injected later.
+  
+  **`statusline` picks its targets like every other command.** It defaulted to Claude Code whatever
+  else was installed; without `--target` it now works on each target that already holds the kit, and
+  falls back to Claude Code on a machine with neither. `--target opencode` on a machine with both
+  leaves the Claude Code install alone. The README covers all of it.
+
+- [#93](https://github.com/rxova/shared/pull/93) [`12a1309`](https://github.com/rxova/shared/commit/12a130991ce11705b501a65762f2d651cf884b7b) - Load the OpenCode status line, fix `statusline --target`, and answer `--help` on a command.
+  
+  The OpenCode status line plugin imported `@opencode/plugin/tui`, which failed to resolve and
+  stopped the plugin loading at all: that package is a dependency a published plugin installs for
+  itself, and a plugin written straight into the config directory has no `node_modules` to find it
+  in. Nothing was lost by dropping it — `Plugin.define` is `(plugin) => plugin`, a typing helper
+  with no runtime behaviour — so the definition is exported directly.
+  
+  `statusline` read the manifest from the Claude Code directory whatever target it was given, so
+  `statusline --target opencode` on a machine that already had the kit in Claude Code installed the
+  `core` profile into OpenCode — agents, skills and hooks nobody asked for. Each target is now
+  decided on its own manifest: `none` plus the status line where the kit has never been, the
+  existing selection where it has.
+  
+  `rxova-agent-kit <command> --help` printed `Unknown option '--help'`, because the command parsed
+  it before anything could answer it. It now prints that command's own usage, and `statusline`'s
+  options list `--target`, which it had been missing since the option was added.
+  
+  An install that switches the status line on says so, instead of reporting only the agents and
+  skills it kept.
+
 ## 0.5.0
 
 ### Minor Changes
