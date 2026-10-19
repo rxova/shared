@@ -37,9 +37,48 @@ const load = async (names: string[]) => {
   const file = join(dir, `plugin-${String(Math.random()).slice(2)}.js`);
   writeFileSync(file, opencodePlugin(runner, opencodeHooks(names)));
   const module = (await import(pathToFileURL(file).href)) as Record<string, unknown>;
-  expect(Object.keys(module)).toEqual(["RxKit"]);
+  // OpenCode 1 takes every exported function as a plugin, so there must still be exactly one.
+  expect(Object.keys(module).filter((key) => typeof module[key] === "function")).toEqual(["RxKit"]);
   const factory = module.RxKit as (context: { directory: string }) => Promise<Record<string, Hook>>;
   return factory({ directory: "/proj" });
+};
+
+/** The OpenCode 2 definition from the same file, set up against a host that records its hooks. */
+const loadV2 = async (names: string[]) => {
+  const file = join(dir, `plugin-v2-${String(Math.random()).slice(2)}.js`);
+  writeFileSync(file, opencodePlugin(runner, opencodeHooks(names)));
+  const module = (await import(pathToFileURL(file).href)) as {
+    default: { id: string; setup: (context: unknown) => Promise<() => Promise<void>> };
+  };
+  const registered = new Map<string, Hook>();
+  let disposed = 0;
+  const domain = (prefix: string) => ({
+    hook: (name: string, callback: Hook) => {
+      registered.set(`${prefix}.${name}`, callback);
+      return Promise.resolve({
+        dispose: () => {
+          disposed += 1;
+          return Promise.resolve();
+        },
+      });
+    },
+  });
+  const cleanup = await module.default.setup({
+    location: { directory: "/proj" },
+    tool: domain("tool"),
+    session: domain("session"),
+  });
+  return {
+    id: module.default.id,
+    names: [...registered.keys()],
+    disposedCount: () => disposed,
+    cleanup,
+    fire: async (name: string, input: unknown) => {
+      const callback = registered.get(name);
+      if (callback === undefined) throw new Error(`the plugin registered no ${name} hook`);
+      await callback(input, undefined);
+    },
+  };
 };
 /** A hook the plugin returned, or a failure naming the one that is missing. */
 const hook = (plugin: Record<string, Hook>, name: string): Hook => {
@@ -177,5 +216,75 @@ describe("the OpenCode plugin", () => {
         { args: { command: "git push --no-verify" } },
       ),
     ).resolves.toBeUndefined();
+  });
+  describe("as an OpenCode 2 plugin", () => {
+    it("is a definition the version 2 loader takes", async () => {
+      const v2 = await loadV2(all);
+      expect(v2.id).toBe("rx-kit");
+      expect(v2.names).toEqual([
+        "tool.execute.before",
+        "tool.execute.after",
+        "session.compaction",
+        "session.context",
+      ]);
+    });
+
+    it("blocks a tool call the hooks refuse", async () => {
+      const v2 = await loadV2(["no-bypass"]);
+      await expect(
+        v2.fire("tool.execute.before", {
+          tool: "bash",
+          sessionID: "s1",
+          input: { command: "git push --no-verify" },
+        }),
+      ).rejects.toThrow(/no-bypass/);
+    });
+
+    it("appends a hook's report to the tool's output", async () => {
+      const v2 = await loadV2(["quick-check"]);
+      const input = {
+        tool: "write",
+        sessionID: "s1",
+        status: "completed",
+        input: { filePath: "/proj/a.ts", content: "x" },
+        result: { content: "wrote it" },
+      };
+      await v2.fire("tool.execute.after", input);
+      expect(input.result.content).toBe("wrote it\n\nrx-ai quick-check: lint problem");
+    });
+
+    it("leaves a failed tool call's result alone", async () => {
+      const v2 = await loadV2(["quick-check"]);
+      const input = {
+        tool: "write",
+        sessionID: "s1",
+        status: "error",
+        input: { filePath: "/proj/a.ts", content: "x" },
+        error: { message: "boom" },
+      };
+      await expect(v2.fire("tool.execute.after", input)).resolves.toBeUndefined();
+    });
+
+    it("adds the session-start reminder to the system prompt once", async () => {
+      const v2 = await loadV2(["handoff-reminder"]);
+      const first = { sessionID: "s1", system: [] as string[] };
+      await v2.fire("session.context", first);
+      expect(first.system).toEqual(["read the handoff note"]);
+      const second = { sessionID: "s1", system: [] as string[] };
+      await v2.fire("session.context", second);
+      expect(second.system).toEqual([]);
+    });
+
+    it("tells the hooks a compaction is coming", async () => {
+      const v2 = await loadV2(["memory-snapshot"]);
+      await v2.fire("session.compaction", { sessionID: "s1", system: [] });
+      expect(calls().some(({ input }) => input.hook_event_name === "PreCompact")).toBe(true);
+    });
+
+    it("unregisters every hook when OpenCode tears it down", async () => {
+      const v2 = await loadV2(all);
+      await v2.cleanup();
+      expect(v2.disposedCount()).toBe(4);
+    });
   });
 });

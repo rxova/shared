@@ -7,7 +7,13 @@ import type { OpencodeHooks } from "@/install/opencode-hooks";
  * hooks through the installed runner with the runtime OpenCode itself runs on, and maps the
  * outcome back: a block throws (OpenCode shows the error to the model), a lint report is appended
  * to the tool's output, and the session-start reminder is added to the system prompt once.
- * Only the plugin function is exported, as OpenCode treats every exported function as a plugin.
+ *
+ * It speaks both plugin shapes, because the two majors load a plugin differently and a machine
+ * may be on either. OpenCode 1 takes every exported function as a plugin, so `RxKit` stays a
+ * named function. OpenCode 2 reads the default export and wants `{ id, setup }`, registering
+ * hooks through domains rather than returning a map of them. Each loader ignores the other's
+ * shape: the default export is an object, not a function, and the named export is a function,
+ * not a definition.
  */
 export const opencodePlugin = (
   runner: string,
@@ -92,5 +98,50 @@ export const RxKit = async ({ directory }) => {
       output.system.push(text);
     },
   };
+};
+
+// OpenCode 2: the default export, registering through the domains.
+export default {
+  id: 'rx-kit',
+  async setup(context) {
+    const directory = context.location?.directory ?? process.cwd();
+    const base = (sessionID, event) => ({ hook_event_name: event, session_id: sessionID, cwd: directory });
+    const greeted = new Set();
+    const registrations = [];
+    const on = async (domain, name, callback) => { registrations.push(await domain.hook(name, callback)); };
+
+    await on(context.tool, 'execute.before', async (input) => {
+      for (const call of inputsFor(input.tool, input.input)) {
+        const result = await run(matching(HOOKS.before, call.tool_name), { ...base(input.sessionID, 'PreToolUse'), ...call });
+        if (result.code === 2) throw new Error(result.stderr.trim());
+      }
+    });
+
+    await on(context.tool, 'execute.after', async (input) => {
+      if (input.status !== 'completed') return;
+      for (const call of inputsFor(input.tool, input.input)) {
+        const result = await run(matching(HOOKS.after, call.tool_name), { ...base(input.sessionID, 'PostToolUse'), ...call });
+        const report = result.code === 2 ? result.stderr.trim() : '';
+        if (report !== '' && typeof input.result?.content === 'string')
+          input.result.content = input.result.content + '\\n\\n' + report;
+      }
+    });
+
+    await on(context.session, 'compaction', async (input) => {
+      await run(HOOKS.compacting, base(input.sessionID, 'PreCompact'));
+    });
+
+    // The reminder rides the session's first context rather than a session.created event, so
+    // the text and the turn it lands in are decided in one place.
+    await on(context.session, 'context', async (input) => {
+      if (greeted.has(input.sessionID)) return;
+      greeted.add(input.sessionID);
+      const result = await run(HOOKS.start, base(input.sessionID, 'SessionStart'));
+      const text = result.stdout.trim();
+      if (text !== '') input.system.push(text);
+    });
+
+    return async () => { for (const registration of registrations) await registration.dispose(); };
+  },
 };
 `;
