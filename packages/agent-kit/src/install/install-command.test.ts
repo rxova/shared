@@ -230,7 +230,10 @@ describe("installCommand", () => {
     expect(installCommand(["--target", "opencode", "--statusline"], env)).toBe(0);
     expect(readFileSync(join(opencode, "rx-ai/statusline-rows.js"), "utf8")).toBe("// rows");
     const plugin = readFileSync(join(opencode, "plugin/rx-statusline/index.js"), "utf8");
-    expect(plugin).toContain("@opencode/plugin/tui");
+    expect(plugin).toContain("@opentui/solid/jsx-runtime");
+    // Nothing from `@opencode/plugin`: a plugin in the config directory has no node_modules to
+    // resolve it from, and the import stopped the whole plugin loading.
+    expect(plugin).not.toContain("@opencode/plugin");
     expect(plugin).toContain(pathToFileURL(join(opencode, "rx-ai/statusline-rows.js")).href);
     expect(json(join(opencode, "cli.json")).plugins).toEqual([
       pathToFileURL(join(opencode, "plugin", "rx-statusline")).href,

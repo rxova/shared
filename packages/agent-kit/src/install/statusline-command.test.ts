@@ -89,4 +89,33 @@ describe("statuslineCommand", () => {
     ]);
     expect(existsSync(join(target, "rx-ai/statusline.js"))).toBe(false);
   });
+  it("installs nothing but the status line into a target the kit has never been in", () => {
+    const { env, opencode, target } = scratch();
+    // The kit is in Claude Code; OpenCode has never had it.
+    expect(installCommand(["--profile", "full"], env)).toBe(0);
+    expect(statuslineCommand(["--target", "opencode"], env)).toBe(0);
+    const manifest = json(join(opencode, "rx-ai/manifest.json"));
+    expect(manifest.profile).toBe("none");
+    expect(manifest.items).toEqual([]);
+    // One target's manifest must not decide another's: `core` here would be agents and skills
+    // nobody asked for.
+    expect(existsSync(join(opencode, "agents"))).toBe(false);
+    expect(existsSync(join(opencode, "skills"))).toBe(false);
+    expect(existsSync(join(opencode, "plugin/rx-statusline/index.js"))).toBe(true);
+    // The Claude install keeps everything it had.
+    expect(json(join(target, "rx-ai/manifest.json")).profile).toBe("full");
+  });
+
+  it("keeps each target's own selection when both are named", () => {
+    const { env, opencode, target } = scratch();
+    expect(installCommand(["--target", "claude", "--profile", "full"], env)).toBe(0);
+    expect(statuslineCommand(["--target", "both"], env)).toBe(0);
+    expect(json(join(target, "rx-ai/manifest.json")).profile).toBe("full");
+    expect(json(join(opencode, "rx-ai/manifest.json")).profile).toBe("none");
+  });
+  it("says the status line is on, rather than only naming what it kept", () => {
+    const { env } = scratch();
+    expect(statuslineCommand([], env)).toBe(0);
+    expect(env.io.out).toHaveBeenCalledWith(expect.stringContaining("with the status line"));
+  });
 });

@@ -88,4 +88,24 @@ describe("the bin", () => {
     },
     SPAWN_TIMEOUT,
   );
+  it("prints a command's own usage for --help, without running it", async () => {
+    const command = vi.fn(() => 0);
+    const streams = io();
+    const table: Record<string, CommandEntry> = {
+      go: { summary: "goes places", flags: "[--fast]", load: () => Promise.resolve(command) },
+    };
+    for (const flag of ["--help", "-h"])
+      expect(await cli(["go", flag], { table, io: streams })).toBe(0);
+    expect(streams.out).toHaveBeenCalledWith("usage: rxova-agent-kit go [--fast]\n\n  goes places");
+    expect(command).not.toHaveBeenCalled();
+  });
+
+  it("answers --help after the command's own options too", async () => {
+    const command = vi.fn(() => 0);
+    const table: Record<string, CommandEntry> = {
+      go: { summary: "goes places", load: () => Promise.resolve(command) },
+    };
+    expect(await cli(["go", "--target", "opencode", "--help"], { table, io: io() })).toBe(0);
+    expect(command).not.toHaveBeenCalled();
+  });
 });

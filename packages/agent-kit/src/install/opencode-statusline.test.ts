@@ -17,7 +17,6 @@ const stub = (name: string, subpath: string, source: string) => {
   );
   writeFileSync(join(root, `${subpath}.js`), source);
 };
-stub("@opencode/plugin", "tui", "export const Plugin = { define: (definition) => definition };");
 stub("@opentui/solid", "jsx-runtime", "export const jsx = (type, props) => ({ type, props });");
 const solid = join(dir, "node_modules", "solid-js");
 mkdirSync(solid, { recursive: true });
@@ -162,5 +161,15 @@ describe("opencodeStatusline", () => {
     expect(specifier?.startsWith("file:")).toBe(true);
     // A raw path would carry the platform's separator into a specifier Node cannot resolve.
     expect(specifier).not.toContain("\\");
+  });
+  it("imports nothing a config-directory plugin cannot resolve", () => {
+    const source = opencodeStatusline(rows, "prompt.footer.status");
+    // `@opencode/plugin` is a dependency a published plugin installs for itself; written into
+    // the config directory there is no node_modules to find it in, and the plugin fails to load.
+    expect(source).not.toContain("@opencode/plugin");
+    const bare = [...source.matchAll(/^import .* from '([^']+)';$/gm)]
+      .map(([, from]) => from ?? "")
+      .filter((from) => !from.startsWith("file:"));
+    expect(bare).toEqual(["@opentui/solid/jsx-runtime", "solid-js"]);
   });
 });
