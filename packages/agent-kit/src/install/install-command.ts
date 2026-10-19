@@ -179,7 +179,11 @@ export const installCommand = (argv: readonly string[], env: InstallEnv = defaul
         createdSettings,
         statusline,
       });
-      io.out(`Installed rx-ai (${selection.profile}: ${counts}) for ${name} into ${target.root}.`);
+      // Say so when the status line is on: `statusline` prints this same line, and without it
+      // the only thing it reports is the agents and skills it kept.
+      io.out(
+        `Installed rx-ai (${selection.profile}: ${counts})${statusline ? " with the status line" : ""} for ${name} into ${target.root}.`,
+      );
     }
     return 0;
   } catch (failure) {

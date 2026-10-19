@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { consoleIo } from "@/internal/cli/console-io";
 import { packageVersion } from "@/internal/cli/package-version";
+import { commandUsage } from "@/internal/cli/command-usage";
 import { usage } from "@/internal/cli/usage";
 import type { CommandEntry, Io } from "@/cli/cli.types";
 import { commands } from "@/cli/commands";
@@ -32,6 +33,12 @@ export const cli = async (
   if (command === undefined) {
     io.err(`rxova-agent-kit: unknown command "${name}"\n\n${usage(table)}`);
     return 1;
+  }
+  // `<command> --help` before the command parses it, since a command rejects an option it
+  // does not take rather than guessing what was meant.
+  if (rest.includes("--help") || rest.includes("-h")) {
+    io.out(commandUsage(name, command));
+    return 0;
   }
   return (await command.load())(rest);
 };

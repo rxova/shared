@@ -6,6 +6,9 @@ export const usage = (commands: Record<string, CommandEntry>): string => {
   return [
     "usage: rxova-agent-kit <command> [options]",
     "",
-    ...Object.entries(commands).map(([name, { summary }]) => `  ${name.padEnd(width)}  ${summary}`),
+    ...Object.entries(commands).map(
+      ([name, { summary, flags }]) =>
+        `  ${name.padEnd(width)}  ${summary}${flags === undefined ? "" : ` ${flags}`}`,
+    ),
   ].join("\n");
 };
