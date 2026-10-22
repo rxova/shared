@@ -1,5 +1,14 @@
 # @rxova/repo-config
 
+## 0.10.0
+
+### Minor Changes
+
+- [#102](https://github.com/rxova/shared/pull/102) [`8f8847c`](https://github.com/rxova/shared/commit/8f8847c10aca17a048ba46f7a4ebc6877ed36234) - Add `rxova-repo-config check-bundle`: a package's built entries, and the chunks they import, may
+  not mention an identifier from `repoConfig.bundle.banned` (`process` by default). Comments and
+  property reads are ignored, so only a free global a consumer's bundler would have to resolve is
+  reported. Added to the default verify gate as `pnpm run --if-present check:bundle`.
+
 ## 0.9.1
 
 ### Patch Changes
