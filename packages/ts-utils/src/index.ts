@@ -12,6 +12,8 @@ export { safeKeys } from "@/safe/safe-keys";
 export { isInstanceOf } from "@/safe/is-instance-of";
 export { objectTag } from "@/safe/object-tag";
 export { arrayItems } from "@/safe/array-items";
+export { readArray } from "@/safe/read-array";
+export type { ReadArrayOptions } from "@/safe/read-array.types";
 export { isError } from "@/errors/is-error";
 export { errorMessage } from "@/errors/error-message";
 export { shallowEqual } from "@/equality/shallow-equal";

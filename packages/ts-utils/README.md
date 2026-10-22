@@ -117,16 +117,17 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 
 **Safe reads** — never let a getter, a proxy trap or `Symbol.hasInstance` throw
 
-| Export                       | Returns                                                              |
-| ---------------------------- | -------------------------------------------------------------------- |
-| `tryRead(value, key)`        | `{ ok: true, value }`, or `{ ok: false }` when the read threw.       |
-| `readProperty(value, key)`   | The property, or `undefined` when reading it throws.                 |
-| `readString(value, key)`     | The property when it is a string, else `undefined`.                  |
-| `hasProperty(value, key)`    | `key in value`, `false` when a proxy refuses.                        |
-| `safeKeys(value)`            | `Object.keys`, `[]` when a proxy refuses.                            |
-| `isInstanceOf(value, Class)` | `instanceof`, `false` when it throws.                                |
-| `objectTag(value)`           | `"[object Map]"` and friends, across realms; `undefined` if refused. |
-| `arrayItems(value)`          | A copy of an array, else `undefined`.                                |
+| Export                       | Returns                                                               |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `tryRead(value, key)`        | `{ ok: true, value }`, or `{ ok: false }` when the read threw.        |
+| `readProperty(value, key)`   | The property, or `undefined` when reading it throws.                  |
+| `readString(value, key)`     | The property when it is a string, else `undefined`.                   |
+| `hasProperty(value, key)`    | `key in value`, `false` when a proxy refuses.                         |
+| `safeKeys(value)`            | `Object.keys`, `[]` when a proxy refuses.                             |
+| `isInstanceOf(value, Class)` | `instanceof`, `false` when it throws.                                 |
+| `objectTag(value)`           | `"[object Map]"` and friends, across realms; `undefined` if refused.  |
+| `arrayItems(value)`          | A copy of an array, else `undefined`.                                 |
+| `readArray(value, readItem)` | Each item through `readItem`; `undefined` when the value is no array. |
 
 **Errors and DOM**
 
@@ -152,7 +153,7 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 | `utf8ByteLength(text)`              | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
 | `randomHex(bytes, { onFallback? })` | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
 
-Types: `ReadResult`, `RandomHexOptions`.
+Types: `ReadResult`, `ReadArrayOptions`, `RandomHexOptions`.
 
 ## `@rxova/ts-utils/env`
 
@@ -222,6 +223,10 @@ Types: `UseDevWarnerOptions`.
   from objects and become `null` in arrays; a cycle throws a `TypeError`. Keys sort by UTF-16 code
   unit, the order RFC 8785 specifies, so a hash is readable from another language — though
   Postgres `jsonb` orders keys its own way and will not agree.
+- **`readArray` and the empty list.** A value that is not an array reads as `undefined`, never
+  `[]`, so "absent" and "empty" stay apart; write `?? []` where they should not. `readItem`
+  returns `undefined` for an item it cannot read, and `onInvalid` decides what that costs:
+  `reject` (the default) loses the list, `skip` loses only that item.
 - **`isRecord` rejects arrays.** Code that meant "any object" should use `isObjectLike`; code that
   must reject a `Date` or a `Map` should use `isPlainObject`.
 - **Two development checks.** `isDevelopment` is permissive (an unset `NODE_ENV` is development),
