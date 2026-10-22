@@ -1,6 +1,8 @@
 export { isObjectLike } from "@/predicates/is-object-like";
 export { isRecord } from "@/predicates/is-record";
 export { isPlainObject } from "@/predicates/is-plain-object";
+export { isFiniteNumber } from "@/predicates/is-finite-number";
+export { isNonNegativeInteger } from "@/predicates/is-non-negative-integer";
 export { tryRead } from "@/safe/try-read";
 export type { ReadResult } from "@/safe/try-read.types";
 export { readProperty } from "@/safe/read-property";
@@ -23,10 +25,14 @@ export type {
 export { canUseDOM } from "@/dom/can-use-dom";
 export { deepFreeze } from "@/freeze/deep-freeze";
 export { clamp } from "@/number/clamp";
+export { sum } from "@/number/sum";
+export { chunk } from "@/array/chunk";
+export { mapValues } from "@/object/map-values";
 export { isNonProduction } from "@/env/is-non-production";
 export type { BundlerEnv, NonProductionOptions } from "@/env/is-non-production.types";
 export { isErrorLike } from "@/errors/is-error-like";
 export { randomHex } from "@/random/random-hex";
 export type { RandomHexOptions } from "@/random/random-hex.types";
 export { escapeHtml } from "@/string/escape-html";
+export { utf8ByteLength } from "@/string/utf8-byte-length";
 export { prefersReducedMotion } from "@/dom/prefers-reduced-motion";

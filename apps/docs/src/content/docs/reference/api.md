@@ -18,6 +18,9 @@ description: Every export, command and action this repository publishes.
 | `isNonProduction`                                     | Conservative non-production detection (`import.meta.env`, then `NODE_ENV`)   |
 | `randomHex` / `escapeHtml` / `prefersReducedMotion`   | Random hex ids; HTML/XML escaping; the reduced-motion preference, now        |
 | `canUseDOM` / `deepFreeze` / `clamp`                  | DOM presence; recursive freeze; a bounded number                             |
+| `isFiniteNumber` / `isNonNegativeInteger`             | A real number; a count or an index                                           |
+| `sum` / `chunk` / `mapValues`                         | Numbers added up; a list in runs; an object's values transformed             |
+| `utf8ByteLength`                                      | A string's UTF-8 size, without encoding it                                   |
 | `useIsomorphicLayoutEffect` (`@rxova/ts-utils/react`) | `useLayoutEffect` in the browser, `useEffect` on the server                  |
 | `useLatestRef` / `useMediaQuery` (`/react`)           | The latest committed value in a stable ref; a live media query               |
 | `assignRef` / `useMergedRefs` (`/react`)              | Feed a value to any ref; one callback ref for several                        |
