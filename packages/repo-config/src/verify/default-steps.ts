@@ -11,6 +11,9 @@ export const defaultSteps = (): Step[] => [
   { name: "typecheck", command: "pnpm exec turbo run typecheck" },
   { name: "unit tests", command: "pnpm exec turbo run test" },
   { name: "package exports", command: "pnpm run check:exports" },
+  // `--if-present`: a repository with no package that bans a global has no
+  // such script, and a gate step is not a reason to make it invent one.
+  { name: "bundle globals", command: "pnpm run --if-present check:bundle" },
   { name: "pack smoke", command: "pnpm run pack:smoke" },
   { name: "dependency versions", command: "pnpm run sherif:check" },
   { name: "unused code", command: "pnpm run knip:check" },

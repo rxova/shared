@@ -41,6 +41,17 @@
       "outputs": [],
       "outputLogs": "new-only"
     },
+    // Reads the built entries and the chunks they import.
+    "check:bundle": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/repo-config/src/bundle/**",
+        "$TURBO_ROOT$/packages/repo-config/src/internal/bundle/**"
+      ],
+      "outputLogs": "new-only"
+    },
     // Packs the real tarball and imports it from a scratch project. Keyed on the
     // shared script too, so editing the checker re-runs it instead of replaying.
     "pack:smoke": {

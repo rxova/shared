@@ -15,21 +15,12 @@ export { arrayItems } from "@/safe/array-items";
 export { isError } from "@/errors/is-error";
 export { errorMessage } from "@/errors/error-message";
 export { shallowEqual } from "@/equality/shallow-equal";
-export { isDevelopment } from "@/env/is-development";
-export { createDevWarner } from "@/dev-warner/create-dev-warner";
-export type {
-  DevWarner,
-  DevWarnerOptions,
-  WarnOptions,
-} from "@/dev-warner/create-dev-warner.types";
 export { canUseDOM } from "@/dom/can-use-dom";
 export { deepFreeze } from "@/freeze/deep-freeze";
 export { clamp } from "@/number/clamp";
 export { sum } from "@/number/sum";
 export { chunk } from "@/array/chunk";
 export { mapValues } from "@/object/map-values";
-export { isNonProduction } from "@/env/is-non-production";
-export type { BundlerEnv, NonProductionOptions } from "@/env/is-non-production.types";
 export { isErrorLike } from "@/errors/is-error-like";
 export { randomHex } from "@/random/random-hex";
 export type { RandomHexOptions } from "@/random/random-hex.types";

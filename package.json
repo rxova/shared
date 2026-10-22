@@ -27,6 +27,7 @@
     "sherif:check": "sherif --fail-on-warnings",
     "knip:check": "turbo run build --filter=@rxova/repo-config --output-logs=errors-only && knip",
     "check:exports": "turbo run check:exports",
+    "check:bundle": "turbo run check:bundle",
     "pack:smoke": "turbo run pack:smoke --concurrency=1",
     "docs": "pnpm --filter docs dev",
     "changeset": "changeset",

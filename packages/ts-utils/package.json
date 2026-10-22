@@ -23,6 +23,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./env": {
+      "types": "./dist/env.d.ts",
+      "default": "./dist/env.js"
+    },
     "./react": {
       "types": "./dist/react.d.ts",
       "default": "./dist/react.js"
@@ -41,6 +45,7 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check:exports": "publint --strict && attw --pack . --profile esm-only",
+    "check:bundle": "rxova-repo-config check-bundle",
     "pack:smoke": "rxova-repo-config pack-smoke"
   },
   "peerDependencies": {
@@ -66,5 +71,15 @@
     "tsx": "^4.23.15",
     "typescript": "6.0.3",
     "vitest": "^5.0.3"
+  },
+  "repoConfig": {
+    "bundle": {
+      "entries": [
+        "dist/index.js"
+      ],
+      "banned": [
+        "process"
+      ]
+    }
   }
 }

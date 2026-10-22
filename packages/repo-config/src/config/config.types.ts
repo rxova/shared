@@ -185,6 +185,13 @@ export interface PackageConfig {
     bins?: false | Record<string, BinCheck>;
     run?: FixtureRun[];
   };
+  /** Identifiers a package's built entries must not mention. */
+  bundle?: {
+    /** Built entry files, each followed through its relative chunk imports (default `dist/index.js`). */
+    entries?: string[];
+    /** Identifiers no entry may mention outside a comment (default `process`). */
+    banned?: string[];
+  };
   llms?: PackageLlmsConfig;
   exports?: {
     /** The `attw --profile` for `check-exports`. */

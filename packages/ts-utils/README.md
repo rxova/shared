@@ -14,6 +14,7 @@
   <a href="#install">Install</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#rxovats-utils">Core</a> ·
+  <a href="#rxovats-utilsenv">Env</a> ·
   <a href="#rxovats-utilsreact">React</a> ·
   <a href="#notes">Notes</a>
 </p>
@@ -35,15 +36,15 @@ try {
 
 ## What you get
 
-|                     |                                                                                                                  |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| 🔍 **Guards**       | `isObjectLike`, `isRecord`, `isPlainObject`, `isFiniteNumber`, `isError`, …: the checks, named once.             |
-| 🛡️ **Safe reads**   | Property reads, `in`, `Object.keys` and `instanceof` that survive throwing getters and proxy traps.              |
-| 🌱 **Environment**  | `isDevelopment` for output, `isNonProduction` for behaviour, `canUseDOM`, `prefersReducedMotion`.                |
-| ⚠️ **Dev warnings** | `createDevWarner`: a prefix, stable codes linked to docs, warn-once.                                             |
-| 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `sum`, `chunk`, `mapValues`, `escapeHtml`, `utf8ByteLength`, `randomHex`. |
-| ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings.  |
-| 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                         |
+|                     |                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 🔍 **Guards**       | `isObjectLike`, `isRecord`, `isPlainObject`, `isFiniteNumber`, `isError`, …: the checks, named once.                      |
+| 🛡️ **Safe reads**   | Property reads, `in`, `Object.keys` and `instanceof` that survive throwing getters and proxy traps.                       |
+| 🌱 **Environment**  | `/env`: `isDevelopment` for output, `isNonProduction` for behaviour. `canUseDOM` and `prefersReducedMotion` stay in core. |
+| ⚠️ **Dev warnings** | `/env`: `createDevWarner`, a prefix, stable codes linked to docs, warn-once.                                              |
+| 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `sum`, `chunk`, `mapValues`, `escapeHtml`, `utf8ByteLength`, `randomHex`.          |
+| ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings.           |
+| 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                                  |
 
 ## Install
 
@@ -72,7 +73,8 @@ export default defineConfig(dualBuildConfig({ deps: { onlyBundle: ["@rxova/ts-ut
 ## Quick start
 
 ```ts
-import { createDevWarner, isRecord, readString } from "@rxova/ts-utils";
+import { isRecord, readString } from "@rxova/ts-utils";
+import { createDevWarner } from "@rxova/ts-utils/env";
 
 const warner = createDevWarner({ prefix: "my-package", docsUrl: "https://example.com/warnings" });
 
@@ -125,15 +127,13 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 | `objectTag(value)`           | `"[object Map]"` and friends, across realms; `undefined` if refused. |
 | `arrayItems(value)`          | A copy of an array, else `undefined`.                                |
 
-**Errors, environment and DOM**
+**Errors and DOM**
 
-| Export                                       | What it does                                                                                                       |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `errorMessage(value)`                        | The text to show for anything thrown: an `Error`'s message, a string, else `String()`. Never throws.               |
-| `isDevelopment()`                            | A boolean `__DEV__` global wins; otherwise `NODE_ENV !== "production"`.                                            |
-| `isNonProduction({ bundlerEnv?, nodeEnv? })` | Conservative: `PROD`/`DEV` of the passed `import.meta.env`, then a string `NODE_ENV`; nothing known means `false`. |
-| `canUseDOM()`                                | Whether both `window` and `document` exist.                                                                        |
-| `prefersReducedMotion()`                     | The reduced-motion media query, now. `false` on the server or without `matchMedia`.                                |
+| Export                   | What it does                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `errorMessage(value)`    | The text to show for anything thrown: an `Error`'s message, a string, else `String()`. Never throws. |
+| `canUseDOM()`            | Whether both `window` and `document` exist.                                                          |
+| `prefersReducedMotion()` | The reduced-motion media query, now. `false` on the server or without `matchMedia`.                  |
 
 **Values**
 
@@ -148,6 +148,21 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 | `escapeHtml(value)`                 | `& < > " '` as entities, for HTML or XML text and quoted attributes. Not a sanitizer.                                                |
 | `utf8ByteLength(text)`              | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
 | `randomHex(bytes, { onFallback? })` | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
+
+Types: `ReadResult`, `RandomHexOptions`.
+
+## `@rxova/ts-utils/env`
+
+The two environment questions and the warner built on them, on their own subpath. They are the
+only exports that name `process`, and a bundler has to resolve that reference even when it sits
+in a `try`: Turbopack reads it as `node:process` and refuses to put it in a service worker or an
+edge chunk. Keeping them here means importing `isRecord` from the main entry cannot break such a
+build, while the literal `process.env.NODE_ENV` stays literal for the bundlers that replace it.
+
+| Export                                       | What it answers                                                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `isDevelopment()`                            | A boolean `__DEV__` global wins; otherwise `NODE_ENV !== "production"`.                                            |
+| `isNonProduction({ bundlerEnv?, nodeEnv? })` | Conservative: `PROD`/`DEV` of the passed `import.meta.env`, then a string `NODE_ENV`; nothing known means `false`. |
 
 **Development warnings**
 
@@ -174,8 +189,7 @@ warner.warn("length must be positive", { code: "OTP1001" });
 //   → https://example.com/warnings#otp1001
 ```
 
-Types: `ReadResult`, `DevWarner`, `DevWarnerOptions`, `WarnOptions`, `BundlerEnv`,
-`NonProductionOptions`, `RandomHexOptions`.
+Types: `DevWarner`, `DevWarnerOptions`, `WarnOptions`, `BundlerEnv`, `NonProductionOptions`.
 
 ## `@rxova/ts-utils/react`
 
@@ -195,6 +209,11 @@ Types: `UseDevWarnerOptions`.
 - **Dead-code elimination.** `isDevelopment` reads `process.env.NODE_ENV` literally, so a bundler
   can replace it. To drop a warning's text from a production bundle, guard the call site itself
   with `if (process.env.NODE_ENV !== "production")`.
+- **Nothing in the main entry names `process`.** `isDevelopment`, `isNonProduction` and
+  `createDevWarner` live on `@rxova/ts-utils/env` precisely because they do, and
+  `rxova-repo-config check-bundle` fails the build if one of them ever reaches `dist/index.js`
+  again. Import the main entry from a service worker, an edge function or any chunk a bundler
+  refuses to give Node builtins to; reach for `/env` where there is a `process` to read.
 - **`isRecord` rejects arrays.** Code that meant "any object" should use `isObjectLike`; code that
   must reject a `Date` or a `Map` should use `isPlainObject`.
 - **Two development checks.** `isDevelopment` is permissive (an unset `NODE_ENV` is development),

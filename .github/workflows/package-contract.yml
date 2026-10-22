@@ -37,5 +37,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Publint and Are The Types Wrong
         run: pnpm run check:exports
+      - name: Bundle globals
+        run: pnpm run --if-present check:bundle
       - name: Pack smoke test
         run: pnpm run pack:smoke

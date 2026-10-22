@@ -10,6 +10,7 @@ describe("defaultSteps", () => {
       "typecheck",
       "unit tests",
       "package exports",
+      "bundle globals",
       "pack smoke",
       "dependency versions",
       "unused code",

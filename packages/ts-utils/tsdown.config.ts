@@ -5,7 +5,7 @@ import { baseBuildConfig } from "@rxova/repo-config/tsdown";
 // the syntax floor is es2020 and nothing assumes a platform.
 export default defineConfig(
   baseBuildConfig({
-    entry: { index: "src/index.ts", react: "src/react.ts" },
+    entry: { index: "src/index.ts", env: "src/env.ts", react: "src/react.ts" },
     platform: "neutral",
     target: "es2020",
   }),
