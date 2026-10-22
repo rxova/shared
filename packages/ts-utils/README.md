@@ -35,15 +35,15 @@ try {
 
 ## What you get
 
-|                     |                                                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| 🔍 **Guards**       | `isObjectLike`, `isRecord`, `isPlainObject`, `isError`, `isErrorLike`: the checks, named once.                  |
-| 🛡️ **Safe reads**   | Property reads, `in`, `Object.keys` and `instanceof` that survive throwing getters and proxy traps.             |
-| 🌱 **Environment**  | `isDevelopment` for output, `isNonProduction` for behaviour, `canUseDOM`, `prefersReducedMotion`.               |
-| ⚠️ **Dev warnings** | `createDevWarner`: a prefix, stable codes linked to docs, warn-once.                                            |
-| 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `escapeHtml`, `randomHex`.                                               |
-| ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings. |
-| 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                        |
+|                     |                                                                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 🔍 **Guards**       | `isObjectLike`, `isRecord`, `isPlainObject`, `isFiniteNumber`, `isError`, …: the checks, named once.             |
+| 🛡️ **Safe reads**   | Property reads, `in`, `Object.keys` and `instanceof` that survive throwing getters and proxy traps.              |
+| 🌱 **Environment**  | `isDevelopment` for output, `isNonProduction` for behaviour, `canUseDOM`, `prefersReducedMotion`.                |
+| ⚠️ **Dev warnings** | `createDevWarner`: a prefix, stable codes linked to docs, warn-once.                                             |
+| 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `sum`, `chunk`, `mapValues`, `escapeHtml`, `utf8ByteLength`, `randomHex`. |
+| ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings.  |
+| 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                         |
 
 ## Install
 
@@ -102,13 +102,15 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 
 **Guards**
 
-| Export                 | What it answers                                                                 |
-| ---------------------- | ------------------------------------------------------------------------------- |
-| `isObjectLike(value)`  | Any non-null object, arrays and class instances included.                       |
-| `isRecord(value)`      | A non-null, non-array object. Class instances pass.                             |
-| `isPlainObject(value)` | An object literal, `JSON.parse` result or `Object.create(null)` bag.            |
-| `isError(value)`       | A real `Error`, from this realm or another. `{ message }` alone does not count. |
-| `isErrorLike(value)`   | Any object whose `message` is a string. A throwing getter makes it `false`.     |
+| Export                        | What it answers                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `isObjectLike(value)`         | Any non-null object, arrays and class instances included.                       |
+| `isRecord(value)`             | A non-null, non-array object. Class instances pass.                             |
+| `isPlainObject(value)`        | An object literal, `JSON.parse` result or `Object.create(null)` bag.            |
+| `isFiniteNumber(value)`       | A number that is not NaN or an infinity, narrowed to `number`.                  |
+| `isNonNegativeInteger(value)` | A whole number from 0 to `Number.MAX_SAFE_INTEGER`: a count or an index.        |
+| `isError(value)`              | A real `Error`, from this realm or another. `{ message }` alone does not count. |
+| `isErrorLike(value)`          | Any object whose `message` is a string. A throwing getter makes it `false`.     |
 
 **Safe reads** — never let a getter, a proxy trap or `Symbol.hasInstance` throw
 
@@ -140,7 +142,11 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 | `shallowEqual(a, b)`                | `Object.is` for each own key. `{ a: undefined }` is not equal to `{ b: undefined }`.                                                 |
 | `deepFreeze(value)`                 | Freezes the value and everything reachable from it, Map and Set entries included. Skips typed arrays and DataViews, survives cycles. |
 | `clamp(value, min, max)`            | `value` kept within `[min, max]`. NaN stays NaN; a reversed range throws a `RangeError`.                                             |
+| `sum(values)`                       | The numbers of any iterable added up from 0; `[]` is 0 and a NaN shows as NaN.                                                       |
+| `chunk(items, size)`                | `items` in runs of `size`, the last one shorter; a size that is not a positive integer throws a `RangeError`.                        |
+| `mapValues(record, transform)`      | A new object with each own string key's value passed through `transform(value, key)`.                                                |
 | `escapeHtml(value)`                 | `& < > " '` as entities, for HTML or XML text and quoted attributes. Not a sanitizer.                                                |
+| `utf8ByteLength(text)`              | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
 | `randomHex(bytes, { onFallback? })` | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
 
 **Development warnings**
