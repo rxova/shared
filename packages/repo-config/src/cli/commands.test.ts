@@ -112,6 +112,11 @@ describe("commands", () => {
     expect(await call("post-publish-smoke")).toBe(1);
   });
 
+  it("check-bundle asks for a build when the directory has no dist", async () => {
+    quiet();
+    expect(await call("check-bundle", [empty])).toBe(1);
+  });
+
   it("check-file-size needs a git repository", async () => {
     quiet();
     vi.spyOn(process, "cwd").mockReturnValue(empty);

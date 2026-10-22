@@ -106,6 +106,13 @@ export const commands = (): Record<string, CommandEntry> => ({
       return (argv) => packSmokeCommand(argv[0]);
     },
   },
+  "check-bundle": {
+    summary: "fail a built entry that reaches a banned global (repoConfig.bundle) [dir]",
+    load: async () => {
+      const { checkBundleCommand } = await import("@/bundle/check-bundle-command");
+      return (argv) => checkBundleCommand(argv[0]);
+    },
+  },
   "check-exports": {
     summary: "publint --strict and attw --pack on this package [--profile p]",
     load: async () => {

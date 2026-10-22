@@ -6,6 +6,7 @@ import { parseLlmsConfig } from "@/internal/config/parse-llms-config";
 import { parsePackSmokeConfig } from "@/internal/config/parse-pack-smoke-config";
 import { readSection } from "@/internal/config/read-section";
 import { readString } from "@/internal/config/read-string";
+import { readStrings } from "@/internal/config/read-strings";
 import type { PackageConfig } from "@/config/config.types";
 
 /**
@@ -16,7 +17,7 @@ import type { PackageConfig } from "@/config/config.types";
 export const parsePackageConfig = (raw: unknown): PackageConfig => {
   if (raw === undefined) return {};
   if (!isRecord(raw)) return failConfig("repoConfig", "an object");
-  assertOnlyKeys(raw, "repoConfig", ["packSmoke", "llms", "exports"]);
+  assertOnlyKeys(raw, "repoConfig", ["packSmoke", "bundle", "llms", "exports"]);
 
   const packSmoke = readSection(raw, "packSmoke", "repoConfig", ["load", "bins", "run"]);
   const llms = readSection(raw, "llms", "repoConfig", [
@@ -25,9 +26,16 @@ export const parsePackageConfig = (raw: unknown): PackageConfig => {
     "idPattern",
     "idsFrom",
   ]);
+  const bundle = readSection(raw, "bundle", "repoConfig", ["entries", "banned"]);
   const exports = readSection(raw, "exports", "repoConfig", ["profile"]);
   return compact<PackageConfig>({
     packSmoke: packSmoke && parsePackSmokeConfig(packSmoke, "repoConfig.packSmoke"),
+    bundle:
+      bundle &&
+      compact({
+        entries: readStrings(bundle, "entries", "repoConfig.bundle"),
+        banned: readStrings(bundle, "banned", "repoConfig.bundle"),
+      }),
     llms: llms && parseLlmsConfig(llms, "repoConfig.llms", { packageLevel: true }),
     exports: exports && compact({ profile: readString(exports, "profile", "repoConfig.exports") }),
   });
