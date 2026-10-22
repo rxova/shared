@@ -43,6 +43,7 @@ try {
 | 🌱 **Environment**  | `/env`: `isDevelopment` for output, `isNonProduction` for behaviour. `canUseDOM` and `prefersReducedMotion` stay in core. |
 | ⚠️ **Dev warnings** | `/env`: `createDevWarner`, a prefix, stable codes linked to docs, warn-once.                                              |
 | 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `sum`, `chunk`, `mapValues`, `escapeHtml`, `utf8ByteLength`, `randomHex`.          |
+| 🎲 **Random**       | `randomBelow` and `shuffle`, unbiased, plus `seededRandom` and `hashString` for orders that must come back.               |
 | 🧾 **JSON**         | `stableStringify` and `jsonEqual`: sorted keys, so a fingerprint survives a different writer.                             |
 | ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings.           |
 | 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                                  |
@@ -139,21 +140,25 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 
 **Values**
 
-| Export                              | What it does                                                                                                                         |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `shallowEqual(a, b)`                | `Object.is` for each own key. `{ a: undefined }` is not equal to `{ b: undefined }`.                                                 |
-| `deepFreeze(value)`                 | Freezes the value and everything reachable from it, Map and Set entries included. Skips typed arrays and DataViews, survives cycles. |
-| `clamp(value, min, max)`            | `value` kept within `[min, max]`. NaN stays NaN; a reversed range throws a `RangeError`.                                             |
-| `sum(values)`                       | The numbers of any iterable added up from 0; `[]` is 0 and a NaN shows as NaN.                                                       |
-| `chunk(items, size)`                | `items` in runs of `size`, the last one shorter; a size that is not a positive integer throws a `RangeError`.                        |
-| `mapValues(record, transform)`      | A new object with each own string key's value passed through `transform(value, key)`.                                                |
-| `stableStringify(value)`            | `JSON.stringify` with every object's keys sorted, for comparing, hashing or storing a document.                                      |
-| `jsonEqual(a, b)`                   | Whether two values are the same JSON document, whatever order their keys were written in.                                            |
-| `escapeHtml(value)`                 | `& < > " '` as entities, for HTML or XML text and quoted attributes. Not a sanitizer.                                                |
-| `utf8ByteLength(text)`              | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
-| `randomHex(bytes, { onFallback? })` | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
+| Export                                | What it does                                                                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `shallowEqual(a, b)`                  | `Object.is` for each own key. `{ a: undefined }` is not equal to `{ b: undefined }`.                                                 |
+| `deepFreeze(value)`                   | Freezes the value and everything reachable from it, Map and Set entries included. Skips typed arrays and DataViews, survives cycles. |
+| `clamp(value, min, max)`              | `value` kept within `[min, max]`. NaN stays NaN; a reversed range throws a `RangeError`.                                             |
+| `sum(values)`                         | The numbers of any iterable added up from 0; `[]` is 0 and a NaN shows as NaN.                                                       |
+| `chunk(items, size)`                  | `items` in runs of `size`, the last one shorter; a size that is not a positive integer throws a `RangeError`.                        |
+| `mapValues(record, transform)`        | A new object with each own string key's value passed through `transform(value, key)`.                                                |
+| `stableStringify(value)`              | `JSON.stringify` with every object's keys sorted, for comparing, hashing or storing a document.                                      |
+| `jsonEqual(a, b)`                     | Whether two values are the same JSON document, whatever order their keys were written in.                                            |
+| `escapeHtml(value)`                   | `& < > " '` as entities, for HTML or XML text and quoted attributes. Not a sanitizer.                                                |
+| `utf8ByteLength(text)`                | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
+| `randomHex(bytes, { onFallback? })`   | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
+| `randomBelow(bound, { onFallback? })` | A whole number in `[0, bound)`, drawn without bias by rejection sampling; same `Math.random` fallback.                               |
+| `shuffle(items, below?)`              | A new array in random order, by Fisher-Yates; `below` defaults to `randomBelow`.                                                     |
+| `seededRandom(seed)`                  | A mulberry32 generator: the same `[0, 1)` sequence every time for the same seed. Not unpredictable.                                  |
+| `hashString(text)`                    | FNV-1a as an unsigned 32-bit number, for a seed or a bucket. Not cryptographic.                                                      |
 
-Types: `ReadResult`, `ReadArrayOptions`, `RandomHexOptions`.
+Types: `ReadResult`, `ReadArrayOptions`, `RandomHexOptions`, `RandomBelowOptions`, `Below`.
 
 ## `@rxova/ts-utils/env`
 
@@ -218,6 +223,13 @@ Types: `UseDevWarnerOptions`.
   `rxova-repo-config check-bundle` fails the build if one of them ever reaches `dist/index.js`
   again. Import the main entry from a service worker, an edge function or any chunk a bundler
   refuses to give Node builtins to; reach for `/env` where there is a `process` to read.
+- **Seeds are stored data, so two of these never change.** `seededRandom`'s sequence and
+  `hashString`'s number are part of the API: the same seed keeps giving the same order across
+  minor releases. Neither is unpredictable — `seededRandom` leaks its 32-bit state in its output
+  and `hashString` is not cryptographic — so use `randomBelow` or `randomHex` for ids and tokens.
+- **`randomBelow` rejects rather than folds.** `getRandomValues(…) % bound` favours the low
+  values unless `bound` divides 2³² exactly; the partial block is redrawn instead, which costs
+  well under one extra draw on average and is uniform for every bound.
 - **`stableStringify` is `JSON.stringify` with sorted keys, and nothing else.** `toJSON` runs
   first, so a `Date` is already its ISO string; `undefined`, functions and symbols are dropped
   from objects and become `null` in arrays; a cycle throws a `TypeError`. Keys sort by UTF-16 code
