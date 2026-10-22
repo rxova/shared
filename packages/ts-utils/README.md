@@ -43,6 +43,7 @@ try {
 | 🌱 **Environment**  | `/env`: `isDevelopment` for output, `isNonProduction` for behaviour. `canUseDOM` and `prefersReducedMotion` stay in core. |
 | ⚠️ **Dev warnings** | `/env`: `createDevWarner`, a prefix, stable codes linked to docs, warn-once.                                              |
 | 🧮 **Values**       | `shallowEqual`, `deepFreeze`, `clamp`, `sum`, `chunk`, `mapValues`, `escapeHtml`, `utf8ByteLength`, `randomHex`.          |
+| 🧾 **JSON**         | `stableStringify` and `jsonEqual`: sorted keys, so a fingerprint survives a different writer.                             |
 | ⚛️ **React**        | `/react`: an isomorphic layout effect, latest-value and merged refs, a media query hook, per-instance warnings.           |
 | 📦 **Zero cost**    | No dependencies, `sideEffects: false`, ESM: what you do not import is not in the bundle.                                  |
 
@@ -145,6 +146,8 @@ export const Panel = ({ ref }: { ref?: Ref<HTMLDivElement> }) => {
 | `sum(values)`                       | The numbers of any iterable added up from 0; `[]` is 0 and a NaN shows as NaN.                                                       |
 | `chunk(items, size)`                | `items` in runs of `size`, the last one shorter; a size that is not a positive integer throws a `RangeError`.                        |
 | `mapValues(record, transform)`      | A new object with each own string key's value passed through `transform(value, key)`.                                                |
+| `stableStringify(value)`            | `JSON.stringify` with every object's keys sorted, for comparing, hashing or storing a document.                                      |
+| `jsonEqual(a, b)`                   | Whether two values are the same JSON document, whatever order their keys were written in.                                            |
 | `escapeHtml(value)`                 | `& < > " '` as entities, for HTML or XML text and quoted attributes. Not a sanitizer.                                                |
 | `utf8ByteLength(text)`              | The UTF-8 size of `text`, as `TextEncoder` counts it, without encoding a copy.                                                       |
 | `randomHex(bytes, { onFallback? })` | `2 * bytes` lowercase hex digits from `crypto.getRandomValues`; `Math.random` fallback, reported once through `onFallback`.          |
@@ -214,6 +217,11 @@ Types: `UseDevWarnerOptions`.
   `rxova-repo-config check-bundle` fails the build if one of them ever reaches `dist/index.js`
   again. Import the main entry from a service worker, an edge function or any chunk a bundler
   refuses to give Node builtins to; reach for `/env` where there is a `process` to read.
+- **`stableStringify` is `JSON.stringify` with sorted keys, and nothing else.** `toJSON` runs
+  first, so a `Date` is already its ISO string; `undefined`, functions and symbols are dropped
+  from objects and become `null` in arrays; a cycle throws a `TypeError`. Keys sort by UTF-16 code
+  unit, the order RFC 8785 specifies, so a hash is readable from another language — though
+  Postgres `jsonb` orders keys its own way and will not agree.
 - **`isRecord` rejects arrays.** Code that meant "any object" should use `isObjectLike`; code that
   must reject a `Date` or a `Map` should use `isPlainObject`.
 - **Two development checks.** `isDevelopment` is permissive (an unset `NODE_ENV` is development),

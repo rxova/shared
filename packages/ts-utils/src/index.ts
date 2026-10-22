@@ -24,6 +24,8 @@ export { mapValues } from "@/object/map-values";
 export { isErrorLike } from "@/errors/is-error-like";
 export { randomHex } from "@/random/random-hex";
 export type { RandomHexOptions } from "@/random/random-hex.types";
+export { stableStringify } from "@/json/stable-stringify";
+export { jsonEqual } from "@/json/json-equal";
 export { escapeHtml } from "@/string/escape-html";
 export { utf8ByteLength } from "@/string/utf8-byte-length";
 export { prefersReducedMotion } from "@/dom/prefers-reduced-motion";
