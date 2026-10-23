@@ -41,6 +41,24 @@ on:
         type: string
         required: false
         default: pnpm exec rxova-repo-config
+      playwright:
+        description: >-
+          Install the Playwright browsers before the build. Needed when a build or typecheck step
+          reaches a browser — a docs site that renders mermaid diagrams at build time through
+          rehype-mermaid does, even when the docs build itself is filtered out, because `astro
+          check` depends on `astro sync`. Without this the job passes only while Turbo is replaying
+          a cached `sync`, and fails the first time anything invalidates that cache.
+        type: boolean
+        required: false
+        default: false
+      playwright-browsers:
+        description: >-
+          Space-separated browser list for the install above, such as "chromium" when the build
+          only renders diagrams. Empty installs every browser Playwright ships, which this job
+          rarely needs.
+        type: string
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -57,6 +75,10 @@ jobs:
           node-version: ${{ inputs.node-version }}
       - uses: rxova/shared/actions/turbo-cache@main
       - run: pnpm install --frozen-lockfile
+      - uses: rxova/shared/actions/setup-playwright@main
+        if: inputs.playwright
+        with:
+          browsers: ${{ inputs.playwright-browsers }}
       - name: Lint
         run: pnpm lint
       - name: Check formatting
