@@ -82,6 +82,28 @@
       platformAutomerge: true,
     },
     {
+      // Below 1.0.0 a minor is a major: semver puts no compatibility promise on
+      // the minor of a 0.x version, so `0.2.x` to `0.3.0` is free to remove
+      // exports. Renovate still classifies it as `minor`, so the rule above
+      // would group it with the patches and merge it on green — and green is no
+      // defence, because the break lands in the consumer, not here.
+      //
+      // @rxova/ts-utils 0.3.0 is the case this was written for: it moved
+      // `isDevelopment`, `isNonProduction` and `createDevWarner` off the main
+      // entry to `@rxova/ts-utils/env` (deliberately — a free `process` in the
+      // main entry made Next.js 16 resolve `node:process` and fail any service
+      // worker or edge chunk that imported anything from the package). The
+      // migration was one changelog line, and it broke the build of two
+      // repositories that had done nothing but take a grouped "non-major" bump.
+      //
+      // So a 0.x minor is held for approval like a major and never automerged.
+      // Patches of a 0.x still flow through the rule above.
+      matchCurrentVersion: "<1.0.0",
+      matchUpdateTypes: ["minor"],
+      automerge: false,
+      dependencyDashboardApproval: true,
+    },
+    {
       // Monthly lockfile maintenance follows the same path once CI is green.
       matchUpdateTypes: ["lockFileMaintenance"],
       automerge: true,
